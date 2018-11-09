@@ -50,7 +50,7 @@ class NYAddressor
   end
 
   def hash
-    PagesHelper.encode(construct, 24)
+    Digest::SHA256.hexdigest(construct)[0..23]
   end
 
   def eq(parsed_address, display = false)
