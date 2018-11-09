@@ -1,10 +1,10 @@
 require 'minitest/autorun'
-load 'lib/addressor.rb'
+load 'lib/ny-addressor.rb'
 
 class NYAddressorTest < MiniTest::Test
   def eq(str1, str2)
     address = NYAddressor.new(str1)
-    address.eq(NYAddressor.new(str2).parse)
+    address.eq(NYAddressor.new(str2).parse, true)
   end
 
   def test_simple_equality
@@ -26,6 +26,14 @@ class NYAddressorTest < MiniTest::Test
 
   def test_prefix_suffix
     assert eq( "1600 North Pennsylvania Ave, Washington, DC, 20500",  "1600 Pennsylvania Ave N, Washington, DC, 20500")
+  end
+
+  def test_country
+    assert eq( "1600 North Pennsylvania Ave, Washington, DC, 20500, United States",  "1600 Pennsylvania Ave N, Washington, DC, 20500")
+  end
+
+  def test_cross_street
+    assert eq( "1600 North Pennsylvania (at 16th) Ave, Washington, DC, 20500",  "1600 Pennsylvania Ave N, Washington, DC, 20500")
   end
 
 end

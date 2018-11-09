@@ -8,7 +8,7 @@ class NYAddressor
   end
 
   def parse(standardize = true)
-    address = StreetAddress::US.parse(remove_periods(@str))
+    address = StreetAddress::US.parse(scrub(@str))
     if standardize
       address.street&.downcase!
       address.street = ordinalize_street(address.street)
@@ -53,7 +53,8 @@ class NYAddressor
     PagesHelper.encode(construct, 24)
   end
 
-  def eq(parsed_address)
+  def eq(parsed_address, display = false)
+    # for displaying errors (display ? puts(parsed_address, @parsed) : false)
     return false if @parsed.number != parsed_address.number
     return false if @parsed.postal_code != parsed_address.postal_code
     return false if @parsed.street != parsed_address.street
@@ -71,6 +72,26 @@ class NYAddressor
 
   def remove_periods(str)
     str.gsub('.','')
+  end
+
+  def remove_country(str)
+    if ['0','1','2','3','4','5','6','7','8','9'].include?(str[-1])
+      str
+    else
+      str.split(',')[0..-2].join(',')
+    end
+  end
+
+  def remove_cross_street(str)
+    str.gsub(/\([^\)]+\)/,'')
+  end
+
+  def remove_many_spaces(str)
+    str.gsub(/[ \t]+/,' ')
+  end
+
+  def scrub(str)
+    remove_many_spaces(remove_cross_street(remove_periods(remove_country(str))))
   end
 
 end
