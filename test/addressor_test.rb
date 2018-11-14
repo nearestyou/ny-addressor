@@ -36,4 +36,12 @@ class NYAddressorTest < MiniTest::Test
     assert eq( "1600 North Pennsylvania (at 16th) Ave, Washington, DC, 20500",  "1600 Pennsylvania Ave N, Washington, DC, 20500")
   end
 
+  def test_no_prezip_comma
+    assert eq( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC, 20500")
+  end
+
+  def test_double_entry
+    assert eq( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500, Washington, DC 20500")
+  end
+
 end

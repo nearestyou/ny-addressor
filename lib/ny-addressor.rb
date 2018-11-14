@@ -90,8 +90,22 @@ class NYAddressor
     str.gsub(/[ \t]+/,' ')
   end
 
+  def remove_duplicate_entries(str)
+    str.split(',').map{|element| element.strip}.uniq.join(', ')
+  end
+
   def scrub(str)
-    remove_many_spaces(remove_cross_street(remove_periods(remove_country(str))))
+    remove_many_spaces(
+      remove_cross_street(
+        remove_duplicate_entries(
+          remove_periods(
+            remove_country(
+              str
+            )
+          )
+        )
+      )
+    )
   end
 
 end
