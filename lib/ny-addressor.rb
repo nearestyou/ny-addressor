@@ -64,6 +64,14 @@ class NYAddressor
     return true
   end
 
+  def comp(parsed_address)
+    sims = 0
+    sims += 1 if @parsed.number == parsed_address.number
+    sims += 1 if @parsed.street == parsed_address.street
+    sims += 1 if @parsed.postal_code == parsed_address.postal_code
+    sims
+  end
+
   def ordinalize_street(street)
     {
       'first' => '1st', 'second' => '2nd', 'third' => '3rd', 'fourth' => '4th', 'fifth' => '5th', 'sixth' => '6th', 'seventh' => '7th', 'eighth' => '8th', 'ninth' => '9th', 'tenth' => '10th', 'eleventh' => '11th', 'twelfth' => '12th'
