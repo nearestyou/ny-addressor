@@ -28,6 +28,10 @@ class NYAddressor
     end
   end
 
+  def parsed
+    @parsed
+  end
+
   def city
     @parsed.city
   end
@@ -72,7 +76,8 @@ class NYAddressor
   end
 
   def comp(parsed_address)
-    return nil if @parsed.nil?
+    return 0 if @parsed.nil?
+    return 0 if parsed_address.nil?
     sims = 0
     sims += 1 if @parsed.number == parsed_address.number
     sims += 1 if @parsed.street == parsed_address.street
