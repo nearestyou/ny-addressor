@@ -8,20 +8,24 @@ class NYAddressor
   end
 
   def parse(standardize = true)
-    address = StreetAddress::US.parse(scrub(@str))
-    if standardize
-      address.street&.downcase!
-      address.street = ordinalize_street(address.street)
-      address.street_type&.downcase!
-      address.unit&.downcase!
-      address.unit_prefix&.downcase!
-      address.suffix&.downcase!
-      address.prefix&.downcase!
-      address.suffix ||= address.prefix
-      address.city&.downcase!
-      address.state&.downcase!
+    begin
+      address = StreetAddress::US.parse(scrub(@str))
+      if standardize
+        address.street&.downcase!
+        address.street = ordinalize_street(address.street)
+        address.street_type&.downcase!
+        address.unit&.downcase!
+        address.unit_prefix&.downcase!
+        address.suffix&.downcase!
+        address.prefix&.downcase!
+        address.suffix ||= address.prefix
+        address.city&.downcase!
+        address.state&.downcase!
+      end
+      @parsed = address
+    rescue
+      @parsed = nil
     end
-    @parsed = address
   end
 
   def city
@@ -37,6 +41,7 @@ class NYAddressor
   end
 
   def construct(line_no = nil)
+    return nil if @parsed.nil?
     addr = ''
     if (line_no.nil? || line_no == 1)
       addr += "#{@parsed.number} #{@parsed.street&.capitalize} #{@parsed.street_type&.capitalize}"
@@ -50,10 +55,12 @@ class NYAddressor
   end
 
   def hash
+    return nil if @parsed.nil?
     Digest::SHA256.hexdigest(construct)[0..23]
   end
 
   def eq(parsed_address, display = false)
+    return nil if @parsed.nil?
     # for displaying errors (display ? puts(parsed_address, @parsed) : false)
     return false if @parsed.number != parsed_address.number
     return false if @parsed.postal_code != parsed_address.postal_code
@@ -65,6 +72,7 @@ class NYAddressor
   end
 
   def comp(parsed_address)
+    return nil if @parsed.nil?
     sims = 0
     sims += 1 if @parsed.number == parsed_address.number
     sims += 1 if @parsed.street == parsed_address.street

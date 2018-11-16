@@ -65,4 +65,12 @@ class NYAddressorTest < MiniTest::Test
     assert_equal comp( "1500 Bennsylvania Ave, Washington, DC 20400",  "1600 Pennsylvania Ave, Washington, DC 20500"), 0
   end
 
+  def test_error_parse
+    assert_nil NYAddressor.new('ghjkjhghjkjhghjkjhghjkjhghjk').parse
+  end
+
+  def test_error_hash
+    assert_nil NYAddressor.new('ghjkjhghjkjhghjkjhghjkjhghjk').hash
+  end
+
 end
