@@ -78,4 +78,17 @@ class NYAddressorTest < MiniTest::Test
     assert_nil NYAddressor.new('ghjkjhghjkjhghjkjhghjkjhghjk').hash
   end
 
+  def test_perfect_name_inclusion
+    assert_equal NYAddressor.string_inclusion('THE TAVERN BAR', 'The Tavernbar'), 1
+    assert_equal NYAddressor.string_inclusion('ASDF', 'The Tavernbar'), 0
+  end
+
+  def test_imperfect_name_inclusion
+    assert_equal NYAddressor.string_inclusion('THE TAVERN BEAR', 'The Tavernbar', true), 10.0/12
+    assert_equal NYAddressor.string_inclusion('THE TAVERN BEAR', 'The Tavernbar on 1st Ave', true), 10.0/13
+    assert_equal NYAddressor.string_inclusion('THE TAVORN BAR', 'The Tavernbar', true), 6.0/12
+    assert_equal NYAddressor.string_inclusion('Zoo', 'The Tavernbar', true), 0.0/3
+    assert_equal NYAddressor.string_inclusion('Zoe', 'The Tavernbar', true), 1.0/3
+  end
+
 end
