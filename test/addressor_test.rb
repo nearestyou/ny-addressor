@@ -53,6 +53,10 @@ class NYAddressorTest < MiniTest::Test
     assert eq( "1600 Pennsylvania Ave, Washington, DC",  "1600 Pennsylvania Ave, Washington, DC 99999")
   end
 
+  def test_missing_zip_with_comma
+    assert eq( "1600 Pennsylvania Ave, Washington, DC,",  "1600 Pennsylvania Ave, Washington, DC 99999")
+  end
+
   def test_missing_zip_with_country
     assert eq( "1600 Pennsylvania Ave, Washington, DC, USA",  "1600 Pennsylvania Ave, Washington, DC 99999, USA")
   end

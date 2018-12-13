@@ -121,6 +121,10 @@ class NYAddressor
     (str[-4..-1].gsub(/[0-9]/,'|') == '||||') ? str : (str + ' 99999')
   end
 
+  def remove_trailing_comma(str)
+    str[-1] == ',' ? str[0..-2] : str
+  end
+
   def scrub(str)
     remove_many_spaces(
       remove_cross_street(
@@ -128,7 +132,9 @@ class NYAddressor
           remove_periods(
             guarantee_zip(
               remove_country(
-                str
+                remove_trailing_comma(
+                  str
+                )
               )
             )
           )
