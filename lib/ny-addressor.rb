@@ -98,6 +98,8 @@ class NYAddressor
   def remove_country(str)
     if ['0','1','2','3','4','5','6','7','8','9'].include?(str[-1])
       str
+    elsif str.count(',') < 3 # in case ZIP is missing
+      str
     else
       str.split(',')[0..-2].join(',')
     end
@@ -115,13 +117,19 @@ class NYAddressor
     str.split(',').map{|element| element.strip}.uniq.join(', ')
   end
 
+  def guarantee_zip(str)
+    (str[-4..-1].gsub(/[0-9]/,'|') == '||||') ? str : (str + ' 99999')
+  end
+
   def scrub(str)
     remove_many_spaces(
       remove_cross_street(
         remove_duplicate_entries(
           remove_periods(
-            remove_country(
-              str
+            guarantee_zip(
+              remove_country(
+                str
+              )
             )
           )
         )

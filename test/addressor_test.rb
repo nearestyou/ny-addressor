@@ -49,6 +49,14 @@ class NYAddressorTest < MiniTest::Test
     assert eq( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500, Washington, DC 20500")
   end
 
+  def test_missing_zip
+    assert eq( "1600 Pennsylvania Ave, Washington, DC",  "1600 Pennsylvania Ave, Washington, DC 99999")
+  end
+
+  def test_missing_zip_with_country
+    assert eq( "1600 Pennsylvania Ave, Washington, DC, USA",  "1600 Pennsylvania Ave, Washington, DC 99999, USA")
+  end
+
   def test_great_match
     assert_equal comp( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 3
   end
