@@ -9,7 +9,7 @@ class NYAddressor
 
   def parse(standardize = true)
     begin
-      address = StreetAddress::US.parse(scrub(@str))
+      address = StreetAddress::US.parse(scrub_str(@str))
       if standardize
         address.street&.downcase!
         address.street = ordinalize_street(address.street)
@@ -125,22 +125,29 @@ class NYAddressor
     str[-1] == ',' ? str[0..-2] : str
   end
 
-  def scrub(str)
-    remove_many_spaces(
-      remove_cross_street(
-        remove_duplicate_entries(
-          remove_periods(
-            guarantee_zip(
-              remove_country(
-                remove_trailing_comma(
-                  str
-                )
-              )
-            )
-          )
-        )
-      )
-    )
+  def guarantee_prezip_comma(str)
+    (str[-8..-1].gsub(/[0-9]/,'|').gsub(/[a-zA-Z]/,'-') == '-- |||||') ? str[0..-7] + ',' + str[-6..-1] : str
+  end
+
+  def remove_numbers_from_city(str)
+    arr = str.split(',')
+    arr[-3] = arr[-3].gsub(/[0-9]/,'').strip
+    arr.join(',')
+  end
+
+  def scrub_str(str, functions = nil)
+    (functions || [ # The order of these is important!
+      :remove_trailing_comma,
+      :remove_country,
+      :remove_duplicate_entries,
+      :remove_periods,
+      :guarantee_zip,
+      :remove_cross_street,
+      :remove_many_spaces,
+      :guarantee_prezip_comma,
+      :remove_numbers_from_city
+    ]).each{|func| str = send(func, str)}
+    str
   end
 
   def self.string_inclusion(str1, str2, numeric_failure = false)

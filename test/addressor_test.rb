@@ -61,6 +61,10 @@ class NYAddressorTest < MiniTest::Test
     assert eq( "1600 Pennsylvania Ave, Washington, DC, USA",  "1600 Pennsylvania Ave, Washington, DC 99999, USA")
   end
 
+  def test_city_with_number
+    assert eq( "1600 Pennsylvania Ave, Washington 2, DC, 99999",  "1600 Pennsylvania Ave, Washington, DC 99999")
+  end
+
   def test_great_match
     assert_equal comp( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 3
   end
