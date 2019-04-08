@@ -9,7 +9,7 @@ class NYAddressor
 
   def parse(standardize = true)
     begin
-      address = StreetAddress::US.parse(scrub_str(@str))
+      address = StreetAddress::US.parse(scrub(@str))
       if standardize
         address.street&.downcase!
         address.street = ordinalize_street(address.street)
@@ -114,7 +114,7 @@ class NYAddressor
   end
 
   def remove_duplicate_entries(str)
-    str.split(',').map{|element| element.strip}.uniq.join(', ')
+    str.split(',').map(&:strip).uniq.join(', ')
   end
 
   def guarantee_zip(str)
@@ -126,7 +126,11 @@ class NYAddressor
   end
 
   def guarantee_prezip_comma(str)
-    (str[-8..-1].gsub(/[0-9]/,'|').gsub(/[a-zA-Z]/,'-') == '-- |||||') ? str[0..-7] + ',' + str[-6..-1] : str
+    (str[-8..-1].gsub(/[0-9]/,'|').gsub(/[a-zA-Z]/,'=') == '== |||||') ? str[0..-7] + ',' + str[-6..-1] : str
+  end
+
+  def guarantee_prestate_comma(str)
+    (str[-11..-1].gsub(/[0-9]/,'|').gsub(/[a-zA-Z]/,'=') == ', ==, |||||') ? str : str[0..-11] + ',' + str[-10..-1]
   end
 
   def remove_numbers_from_city(str)
@@ -135,7 +139,7 @@ class NYAddressor
     arr.join(',')
   end
 
-  def scrub_str(str, functions = nil)
+  def scrub(str, functions = nil)
     (functions || [ # The order of these is important!
       :remove_trailing_comma,
       :remove_country,
@@ -145,9 +149,25 @@ class NYAddressor
       :remove_cross_street,
       :remove_many_spaces,
       :guarantee_prezip_comma,
-      :remove_numbers_from_city
+      :guarantee_prestate_comma,
+      :remove_numbers_from_city,
+      :remove_duplicate_entries, # Yup, this has to be in here more than once.
+      :to_array_scrub_and_back
     ]).each{|func| str = send(func, str)}
     str
+  end
+
+  def remove_state_from_city(arr)
+    arr[-3] = arr[-3][0..-4] if arr[-3][-3..-1].downcase == " #{arr[-2].downcase}"
+    arr
+  end
+
+  def to_array_scrub_and_back(str, functions = nil)
+    arr = str.split(',').map(&:strip)
+    (functions || [ # The order of these is important!
+      :remove_state_from_city,
+    ]).each{|func| arr = send(func, arr)}
+    arr.join(',')
   end
 
   def self.string_inclusion(str1, str2, numeric_failure = false)
@@ -180,5 +200,58 @@ class NYAddressor
       end
     end
   end
+
+  STATES ||= {
+    "Alabama" => "AL",
+    "Alaska" => "AK",
+    "Arizona" => "AZ",
+    "Arkansas" => "AR",
+    "California" => "CA",
+    "Colorado" => "CO",
+    "Connecticut" => "CT",
+    "Delaware" => "DE",
+    "Florida" => "FL",
+    "Georgia" => "GA",
+    "Hawaii" => "HI",
+    "Idaho" => "ID",
+    "Illinois" => "IL",
+    "Indiana" => "IN",
+    "Iowa" => "IA",
+    "Kansas" => "KS",
+    "Kentucky" => "KY",
+    "Louisiana" => "LA",
+    "Maine" => "ME",
+    "Maryland" => "MD",
+    "Massachusetts" => "MA",
+    "Michigan" => "MI",
+    "Minnesota" => "MN",
+    "Mississippi" => "MS",
+    "Missouri" => "MO",
+    "Montana" => "MT",
+    "Nebraska" => "NE",
+    "Nevada" => "NV",
+    "New Hampshire" => "NH",
+    "New Jersey" => "NJ",
+    "New Mexico" => "NM",
+    "New York" => "NY",
+    "North Carolina" => "NC",
+    "North Dakota" => "ND",
+    "Ohio" => "OH",
+    "Oklahoma" => "OK",
+    "Oregon" => "OR",
+    "Pennsylvania" => "PA",
+    "Rhode Island" => "RI",
+    "South Carolina" => "SC",
+    "South Dakota" => "SD",
+    "Tennessee" => "TN",
+    "Texas" => "TX",
+    "Utah" => "UT",
+    "Vermont" => "VT",
+    "Virginia" => "VA",
+    "Washington" => "WA",
+    "West Virginia" => "WV",
+    "Wisconsin" => "WI",
+    "Wyoming" => "WY"
+  }
 
 end

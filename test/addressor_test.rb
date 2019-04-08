@@ -47,10 +47,13 @@ class NYAddressorTest < MiniTest::Test
 
   def test_double_entry
     assert eq( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500, Washington, DC 20500")
+    assert eq( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington DC, DC 20500")
+    assert eq( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC, DC 20500")
   end
 
   def test_missing_zip
     assert eq( "1600 Pennsylvania Ave, Washington, DC",  "1600 Pennsylvania Ave, Washington, DC 99999")
+    assert eq( "1600 Pennsylvania Ave, Washington DC",  "1600 Pennsylvania Ave, Washington, DC 99999")
   end
 
   def test_missing_zip_with_comma
