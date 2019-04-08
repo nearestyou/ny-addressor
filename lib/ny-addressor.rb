@@ -1,4 +1,5 @@
 require 'street_address'
+require 'digest'
 
 class NYAddressor
 
@@ -49,11 +50,11 @@ class NYAddressor
     addr = ''
     if (line_no.nil? || line_no == 1)
       addr += "#{@parsed.number} #{@parsed.street&.capitalize} #{@parsed.street_type&.capitalize}"
-      addr += ' ' + @parsed.suffix.upcase if @parsed.suffix.present?
-      addr += ', ' + @parsed.unit_prefix.capitalize + (@parsed.unit_prefix == '#' ? '' : ' ') + @parsed.unit.capitalize if @parsed.unit.present? 
+      addr += ' ' + @parsed.suffix.upcase unless @parsed.suffix.nil?
+      addr += ', ' + @parsed.unit_prefix.capitalize + (@parsed.unit_prefix == '#' ? '' : ' ') + @parsed.unit.capitalize unless @parsed.unit.nil? 
     end
     if (line_no.nil? || line_no == 2)
-      addr += ", #{@parsed.city.capitalize}, #{@parsed.state.upcase} #{@parsed.postal_code}#{'-' if @parsed.postal_code_ext.present?}#{@parsed.postal_code_ext}"
+      addr += ", #{@parsed.city.capitalize}, #{@parsed.state.upcase} #{@parsed.postal_code}"
     end
     addr
   end
@@ -61,6 +62,11 @@ class NYAddressor
   def hash
     return nil if @parsed.nil?
     Digest::SHA256.hexdigest(construct)[0..23]
+  end
+
+  def hash99999 # for searching by missing/erroneous ZIP
+    return nil if @parsed.nil?
+    Digest::SHA256.hexdigest(construct[0..-6] + "99999")[0..31]
   end
 
   def eq(parsed_address, display = false)
