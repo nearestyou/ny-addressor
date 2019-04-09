@@ -66,7 +66,7 @@ class NYAddressor
 
   def hash99999 # for searching by missing/erroneous ZIP
     return nil if @parsed.nil?
-    Digest::SHA256.hexdigest(construct[0..-6] + "99999")[0..31]
+    Digest::SHA256.hexdigest(construct[0..-6] + "99999")[0..23]
   end
 
   def eq(parsed_address, display = false)
