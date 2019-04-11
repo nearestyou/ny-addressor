@@ -17,9 +17,10 @@ class NYAddressor
         address.street_type&.downcase!
         address.unit&.downcase!
         address.unit_prefix&.downcase!
-        address.suffix&.downcase!
-        address.prefix&.downcase!
-        address.suffix ||= address.prefix
+        address.suffix&.downcase!           # Don't tell me this isn't glorious
+        address.prefix&.downcase!           #
+        address.suffix ||= address.prefix   #
+        address.prefix ||= address.suffix   #
         address.city&.downcase!
         address.state&.downcase!
       end
@@ -45,12 +46,12 @@ class NYAddressor
     @parsed.postal_code
   end
 
-  def construct(line_no = nil)
+  def construct(line_no = nil, fix = :suffix)
     return nil if @parsed.nil?
     addr = ''
     if (line_no.nil? || line_no == 1)
-      addr += "#{@parsed.number} #{@parsed.street&.capitalize} #{@parsed.street_type&.capitalize}"
-      addr += ' ' + @parsed.suffix.upcase unless @parsed.suffix.nil?
+      addr += "#{@parsed.number} #{(fix == :prefix and @parsed.suffix) ? @parsed.suffix.upcase + ' ' : ''}#{@parsed.street&.capitalize} #{@parsed.street_type&.capitalize}"
+      addr += ' ' + @parsed.suffix.upcase unless (@parsed.suffix.nil? or fix == :prefix)
       addr += ', ' + @parsed.unit_prefix.capitalize + (@parsed.unit_prefix == '#' ? '' : ' ') + @parsed.unit.capitalize unless @parsed.unit.nil? 
     end
     if (line_no.nil? || line_no == 2)

@@ -33,6 +33,10 @@ class NYAddressorTest < MiniTest::Test
     assert eq( "1600 North Pennsylvania Ave, Washington, DC, 20500",  "1600 Pennsylvania Ave N, Washington, DC, 20500")
   end
 
+  def test_prefix_only
+    assert NYAddressor.new("1600 North Pennsylvania Ave, Washington, DC, 20500").construct(nil, :prefix) == NYAddressor.new("1600 N Pennsylvania Ave, Washington, DC, 20500").construct(nil, :prefix)
+  end
+
   def test_country
     assert eq( "1600 North Pennsylvania Ave, Washington, DC, 20500, United States",  "1600 Pennsylvania Ave N, Washington, DC, 20500")
   end
