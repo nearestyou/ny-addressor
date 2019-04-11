@@ -46,7 +46,7 @@ class NYAddressor
     @parsed.postal_code
   end
 
-  def construct(line_no = nil, fix = :suffix)
+  def construct(line_no = nil, fix = :suffix, include99999 = true)
     return nil if @parsed.nil?
     addr = ''
     if (line_no.nil? || line_no == 1)
@@ -55,7 +55,7 @@ class NYAddressor
       addr += ', ' + @parsed.unit_prefix.capitalize + (@parsed.unit_prefix == '#' ? '' : ' ') + @parsed.unit.capitalize unless @parsed.unit.nil? 
     end
     if (line_no.nil? || line_no == 2)
-      addr += ", #{@parsed.city.capitalize}, #{@parsed.state.upcase} #{@parsed.postal_code}"
+      addr += ", #{@parsed.city.capitalize}, #{@parsed.state.upcase} #{@parsed.postal_code if (@parsed.postal_code.to_s != '99999' or include99999)}"
     end
     addr
   end
