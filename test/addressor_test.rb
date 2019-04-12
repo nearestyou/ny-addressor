@@ -114,4 +114,9 @@ class NYAddressorTest < MiniTest::Test
     assert_equal NYAddressor.string_inclusion('Zoe', 'The Tavernbar', true), 1.0/3
   end
 
+  def test_canadian_zip
+    zip = 'H0H 0H0'
+    assert NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip).zip == zip
+  end
+
 end

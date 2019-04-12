@@ -4,13 +4,74 @@ require 'digest'
 class NYAddressor
 
   def initialize(str)
+    @orig = str # to keep an original
     @str = str
+    @bus = {}
+    set_locale
+    pre_scrub_logic
+    scrub
+    post_scrub_logic
     parse
+    undo_logic
+  end
+
+  def str
+    @str
+  end
+
+  def typify
+    @typified = @str.gsub(/[0-9]/,'|').gsub(/[a-zA-Z]/,'=')
+  end
+
+  def set_locale
+    typify
+    @locale = if @typified.include?('=|= |=|')
+      :ca 
+    else
+      :us
+    end
+  end
+
+  def pre_scrub_logic
+    case @locale
+    when :ca
+      start = @typified.index('=|= |=|')
+      @bus[:postal_code] = @str.slice(start..(start + 6))
+      parts = @str.split(@bus[:postal_code])
+      @str = parts.first + '99999' + (parts.length == 2 ? parts.last : '')
+    end
+  end
+
+  def post_scrub_logic
+    case @locale
+    when :ca
+      arr = @str.split(',')
+      @bus[:prov] = arr[-2]
+      arr[-2] = 'MN'
+      @str = arr.join(',')
+    end
+  end
+
+  def undo_logic
+    case @locale
+    when :ca
+      @parsed.state = @bus[:prov].downcase
+      @parsed.postal_code = @bus[:postal_code]
+    end
   end
 
   def parse(standardize = true)
+    case @locale
+    when :ca
+      parse_us(standardize)
+    else
+      parse_us(standardize)
+    end
+  end
+
+  def parse_us(standardize = true)
     begin
-      address = StreetAddress::US.parse(scrub(@str))
+      address = StreetAddress::US.parse(@str)
       if standardize
         address.street&.downcase!
         address.street = ordinalize_street(address.street)
@@ -98,55 +159,53 @@ class NYAddressor
     }[street] || street
   end
 
-  def remove_periods(str)
-    str.gsub('.','')
+  def remove_periods
+    @str = @str.gsub('.','')
   end
 
-  def remove_country(str)
-    if ['0','1','2','3','4','5','6','7','8','9'].include?(str[-1])
-      str
-    elsif str.count(',') < 3 # in case ZIP is missing
-      str
+  def remove_country
+    if ['0','1','2','3','4','5','6','7','8','9'].include?(@str[-1])
+    elsif @str.count(',') < 3 # in case ZIP is missing
     else
-      str.split(',')[0..-2].join(',')
+      @str = @str.split(',')[0..-2].join(',')
     end
   end
 
-  def remove_cross_street(str)
-    str.gsub(/\([^\)]+\)/,'')
+  def remove_cross_street
+    @str = @str.gsub(/\([^\)]+\)/,'')
   end
 
-  def remove_many_spaces(str)
-    str.gsub(/[ \t]+/,' ')
+  def remove_many_spaces
+    @str = @str.gsub(/[ \t]+/,' ')
   end
 
-  def remove_duplicate_entries(str)
-    str.split(',').map(&:strip).uniq.join(', ')
+  def remove_duplicate_entries
+    @str = @str.split(',').map(&:strip).uniq.join(', ')
   end
 
-  def guarantee_zip(str)
-    (str[-4..-1].gsub(/[0-9]/,'|') == '||||') ? str : (str + ' 99999')
+  def guarantee_zip
+    @str = @str + ' 99999' unless @typified[-4..-1] == '||||'
   end
 
-  def remove_trailing_comma(str)
-    str[-1] == ',' ? str[0..-2] : str
+  def remove_trailing_comma
+    @str = @str[0..-2] if @str[-1] == ','
   end
 
-  def guarantee_prezip_comma(str)
-    (str[-8..-1].gsub(/[0-9]/,'|').gsub(/[a-zA-Z]/,'=') == '== |||||') ? str[0..-7] + ',' + str[-6..-1] : str
+  def guarantee_prezip_comma
+    @str = @str[0..-7] + ',' + @str[-6..-1] if @typified[-8..-1] == '== |||||'
   end
 
-  def guarantee_prestate_comma(str)
-    (str[-11..-1].gsub(/[0-9]/,'|').gsub(/[a-zA-Z]/,'=') == ', ==, |||||') ? str : str[0..-11] + ',' + str[-10..-1]
+  def guarantee_prestate_comma
+    @str = @str[0..-11] + ',' + @str[-10..-1] unless @typified[-11..-1] == ', ==, |||||'
   end
 
-  def remove_numbers_from_city(str)
-    arr = str.split(',')
+  def remove_numbers_from_city
+    arr = @str.split(',')
     arr[-3] = arr[-3].gsub(/[0-9]/,'').strip
-    arr.join(',')
+    @str = arr.join(',')
   end
 
-  def scrub(str, functions = nil)
+  def scrub(functions = nil)
     (functions || [ # The order of these is important!
       :remove_trailing_comma,
       :remove_country,
@@ -160,8 +219,10 @@ class NYAddressor
       :remove_numbers_from_city,
       :remove_duplicate_entries, # Yup, this has to be in here more than once.
       :to_array_scrub_and_back
-    ]).each{|func| str = send(func, str)}
-    str
+    ]).each do |func|
+      send(func)
+      typify
+    end
   end
 
   def remove_state_from_city(arr)
@@ -169,12 +230,12 @@ class NYAddressor
     arr
   end
 
-  def to_array_scrub_and_back(str, functions = nil)
-    arr = str.split(',').map(&:strip)
+  def to_array_scrub_and_back(functions = nil)
+    arr = @str.split(',').map(&:strip)
     (functions || [ # The order of these is important!
       :remove_state_from_city,
     ]).each{|func| arr = send(func, arr)}
-    arr.join(',')
+    @str = arr.join(',')
   end
 
   def self.string_inclusion(str1, str2, numeric_failure = false)
@@ -208,6 +269,21 @@ class NYAddressor
     end
   end
 
+  CA_PROVINCES ||= {
+    "Ontario" => "ON",
+    "Quebec" => "QC",
+    "Nova Scotia" => "NS",
+    "New Brunswick" => "NB",
+    "Manitoba" => "MB",
+    "British Columbia" => "BC",
+    "Prince Edward Island" => "PE",
+    "Saskatchewan" => "SK",
+    "Alberta" => "AB",
+    "Newfoundland and Labrador" => "NL",
+    "Northwest Territories" => "NT",
+    "Yukon" => "YT",
+    "Nunavut" => "NU",
+  }
   STATES ||= {
     "Alabama" => "AL",
     "Alaska" => "AK",
