@@ -4,7 +4,7 @@ load 'lib/ny-addressor.rb'
 class NYAddressorTest < MiniTest::Test
   def eq(str1, str2)
     address = NYAddressor.new(str1)
-    address.eq(NYAddressor.new(str2).parse, true)
+    address.eq(NYAddressor.new(str2).parsed, true)
   end
 
   def comp(str1, str2)
@@ -47,6 +47,7 @@ class NYAddressorTest < MiniTest::Test
 
   def test_no_prezip_comma
     assert eq( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC, 20500")
+    assert eq( "1600 Pennsylvania Ave, Washington, DC,20500",  "1600 Pennsylvania Ave, Washington, DC, 20500")
   end
 
   def test_double_entry
@@ -122,6 +123,11 @@ class NYAddressorTest < MiniTest::Test
   def test_determine_state
     assert NYAddressor.determine_state('Minnesota') == 'MN'
     assert NYAddressor.determine_state('Ontario') == 'ON'
+  end
+
+  def test_full_state
+    assert eq( "1600 Pennsylvania Ave, Washington, Iowa, 20500",  "1600 Pennsylvania Ave, Washington, IA, 20500")
+    assert eq( "1600 Pennsylvania Ave, Washington, Manitoba, M3M 5T5",  "1600 Pennsylvania Ave, Washington, MB, M3M 5T5")
   end
 
 end

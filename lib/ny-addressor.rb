@@ -83,7 +83,9 @@ class NYAddressor
         address.suffix ||= address.prefix   #
         address.prefix ||= address.suffix   #
         address.city&.downcase!
+        address.state = @bus[:state] if @bus[:state]
         address.state&.downcase!
+        address.postal_code = @bus[:zip] if @bus[:zip]
       end
       @parsed = address
     rescue
@@ -191,8 +193,35 @@ class NYAddressor
     @str = @str[0..-2] if @str[-1] == ','
   end
 
+  def abbreviate_state
+    unless @str[-10] == ' ' # This is the prestate character
+      case @locale
+      when :us
+        state_list = US_STATES
+      when :ca
+        state_list = CA_PROVINCES
+      end
+      zipless_str = @str[0..-8].downcase
+      states = state_list.keys.select{|full_name| zipless_str.end_with?(full_name.downcase)}
+      if state = states.max_by{|state| state.length}
+        case @locale
+        when :us
+          @str = @str[0..(-8 - state.length)] + state_list[state] + @str[-7..-1] 
+        when :ca
+          @str = @str[0..(-8 - state.length)] + 'MN' + @str[-7..-1] 
+          @bus[:state] = state_list[state]
+        end
+      end
+    end
+  end
+
   def guarantee_prezip_comma
-    @str = @str[0..-7] + ',' + @str[-6..-1] if @typified[-8..-1] == '== |||||'
+    case @typified[-8..-1] 
+    when '== |||||'
+      @str = @str[0..-7] + ',' + @str[-6..-1] 
+    when '==,|||||'
+      @str = @str[0..-6] + ' ' + @str[-5..-1] 
+    end
   end
 
   def guarantee_prestate_comma
@@ -215,6 +244,7 @@ class NYAddressor
       :remove_cross_street,
       :remove_many_spaces,
       :guarantee_prezip_comma,
+      :abbreviate_state,
       :guarantee_prestate_comma,
       :remove_numbers_from_city,
       :remove_duplicate_entries, # Yup, this has to be in here more than once.
