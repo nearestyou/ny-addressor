@@ -269,6 +269,15 @@ class NYAddressor
     end
   end
 
+  def self.determine_state(state_name, zip = nil)
+    if zip
+    else
+      return US_STATES[state_name] if US_STATES[state_name]
+      return CA_PROVINCES[state_name] if CA_PROVINCES[state_name]
+      return 'ER'
+    end
+  end
+
   CA_PROVINCES ||= {
     "Ontario" => "ON",
     "Quebec" => "QC",
@@ -284,7 +293,7 @@ class NYAddressor
     "Yukon" => "YT",
     "Nunavut" => "NU",
   }
-  STATES ||= {
+  US_STATES ||= {
     "Alabama" => "AL",
     "Alaska" => "AK",
     "Arizona" => "AZ",

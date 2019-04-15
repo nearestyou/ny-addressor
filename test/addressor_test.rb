@@ -119,4 +119,9 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip).zip == zip
   end
 
+  def test_determine_state
+    assert NYAddressor.determine_state('Minnesota') == 'MN'
+    assert NYAddressor.determine_state('Ontario') == 'ON'
+  end
+
 end
