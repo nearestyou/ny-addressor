@@ -130,4 +130,9 @@ class NYAddressorTest < MiniTest::Test
     assert eq( "1600 Pennsylvania Ave, Washington, Manitoba, M3M 5T5",  "1600 Pennsylvania Ave, Washington, MB, M3M 5T5")
   end
 
+  def test_duplicate_entries
+    assert eq("611 E 30th Ave, Spokane, WA 99203, USA, Spokane, WA 99203, USA", "611 E 30th Ave, Spokane, WA, 99203")
+    assert eq("611 E 30th Ave, Spokane, WA 99203, USA, Spokane, WA 99203, United States", "611 E 30th Ave, Spokane, WA, 99203")
+  end
+
 end

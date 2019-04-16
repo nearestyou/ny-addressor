@@ -19,6 +19,10 @@ class NYAddressor
     @str
   end
 
+  def set_str(str)
+    @str = str
+  end
+
   def typify
     @typified = @str.gsub(/[0-9]/,'|').gsub(/[a-zA-Z]/,'=')
   end
@@ -166,11 +170,23 @@ class NYAddressor
   end
 
   def remove_country
-    if ['0','1','2','3','4','5','6','7','8','9'].include?(@str[-1])
-    elsif @str.count(',') < 3 # in case ZIP is missing
-    else
-      @str = @str.split(',')[0..-2].join(',')
+    splt = @str.split(',').map(&:strip)
+    splt_typ = @typified.split(',').map(&:strip)
+    if zip_ndx = splt_typ.index('|||||')
+      @str = splt[0..zip_ndx].join(',')
+    elsif zip_ndx = splt_typ.index('== |||||')
+      @str = splt[0..zip_ndx].join(',')
+    elsif st_ndx = splt_typ.index('==')
+      @str = splt[0..st_ndx].join(',')
     end
+    #if @str.count(',') >= 3 # in case ZIP is missing
+    #  splt = @str.split(',').map(&:strip)
+    #  splt_typ = @typified.split(',').map(&:strip)
+    #  splt = splt[0..-2] unless splt_typ[-1][-1] == '|'
+    #  @str = splt.join(',')
+    #  puts @str
+    #  #@str = @str.split(',')[0..-2].join(',') unless ['0','1','2','3','4','5','6','7','8','9'].include?(@str[-1])
+    #end
   end
 
   def remove_cross_street
@@ -225,20 +241,24 @@ class NYAddressor
   end
 
   def guarantee_prestate_comma
-    @str = @str[0..-11] + ',' + @str[-10..-1] unless @typified[-11..-1] == ', ==, |||||'
+    if @typified[-11..-1] == ', ==, |||||'
+    elsif @typified[-10..-1] == ',==, |||||'
+    elsif @typified[-11..-1] == '= ==, |||||'
+      @str = @str[0..-11] + ',' + @str[-10..-1] 
+    end
   end
 
   def remove_numbers_from_city
     arr = @str.split(',')
-    arr[-3] = arr[-3].gsub(/[0-9]/,'').strip
+    arr[-3] = arr[-3].gsub(/[0-9]/,'').strip if arr[-3]
     @str = arr.join(',')
   end
 
   def scrub(functions = nil)
     (functions || [ # The order of these is important!
       :remove_trailing_comma,
-      :remove_country,
       :remove_duplicate_entries,
+      :remove_country,
       :remove_periods,
       :guarantee_zip,
       :remove_cross_street,
@@ -255,8 +275,12 @@ class NYAddressor
     end
   end
 
+  def monitor
+    puts @str + @typified
+  end
+
   def remove_state_from_city(arr)
-    arr[-3] = arr[-3][0..-4] if arr[-3][-3..-1].downcase == " #{arr[-2].downcase}"
+    arr[-3] = arr[-3][0..-4] if arr[3] and arr[-3][-3..-1].downcase == " #{arr[-2].downcase}"
     arr
   end
 
