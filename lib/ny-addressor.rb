@@ -205,6 +205,21 @@ class NYAddressor
     @str = @str + ' 99999' unless @typified[-4..-1] == '||||'
   end
 
+  def numerify_zip
+    typ = @str.gsub(/[0-9Oo]/,'|')
+    determination = [typ,@typified].map{|metric| metric.split(',').map{|i| i.split(' ')}.flatten.count('|||||')}
+    if determination.first != determination.last
+      rev_typ = typ.reverse
+      rev_str = @str.reverse
+      ndx = rev_typ.index('|||||')
+      if ndx == 0
+        @str = (rev_str[0..4].gsub(/[Oo]/,'0') + rev_str[5..-1]).reverse
+      else
+        @str = (rev_str[0..(ndx - 1)] + rev_str[ndx..(ndx + 4)].gsub(/[Oo]/,'0') + rev_str[(ndx + 5)..-1]).reverse
+      end
+    end
+  end
+
   def remove_trailing_comma
     @str = @str[0..-2] if @str[-1] == ','
   end
@@ -258,6 +273,7 @@ class NYAddressor
     (functions || [ # The order of these is important!
       :remove_trailing_comma,
       :remove_duplicate_entries,
+      :numerify_zip,
       :remove_country,
       :remove_periods,
       :guarantee_zip,

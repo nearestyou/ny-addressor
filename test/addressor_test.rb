@@ -135,4 +135,10 @@ class NYAddressorTest < MiniTest::Test
     assert eq("611 E 30th Ave, Spokane, WA 99203, USA, Spokane, WA 99203, United States", "611 E 30th Ave, Spokane, WA, 99203")
   end
 
+  def test_ohs_in_zip
+    $print = true
+    assert eq( "1600 First Ave, Washington, DC, 20500",  "1600 First Ave, Washington, DC, 205Oo")
+    $print = false
+  end
+
 end

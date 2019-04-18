@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = "ny-addressor"
-  s.version = "0.0.19"
-  s.date = "2019-04-16"
+  s.version = "0.0.20"
+  s.date = "2019-04-18"
   s.summary = 'An extension of StreetAddress that standardizes addresses for comparison to other addresses'
   s.author = 'P Kirwin'
   s.email = 'peter@puzzlesandwich.com'
