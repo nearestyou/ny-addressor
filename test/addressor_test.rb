@@ -136,9 +136,23 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_ohs_in_zip
-    $print = true
     assert eq( "1600 First Ave, Washington, DC, 20500",  "1600 First Ave, Washington, DC, 205Oo")
-    $print = false
+  end
+
+  def test_empty_array_entries
+    assert eq( "1600 First Ave, Washington, DC, 20500",  "1600 First Ave,, Washington, DC, 20500")
+  end
+
+  def test_boulevard
+    assert eq( "13322 West Airport Boulevard, Sugar Land, TX 77478",  "13322 Airport Blvd W, Sugar Land, TX 77478")
+  end
+
+  def test_missing
+    assert NYAddressor.new(nil).hash.nil?
+  end
+
+  def test_double_comma
+    assert eq("602 21st r  NW, portland,, or 97209","602 21st r  NW, portland, or 97209")
   end
 
 end

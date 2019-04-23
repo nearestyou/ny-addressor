@@ -7,12 +7,16 @@ class NYAddressor
     @orig = str # to keep an original
     @str = str
     @bus = {}
-    set_locale
-    pre_scrub_logic
-    scrub
-    post_scrub_logic
-    parse
-    undo_logic
+    if str.nil?
+      @parsed = nil
+    else
+      set_locale
+      pre_scrub_logic
+      scrub
+      post_scrub_logic
+      parse
+      undo_logic
+    end
   end
 
   def str
@@ -220,8 +224,8 @@ class NYAddressor
     end
   end
 
-  def remove_trailing_comma
-    @str = @str[0..-2] if @str[-1] == ','
+  def remove_extra_commas
+    @str = @str.split(',').select{|i| !i.nil? and !i.empty?}.join(',')
   end
 
   def abbreviate_state
@@ -271,7 +275,7 @@ class NYAddressor
 
   def scrub(functions = nil)
     (functions || [ # The order of these is important!
-      :remove_trailing_comma,
+      :remove_extra_commas,
       :remove_duplicate_entries,
       :numerify_zip,
       :remove_country,
@@ -286,8 +290,12 @@ class NYAddressor
       :remove_duplicate_entries, # Yup, this has to be in here more than once.
       :to_array_scrub_and_back
     ]).each do |func|
-      send(func)
-      typify
+      begin
+        send(func)
+        typify
+      rescue Exception => e
+        puts e
+      end
     end
   end
 
