@@ -157,4 +157,8 @@ class NYAddressorTest < MiniTest::Test
     assert eq("602 21st r  NW, portland,, or 97209","602 21st r  NW, portland, or 97209")
   end
 
+  def test_unknown_errors
+    assert eq("1337 14th St NW (at Rhode Island Ave NW), Washington, D.C. 20005, United States","1337 14th St NW, Washington, DC, 20005")
+  end
+
 end

@@ -4,6 +4,7 @@ require 'digest'
 class NYAddressor
 
   def initialize(str)
+    @monitor = false
     @orig = str # to keep an original
     @str = str
     @bus = {}
@@ -19,8 +20,16 @@ class NYAddressor
     end
   end
 
+  def monitor(set_state = true)
+    @monitor = set_state
+  end
+
   def str
     @str
+  end
+
+  def orig
+    @orig
   end
 
   def set_str(str)
@@ -281,8 +290,8 @@ class NYAddressor
       :remove_extra_commas,
       :remove_duplicate_entries,
       :numerify_zip,
-      :remove_country,
       :remove_periods,
+      :remove_country,
       :guarantee_zip,
       :remove_cross_street,
       :remove_many_spaces,
@@ -296,18 +305,18 @@ class NYAddressor
       begin
         send(func)
         typify
-        if false
+        if @monitor
           puts func
           puts @typified
           puts @str
         end
       rescue Exception => e
-        puts e
+        puts "#{func}: #{@orig} - #{e}"
       end
     end
   end
 
-  def monitor
+  def show_state
     puts @str + @typified
   end
 
