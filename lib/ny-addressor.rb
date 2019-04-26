@@ -182,6 +182,9 @@ class NYAddressor
       @str = splt[0..zip_ndx].join(',')
     elsif st_ndx = splt_typ.index('==')
       @str = splt[0..st_ndx].join(',')
+    elsif possible_second_line = splt_typ.select{|el| el[-10..-1] == '= == |||||'}.last
+      psl_ndx =splt_typ.index(possible_second_line)
+      @str = splt[0..psl_ndx].join(',')
     end
     #if @str.count(',') >= 3 # in case ZIP is missing
     #  splt = @str.split(',').map(&:strip)
@@ -293,6 +296,11 @@ class NYAddressor
       begin
         send(func)
         typify
+        if false
+          puts func
+          puts @typified
+          puts @str
+        end
       rescue Exception => e
         puts e
       end
