@@ -240,6 +240,16 @@ class NYAddressor
     @str = @str.split(',').select{|i| !i.nil? and !i.empty?}.join(',')
   end
 
+  def remove_zip_extension
+    ['|||||-||||','|||||||||'].each do |pattern|
+      @typified.scan(pattern).count.times do |i|
+        ndx = @typified.index(pattern)
+        @str[ndx..(ndx + pattern.length)] = @str[ndx..(ndx + 4)]
+        typify
+      end
+    end
+  end
+
   def abbreviate_state
     unless @str[-10] == ' ' # This is the prestate character
       case @locale
@@ -288,6 +298,7 @@ class NYAddressor
   def scrub(functions = nil)
     (functions || [ # The order of these is important!
       :remove_extra_commas,
+      :remove_zip_extension,
       :remove_duplicate_entries,
       :numerify_zip,
       :remove_periods,

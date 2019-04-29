@@ -157,6 +157,11 @@ class NYAddressorTest < MiniTest::Test
     assert eq("602 21st r  NW, portland,, or 97209","602 21st r  NW, portland, or 97209")
   end
 
+  def test_zip_extension
+    assert eq( "13322 West Airport Boulevard, Sugar Land, TX 77478-9898",  "13322 Airport Blvd W, Sugar Land, TX 77478")
+    assert eq( "13322 West Airport Boulevard, Sugar Land, TX 774789898",  "13322 Airport Blvd W, Sugar Land, TX 77478")
+  end
+
   def test_unknown_errors
     assert eq("1337 14th St NW (at Rhode Island Ave NW), Washington, D.C. 20005, United States","1337 14th St NW, Washington, DC, 20005")
   end
