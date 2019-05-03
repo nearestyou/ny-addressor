@@ -166,4 +166,13 @@ class NYAddressorTest < MiniTest::Test
     assert eq("1337 14th St NW (at Rhode Island Ave NW), Washington, D.C. 20005, United States","1337 14th St NW, Washington, DC, 20005")
   end
 
+  def test_missing_unit_designation
+    assert eq("15355 24 Ave,700 (at Peninsula Village), Surrey BC V4A 2H9, Canada", "15355 24 Ave,#700 (at Peninsula Village), Surrey BC V4A 2H9, Canada")
+  end
+
+  def test_leading_unit_designations
+    assert eq("700-15355 24 Ave, Surrey BC V4A 2H9, Canada", "15355 24 Ave,#700, Surrey BC V4A 2H9, Canada")
+    assert eq("700/15355 24 Ave, Surrey BC V4A 2H9, Canada", "15355 24 Ave,#700, Surrey BC V4A 2H9, Canada")
+  end
+
 end

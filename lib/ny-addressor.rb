@@ -32,7 +32,7 @@ class NYAddressor
     @orig
   end
 
-  def set_str(str)
+  def reset_str(str = @orig)
     @str = str
   end
 
@@ -72,8 +72,10 @@ class NYAddressor
   def undo_logic
     case @locale
     when :ca
-      @parsed.state = @bus[:prov].downcase
-      @parsed.postal_code = @bus[:postal_code]
+      if @parsed
+        @parsed.state = @bus[:prov].downcase
+        @parsed.postal_code = @bus[:postal_code]
+      end
     end
   end
 
@@ -336,9 +338,31 @@ class NYAddressor
     arr
   end
 
+  def guarantee_second_line_unit_designator(arr)
+    if ['1','2','3','4','5','6','7','8','9','0'].include?(arr[1][0])
+      arr[1] = '#' + arr[1]
+    end
+    arr
+  end
+
+  def move_leading_unit_designator(arr)
+    if @locale == :ca
+      if arr[0].include?('-')
+        first_entry = arr[0].split('-')
+        arr = [first_entry.last, '#' + first_entry.first] + arr[1..-1]
+      elsif arr[0].include?('/')
+        first_entry = arr[0].split('/')
+        arr = [first_entry.last, '#' + first_entry.first] + arr[1..-1]
+      end
+    end
+    arr
+  end
+
   def to_array_scrub_and_back(functions = nil)
     arr = @str.split(',').map(&:strip)
     (functions || [ # The order of these is important!
+      :guarantee_second_line_unit_designator,
+      :move_leading_unit_designator,
       :remove_state_from_city,
     ]).each{|func| arr = send(func, arr)}
     @str = arr.join(',')
