@@ -152,6 +152,10 @@ class NYAddressor
     Digest::SHA256.hexdigest(construct[0..-6] + "99999")[0..23]
   end
 
+  def sns
+    [@parsed.number,@parsed.street,@bus[:state] || @parsed.state].join('')
+  end
+
   def eq(parsed_address, display = false)
     return nil if @parsed.nil?
     # for displaying errors (display ? puts(parsed_address, @parsed) : false)
@@ -353,6 +357,16 @@ class NYAddressor
       elsif arr[0].include?('/')
         first_entry = arr[0].split('/')
         arr = [first_entry.last, '#' + first_entry.first] + arr[1..-1]
+      else
+        ### this is meant to pick up units separated by spaces, but will pick up a lot of false positives, so we're leaving it off.
+        #first_entry_word_types = arr[0].gsub(/[0-9]/,'|').split(' ') 
+        #if first_entry_word_types.select{|word| word[0] == '|'}.count == 2
+        #  if first_entry_word_types[0].split(//).uniq == ['|'] and first_entry_word_types[1].split(//).uniq == ['|']
+        #    first_entry_words = arr[0].split(' ') 
+        #    arr = [first_entry_words[1..-1].join(' '), '#' + first_entry_words.first] + arr[1..-1]
+        #    puts arr
+        #  end
+        #end
       end
     end
     arr

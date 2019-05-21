@@ -171,8 +171,13 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_leading_unit_designations
-    assert eq("700-15355 24 Ave, Surrey BC V4A 2H9, Canada", "15355 24 Ave,#700, Surrey BC V4A 2H9, Canada")
-    assert eq("700/15355 24 Ave, Surrey BC V4A 2H9, Canada", "15355 24 Ave,#700, Surrey BC V4A 2H9, Canada")
+    assert eq("700-15355 Main Ave, Surrey BC V4A 2H9, Canada", "15355 Main Ave,#700, Surrey BC V4A 2H9, Canada")
+    assert eq("700/15355 Main Ave, Surrey BC V4A 2H9, Canada", "15355 Main Ave,#700, Surrey BC V4A 2H9, Canada")
+  end
+
+  def test_definition_of_sns # street, number, state
+    assert NYAddressor.new( "1600 First Ave, Washington, DC, 20500").sns == '16001stdc'
+    assert NYAddressor.new( "1600 1st Ave, Washington, DC, 20500").sns == '16001stdc'
   end
 
 end
