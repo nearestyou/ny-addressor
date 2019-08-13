@@ -170,6 +170,10 @@ class NYAddressorTest < MiniTest::Test
     assert eq("15355 24 Ave,700 (at Peninsula Village), Surrey BC V4A 2H9, Canada", "15355 24 Ave,#700 (at Peninsula Village), Surrey BC V4A 2H9, Canada")
   end
 
+  def test_non_demarcated_unit_designation
+    assert eq("9810 Medlock Bridge Rd Suite 500, Johns Creek, GA 30097, USA", "9810 Medlock Bridge Rd #500, Johns Creek, GA 30097, USA")
+  end
+
   def test_leading_unit_designations
     assert eq("700-15355 Main Ave, Surrey BC V4A 2H9, Canada", "15355 Main Ave,#700, Surrey BC V4A 2H9, Canada")
     assert eq("700/15355 Main Ave, Surrey BC V4A 2H9, Canada", "15355 Main Ave,#700, Surrey BC V4A 2H9, Canada")
@@ -178,6 +182,11 @@ class NYAddressorTest < MiniTest::Test
   def test_definition_of_sns # street, number, state
     assert NYAddressor.new( "1600 First Ave, Washington, DC, 20500").sns == '16001stdc'
     assert NYAddressor.new( "1600 1st Ave, Washington, DC, 20500").sns == '16001stdc'
+  end
+
+  def test_highways
+    assert NYAddressor.new("21317 OR99E,AURORA,OR,97002").sns == '21317or99eor'
+    assert NYAddressor.new("21317 OR-99E,AURORA,OR,97002").sns == '21317or99eor'
   end
 
 end

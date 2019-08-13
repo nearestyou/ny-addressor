@@ -153,7 +153,7 @@ class NYAddressor
   end
 
   def sns
-    [@parsed.number,@parsed.street,@bus[:state] || @parsed.state].join('')
+    [@parsed.number,@parsed.street,@bus[:state] || @parsed.state].join('').gsub('-','')
   end
 
   def eq(parsed_address, display = false)
@@ -301,6 +301,14 @@ class NYAddressor
     @str = arr.join(',')
   end
 
+  def guarantee_street_type
+    arr = @str.split(',')
+    if arr.length > 1 and arr[0].split(' ').length < 3
+      arr[0] = arr[0] + ' st'
+      @str = arr.join(',')
+    end
+  end
+
   def scrub(functions = nil)
     (functions || [ # The order of these is important!
       :remove_extra_commas,
@@ -312,6 +320,7 @@ class NYAddressor
       :guarantee_zip,
       :remove_cross_street,
       :remove_many_spaces,
+      :guarantee_street_type,
       :guarantee_prezip_comma,
       :abbreviate_state,
       :guarantee_prestate_comma,
