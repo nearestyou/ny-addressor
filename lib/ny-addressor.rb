@@ -20,6 +20,10 @@ class NYAddressor
     end
   end
 
+  def basic
+    StreetAddress::US.parse(@str)
+  end
+
   def monitor(set_state = true)
     @monitor = set_state
   end
@@ -153,7 +157,7 @@ class NYAddressor
   end
 
   def sns
-    [@parsed.number,@parsed.street,@bus[:state] || @parsed.state].join('').gsub('-','')
+    @parsed ?  [@parsed.number || '',@parsed.street || '',@bus[:state] || @parsed.state].join('').gsub('-','') : ''
   end
 
   def eq(parsed_address, display = false)
@@ -309,8 +313,21 @@ class NYAddressor
     end
   end
 
+  def remove_two_locations
+    if @str.include?('&')
+      words = @str.split(' ')
+      if words[1] == '&'
+        @str = words[2..-1].join(' ')
+      elsif words[0].include?('&')
+        first_word = words[0].split('&')
+        @str = ([first_word.last] + words[1..-1]).join(' ')
+      end
+    end
+  end
+
   def scrub(functions = nil)
     (functions || [ # The order of these is important!
+      :remove_two_locations,
       :remove_extra_commas,
       :remove_zip_extension,
       :remove_duplicate_entries,
@@ -381,9 +398,23 @@ class NYAddressor
     arr
   end
 
+  def remove_ste_units(arr)
+    if arr.first.downcase.include?(" ste ")
+      if arr.first.include?(" STE ")
+        arr[0] = arr[0].split(" STE ").first
+      elsif arr.first.include?(" Ste ")
+        arr[0] = arr[0].split(" Ste ").first
+      elsif arr.first.include?(" ste ")
+        arr[0] = arr[0].split(" Ste ").first
+      end
+    end
+    arr
+  end
+
   def to_array_scrub_and_back(functions = nil)
     arr = @str.split(',').map(&:strip)
     (functions || [ # The order of these is important!
+      :remove_ste_units,
       :guarantee_second_line_unit_designator,
       :move_leading_unit_designator,
       :remove_state_from_city,
