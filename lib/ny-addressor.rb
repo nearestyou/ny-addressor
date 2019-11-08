@@ -61,6 +61,7 @@ class NYAddressor
       parts = @str.split(@bus[:postal_code])
       @str = parts.first + '99999' + (parts.length == 2 ? parts.last : '')
     end
+    shunt_wi_address(:dump)
   end
 
   def post_scrub_logic
@@ -79,6 +80,24 @@ class NYAddressor
       if @parsed
         @parsed.state = @bus[:prov].downcase
         @parsed.postal_code = @bus[:postal_code]
+      end
+    end
+    shunt_wi_address(:load)
+  end
+
+  def shunt_wi_address(action)
+    street_number_placeholder = "00000"
+    if action == :dump
+      if @str.index(/[NEWSnews]\d+([NEWSnews]\d+)?/)
+        street_number = @str.gsub(',',' ').split(' ').select{|part| part =~ /[NEWSnews]\d+([NEWSnews]\d+)?/}.first
+        @bus[:street_number] = street_number
+        @str = @str.gsub(street_number, street_number_placeholder)
+        typify
+      end
+    else
+      if @bus[:street_number]
+        @str = @str.gsub(street_number_placeholder, @bus[:street_number])
+        typify
       end
     end
   end
@@ -157,7 +176,7 @@ class NYAddressor
   end
 
   def sns
-    @parsed ?  [@parsed.number || '',@parsed.street || '',@bus[:state] || @parsed.state].join('').gsub('-','') : ''
+    @parsed ?  [@bus[:street_number] || @parsed.number || '',@parsed.street || '',@bus[:state] || @parsed.state].join('').downcase.gsub('-','') : ''
   end
 
   def eq(parsed_address, display = false)

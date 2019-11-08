@@ -202,4 +202,8 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddressor.new("Main St,AURORA,OR,97002").sns == ''
   end
 
+  def test_wisconsin_addresses
+    assert NYAddressor.new("W204N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
+  end
+
 end
