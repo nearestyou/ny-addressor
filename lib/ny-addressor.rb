@@ -325,6 +325,7 @@ class NYAddressor
   end
 
   def guarantee_street_type
+    @str = @str.gsub(/express way/i,'Expy').gsub(/expressway/i,'Expy').gsub(/exwy/i,'Expy').gsub(/expwy/i,'Expy') if @str.downcase.include?('ex')
     arr = @str.split(',')
     if arr.length > 1 and arr[0].split(' ').length < 3
       arr[0] = arr[0] + ' st'
