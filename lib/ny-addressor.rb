@@ -157,10 +157,10 @@ class NYAddressor
     if (line_no.nil? || line_no == 1)
       addr += "#{@parsed.number} #{(fix == :prefix and @parsed.suffix) ? @parsed.suffix.upcase + ' ' : ''}#{@parsed.street&.capitalize} #{@parsed.street_type&.capitalize}"
       addr += ' ' + @parsed.suffix.upcase unless (@parsed.suffix.nil? or fix == :prefix)
-      addr += ', ' + @parsed.unit_prefix.capitalize + (@parsed.unit_prefix == '#' ? '' : ' ') + @parsed.unit.capitalize unless @parsed.unit.nil? 
+      addr += ', ' + @parsed.unit_prefix&.capitalize + (@parsed.unit_prefix == '#' ? '' : ' ') + @parsed.unit&.capitalize unless @parsed.unit.nil? 
     end
     if (line_no.nil? || line_no == 2)
-      addr += ", #{@parsed.city.capitalize}, #{@parsed.state.upcase} #{@parsed.postal_code if (@parsed.postal_code.to_s != '99999' or include99999)}"
+      addr += ", #{@parsed.city&.capitalize}, #{@parsed.state.upcase} #{@parsed.postal_code if (@parsed.postal_code.to_s != '99999' or include99999)}"
     end
     addr
   end
