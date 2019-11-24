@@ -190,7 +190,8 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_STE
-    assert eq("15355 Main Ave, Surrey, MN, 55082", "15355 Main Ave STE G&H, Surrey, MN, 55082")
+    assert eq("15355 Main Ave #456, Surrey, MN, 55082", "15355 Main Ave STE 456, Surrey, MN, 55082")
+    assert !NYAddressor.new("15355 Main Ave STE G&H, Surrey, MN, 55082").hash.nil?
   end
 
   def test_two_adjacent_locations
@@ -208,9 +209,9 @@ class NYAddressorTest < MiniTest::Test
 
   def test_expressway_abbreviation
     assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main Express way,AURORA,OR,97002").hash
-    #assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main Expressway,AURORA,OR,97002").hash
-    #assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main EXPWY,AURORA,OR,97002").hash
-    #assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main EXWY,AURORA,OR,97002").hash
+    assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main Expressway,AURORA,OR,97002").hash
+    assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main EXPWY,AURORA,OR,97002").hash
+    assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main EXWY,AURORA,OR,97002").hash
   end
 
 end

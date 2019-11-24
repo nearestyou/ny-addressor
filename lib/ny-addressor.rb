@@ -3,6 +3,8 @@ require 'digest'
 
 class NYAddressor
 
+  PLACEHOLDERS = {street_number: '000000', unit: '0XYZ'}
+
   def initialize(str)
     @monitor = false
     @orig = str # to keep an original
@@ -83,20 +85,20 @@ class NYAddressor
       end
     end
     shunt_wi_address(:load)
+    octothorpize_ste_units(:undo)
   end
 
   def shunt_wi_address(action)
-    street_number_placeholder = "00000"
     if action == :dump
       if @str.index(/[NEWSnews]\d+([NEWSnews]\d+)?/)
         street_number = @str.gsub(',',' ').split(' ').select{|part| part =~ /[NEWSnews]\d+([NEWSnews]\d+)?/}.first
         @bus[:street_number] = street_number
-        @str = @str.gsub(street_number, street_number_placeholder)
+        @str = @str.gsub(street_number, PLACEHOLDERS[:street_number])
         typify
       end
     else
       if @bus[:street_number]
-        @str = @str.gsub(street_number_placeholder, @bus[:street_number])
+        @str = @str.gsub(PLACEHOLDERS[:street_number], @bus[:street_number])
         typify
       end
     end
@@ -176,7 +178,7 @@ class NYAddressor
   end
 
   def sns
-    @parsed ?  [@bus[:street_number] || @parsed.number || '',@parsed.street || '',@bus[:state] || @parsed.state].join('').downcase.gsub('-','') : ''
+    @parsed ? ([@bus[:street_number] || @parsed.number || '',@parsed.street || '',@bus[:state] || @parsed.state].join('')&.downcase&.gsub('-','') || '') : ''
   end
 
   def eq(parsed_address, display = false)
@@ -418,23 +420,35 @@ class NYAddressor
     arr
   end
 
-  def remove_ste_units(arr)
-    if arr.first.downcase.include?(" ste ")
-      if arr.first.include?(" STE ")
-        arr[0] = arr[0].split(" STE ").first
-      elsif arr.first.include?(" Ste ")
-        arr[0] = arr[0].split(" Ste ").first
-      elsif arr.first.include?(" ste ")
-        arr[0] = arr[0].split(" Ste ").first
+  def octothorpize_ste_units(arr)
+    if(arr == :undo)
+      if @str.include?(PLACEHOLDERS[:unit])
+        @str.gsub(PLACEHOLDERS[:unit], @bus[:unit])
+        typify
       end
+    else
+      if arr.first.downcase.include?(" ste ")
+        arr[0] = arr[0].gsub(/ ste /i,' #').strip
+        part_after_number = arr[0].split('#').last
+        unless ['1','2','3','4','5','6','7','8','9','0'].include?(part_after_number[0])
+          after_number_words = part_after_number.split(' ')
+          @bus[:unit] = after_number_words.first
+          if after_number_words.count == 1
+            arr[0] = [arr[0].split('#').first, PLACEHOLDERS[:unit]].join('#')
+          else
+            after_number_words[0] = PLACEHOLDERS[:unit]
+            arr[0] = [arr[0].split('#').first, after_number_words.join(' ')].join('#')
+          end
+        end
+      end
+      return arr
     end
-    arr
   end
 
   def to_array_scrub_and_back(functions = nil)
     arr = @str.split(',').map(&:strip)
     (functions || [ # The order of these is important!
-      :remove_ste_units,
+      :octothorpize_ste_units,
       :guarantee_second_line_unit_designator,
       :move_leading_unit_designator,
       :remove_state_from_city,
