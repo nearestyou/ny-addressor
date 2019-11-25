@@ -34,7 +34,7 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_prefix_only
-    assert NYAddressor.new("1600 North Pennsylvania Ave, Washington, DC, 20500").construct(nil, :prefix) == NYAddressor.new("1600 N Pennsylvania Ave, Washington, DC, 20500").construct(nil, :prefix)
+    assert NYAddressor.new("1600 North Pennsylvania Ave, Washington, DC, 20500").construct({fix: :prefix}) == NYAddressor.new("1600 N Pennsylvania Ave, Washington, DC, 20500").construct({fix: :prefix})
   end
 
   def test_country
@@ -212,6 +212,12 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main Expressway,AURORA,OR,97002").hash
     assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main EXPWY,AURORA,OR,97002").hash
     assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main EXWY,AURORA,OR,97002").hash
+  end
+
+  def test_unitless_hash
+    assert NYAddressor.new( "1600 Pennsylvania Ave #3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
+    assert NYAddressor.new( "1600 Pennsylvania Ave, APT 3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
+    assert NYAddressor.new( "1600 Pennsylvania Ave Ste 3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
   end
 
 end

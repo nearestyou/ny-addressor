@@ -153,16 +153,17 @@ class NYAddressor
     @parsed.postal_code
   end
 
-  def construct(line_no = nil, fix = :suffix, include99999 = true)
+  def construct(opts = {})
+    opts = {line_no: nil, fix: :suffix, include99999: true, exclude_unit: false}.merge(opts)
     return nil if @parsed.nil?
     addr = ''
-    if (line_no.nil? || line_no == 1)
-      addr += "#{@parsed.number} #{(fix == :prefix and @parsed.suffix) ? @parsed.suffix&.upcase + ' ' : ''}#{@parsed.street&.capitalize} #{@parsed.street_type&.capitalize}"
-      addr += ' ' + @parsed.suffix&.upcase unless (@parsed.suffix.nil? or fix == :prefix)
-      addr += ', ' + @parsed.unit_prefix&.capitalize + (@parsed.unit_prefix == '#' ? '' : ' ') + @parsed.unit&.capitalize unless @parsed.unit.nil? 
+    if (opts[:line_no].nil? || opts[:line_no] == 1)
+      addr += "#{@parsed.number} #{(opts[:fix] == :prefix and @parsed.suffix) ? @parsed.suffix&.upcase + ' ' : ''}#{@parsed.street&.capitalize} #{@parsed.street_type&.capitalize}"
+      addr += ' ' + @parsed.suffix&.upcase unless (@parsed.suffix.nil? or opts[:fix] == :prefix)
+      addr += ', ' + @parsed.unit_prefix&.capitalize + (@parsed.unit_prefix == '#' ? '' : ' ') + @parsed.unit&.capitalize unless (@parsed.unit.nil? or opts[:exclude_unit])
     end
-    if (line_no.nil? || line_no == 2)
-      addr += ", #{@parsed.city&.capitalize}, #{@parsed.state&.upcase} #{@parsed.postal_code if (@parsed.postal_code.to_s != '99999' or include99999)}"
+    if (opts[:line_no].nil? || opts[:line_no] == 2)
+      addr += ", #{@parsed.city&.capitalize}, #{@parsed.state&.upcase} #{@parsed.postal_code if (@parsed.postal_code.to_s != '99999' or opts[:include99999])}"
     end
     addr
   end
@@ -175,6 +176,11 @@ class NYAddressor
   def hash99999 # for searching by missing/erroneous ZIP
     return nil if @parsed.nil?
     Digest::SHA256.hexdigest(construct[0..-6] + "99999")[0..23]
+  end
+
+  def unitless_hash
+    return nil if @parsed.nil?
+    Digest::SHA256.hexdigest(construct({exclude_unit: true}))[0..23]
   end
 
   def sns
