@@ -142,15 +142,15 @@ class NYAddressor
   end
 
   def city
-    @parsed.city
+    @parsed&.city
   end
 
   def state
-    @parsed.state
+    @parsed&.state
   end
 
   def zip
-    @parsed.postal_code
+    @parsed&.postal_code
   end
 
   def construct(opts = {})
