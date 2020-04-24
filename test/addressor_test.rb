@@ -220,4 +220,8 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddressor.new( "1600 Pennsylvania Ave Ste 3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
   end
 
+  def test_canadian_hiway
+    assert NYAddressor.new("2070 BC-3, Cawston, BC V0X 1C2, Canada").sns == "2070bc3bc"
+  end
+
 end

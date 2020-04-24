@@ -2,6 +2,7 @@ require 'street_address'
 require 'digest'
 
 class NYAddressor
+  attr_accessor :monitor, :str, :orig
 
   PLACEHOLDERS = {street_number: '000000', unit: '0XYZ'}
 
@@ -24,18 +25,6 @@ class NYAddressor
 
   def basic
     StreetAddress::US.parse(@str)
-  end
-
-  def monitor(set_state = true)
-    @monitor = set_state
-  end
-
-  def str
-    @str
-  end
-
-  def orig
-    @orig
   end
 
   def reset_str(str = @orig)
@@ -405,10 +394,11 @@ class NYAddressor
 
   def move_leading_unit_designator(arr)
     if @locale == :ca
-      if arr[0].include?('-')
+      split_street = arr[0].split(' ')
+      if split_street[0].include?('-')
         first_entry = arr[0].split('-')
         arr = [first_entry.last, '#' + first_entry.first] + arr[1..-1]
-      elsif arr[0].include?('/')
+      elsif split_street[0].include?('/')
         first_entry = arr[0].split('/')
         arr = [first_entry.last, '#' + first_entry.first] + arr[1..-1]
       else
