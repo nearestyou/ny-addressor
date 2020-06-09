@@ -79,10 +79,13 @@ class NYAddressor
 
   def shunt_wi_address(action)
     if action == :dump
-      if @str.index(/[NEWSnews]\d+([NEWSnews]\d+)?/)
-        street_number = @str.gsub(',',' ').split(' ').select{|part| part =~ /[NEWSnews]\d+([NEWSnews]\d+)?/}.first
-        @bus[:street_number] = street_number
-        @str = @str.gsub(street_number, PLACEHOLDERS[:street_number])
+      wi_address_pattern = /[NEWSnews]\d+([NEWSnews]\d+)?/ 
+      if wi_address_pattern.match?(@str)
+        street_number_parts = @str.gsub(',',' ').split(' ').select{|part| part =~ wi_address_pattern}
+        @bus[:street_number] = street_number_parts.join('')
+        street_number_parts.each{|pt| @str = @str.gsub(pt, '')}
+        @str = [PLACEHOLDERS[:street_number], @str].join(' ')
+        @str = @str.gsub(/\s+/,' ')
         typify
       end
     else
