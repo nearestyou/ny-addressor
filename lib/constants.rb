@@ -23,6 +23,7 @@ class NYAConstants
     "California" => "CA",
     "Colorado" => "CO",
     "Connecticut" => "CT",
+    "DC" => "DC",
     "Delaware" => "DE",
     "Florida" => "FL",
     "Georgia" => "GA",

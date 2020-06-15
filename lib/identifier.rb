@@ -47,8 +47,17 @@ def separate
 end
 
 def identify_all_by_pattern
+  found_label = false
   @sep_map.each_with_index do |part, i|
-    @sep_map[i][:from_pattern] = pattern_options(part)
+    options = pattern_options(part)
+    if options.include? :street_label
+      found_label = true
+    end
+    if found_label and options.include? :street_name
+      options.delete :street_name
+    end
+    @sep_map[i][:from_pattern] = options
+
   end
 end
 
@@ -96,7 +105,6 @@ end
 
 def potential_state(part)
   return true if NYAConstants::STATE_DESCRIPTORS.include?(part[:down])
-  return true if letters_only(part) and part[:down].length < 5
   return false
 end
 
