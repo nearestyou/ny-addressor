@@ -52,12 +52,13 @@ class NYAddressorTest < MiniTest::Test
     nyi.create_sep_map
     nyi.identify_all_by_pattern
     nyi.identify_all_by_location
-    assert nyi.sep_map.select{|data| data[:text] == '1600'}.first[:from_location] == [:street_number, :street_name]
-    assert nyi.sep_map.select{|data| data[:text] == 'Pennsylvania'}.first[:from_location] == [:street_name]
-    assert nyi.sep_map.select{|data| data[:text] == 'Ave'}.first[:from_location] == [:street_name, :street_label]
-    assert nyi.sep_map.select{|data| data[:text] == 'NE'}.first[:from_location] == [:street_name, :street_direction, :city, :state]
-    assert nyi.sep_map.select{|data| data[:text] == 'Washington'}.first[:from_location] == [:city, :state]
-    assert nyi.sep_map.select{|data| data[:text] == 'DC'}.first[:from_location] == [:state]
-    assert nyi.sep_map.select{|data| data[:text] == '20202'}.first[:from_location] == [:postal_code]
+    nyi.consolidate_identity_options
+    assert nyi.sep_map.select{|data| data[:text] == '1600'}.first[:in_both] == [:street_number, :street_name]
+    assert nyi.sep_map.select{|data| data[:text] == 'Pennsylvania'}.first[:in_both] == [:street_name]
+    assert nyi.sep_map.select{|data| data[:text] == 'Ave'}.first[:in_both] == [:street_name, :street_label]
+    assert nyi.sep_map.select{|data| data[:text] == 'NE'}.first[:in_both] == [:street_name, :street_direction, :city, :state]
+    assert nyi.sep_map.select{|data| data[:text] == 'Washington'}.first[:in_both] == [:city, :state]
+    assert nyi.sep_map.select{|data| data[:text] == 'DC'}.first[:in_both] == [:state]
+    assert nyi.sep_map.select{|data| data[:text] == '20202'}.first[:in_both] == [:postal_code]
   end
 end
