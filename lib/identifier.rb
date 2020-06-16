@@ -27,7 +27,7 @@ end
 
 def identifications
   identify
-  { sep: @sep, sep_map: @sep_map, locale: @locale, bus: @bus }
+  { sep: @sep, sep_map: @sep_map, locale: @locale, bus: @bus, parts: @parts }
 end
 
 def identify
@@ -38,6 +38,7 @@ def identify
   consolidate_identity_options
   strip_identity_options
   check_po
+  select_final_options
 end
 
 def create_sep_map
@@ -255,6 +256,19 @@ def check_po
     @sep_map[2][:stripped] = [:street_number]
     if @sep_map[3][:down].numeric?
       @sep_map[3][:stripped] = [:street_number]
+    end
+  end
+end
+
+def select_final_options
+  @parts = {}
+  @sep_map.each do |sep|
+    label = sep[:stripped].first
+    part = sep[:text]
+    if @parts[label].nil?
+      @parts[label] = part
+    else
+      @parts[label] = "#{@parts[label]} #{part}"
     end
   end
 end
