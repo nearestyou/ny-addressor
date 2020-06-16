@@ -1,5 +1,6 @@
 load 'lib/addressor_utils.rb'
 load 'lib/constants.rb'
+load 'lib/extensions.rb'
 
 class NYIdentifier
 attr_accessor :str, :sep, :sep_map, :locale, :bus
@@ -35,6 +36,7 @@ def identify
   identify_all_by_pattern
   identify_all_by_location
   consolidate_identity_options
+  strip_identity_options
 end
 
 def create_sep_map
@@ -96,7 +98,7 @@ end
 
 def potential_state(part)
   return true if NYAConstants::STATE_DESCRIPTORS.include?(part[:down])
-  return true if letters_only(part) and part[:down].length < 5
+  # return true if letters_only(part) and part[:down].length < 5
   return false
 end
 
@@ -141,7 +143,7 @@ def location_options(part, i, nParts)
   when nParts - 2
     [:state, :postal_code]
   when nParts - 1
-    [:postal_code, :country]
+    [:state, :postal_code, :country]
   else
     [:street_name, :street_label, :street_direction, :unit, :city, :state]
   end
@@ -150,6 +152,67 @@ end
 def consolidate_identity_options
   @sep_map.each do |part|
     part[:in_both] = part[:from_location] & part[:from_pattern]
+  end
+end
+
+def strip_identity_options
+  @sep_map.each do |sep|
+    sep[:stripped] = sep[:in_both]
+  end
+  strip_state_options
+  strip_street_number_options
+  strip_direction_options
+  strip_street_label_options
+  strip_city_options
+end
+
+def strip_state_options
+  found = false
+  @sep_map.reverse.each do |sep|
+    if sep[:stripped].include? :state and found
+      sep[:stripped].delete(:state)
+    elsif sep[:stripped].include? :state
+      found = true
+      sep[:stripped] = [:state]
+    end
+  end
+end
+
+def strip_street_number_options
+  first_sep = @sep_map[0]
+  if first_sep[:text].length == 4 and first_sep[:text].numeric?
+    first_sep[:stripped] = [:street_number]
+  end
+end
+
+def strip_direction_options
+  @sep_map.each_with_index do |sep, i|
+    if sep[:stripped].include? :street_direction and @sep_map[i+1][:stripped].include? :city
+      sep[:stripped] = [:street_direction]
+      break
+    end
+  end
+end
+
+def strip_street_label_options
+  @sep_map.each_with_index do |sep, i|
+    if sep[:stripped].include? :street_label and @sep_map[i-1][:stripped].include? :street_name
+      sep[:stripped] = [:street_label]
+      break
+    end
+  end
+end
+
+def strip_city_options
+  found_state = false
+  @sep_map.reverse.each do |sep|
+    if sep[:stripped].include? :city
+      break
+    elsif not sep[:stripped].include? :city and found_state
+      sep[:stripped].push(:city)
+    elsif sep[:stripped].include? :state
+      found_state = true
+    end
   end
 end
 
@@ -164,7 +227,7 @@ end
 def set_locale
   @nya.typify
   @locale = if @nya.typified.include?('=|= |=|')
-    :ca 
+    :ca
   else
     :us
   end
