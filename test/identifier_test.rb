@@ -71,9 +71,9 @@ class NYAddressorTest < MiniTest::Test
 
   def test_strip_identity_options
     nyi = NYIdentifier.new
-    nyi.str = '1600 Pennsylvania Ave NE, Washington, DC 20202'
+    # nyi.str = '1600 Pennsylvania Ave NE, Washington, DC 20202'
     # nyi.str = '4933 Yukon Ave N New Hope MN'
-    # nyi.str = '5301 Radford Rd, Watertown, South Dakota, USA'
+    nyi.str = '5301 Radford Rd, Water Town, South Dakota, USA'
     nyi.clean_string
     nyi.separate
     nyi.create_sep_map
@@ -85,12 +85,13 @@ class NYAddressorTest < MiniTest::Test
       puts "#{sep[:text]} - #{sep[:stripped]}"
     end
 
-    assert nyi.sep_map.select{|data| data[:text] == '1600'}.first[:stripped] == [:street_number]
-    assert nyi.sep_map.select{|data| data[:text] == 'Pennsylvania'}.first[:stripped] == [:street_name]
-    assert nyi.sep_map.select{|data| data[:text] == 'Ave'}.first[:stripped] == [:street_label]
-    assert nyi.sep_map.select{|data| data[:text] == 'NE'}.first[:stripped] == [:street_direction]
-    assert nyi.sep_map.select{|data| data[:text] == 'Washington'}.first[:stripped] == [:city]
-    assert nyi.sep_map.select{|data| data[:text] == 'DC'}.first[:stripped] == [:state]
-    assert nyi.sep_map.select{|data| data[:text] == '20202'}.first[:stripped] == [:postal_code]
+    assert nyi.sep_map.select{|data| data[:text] == '5301'}.first[:stripped] == [:street_number]
+    assert nyi.sep_map.select{|data| data[:text] == 'Radford'}.first[:stripped] == [:street_name]
+    assert nyi.sep_map.select{|data| data[:text] == 'Rd'}.first[:stripped] == [:street_label]
+    assert nyi.sep_map.select{|data| data[:text] == 'Water'}.first[:stripped] == [:city]
+    assert nyi.sep_map.select{|data| data[:text] == 'Town' }.first[:stripped] == [:city]
+    assert nyi.sep_map.select{|data| data[:text] == 'South'}.first[:stripped] == [:state]
+    assert nyi.sep_map.select{|data| data[:text] == 'Dakota'}.first[:stripped] == [:state]
+    assert nyi.sep_map.select{|data| data[:text] == 'USA'}.first[:stripped] == [:country]
   end
 end

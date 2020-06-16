@@ -161,6 +161,7 @@ def strip_identity_options
   end
   strip_state_options
   strip_street_number_options
+  strip_street_name_options
   strip_direction_options
   strip_street_label_options
   strip_city_options
@@ -176,12 +177,34 @@ def strip_state_options
       sep[:stripped] = [:state]
     end
   end
+  #Check for compound state
+  if not found
+    @sep_map.reverse.each_with_index do |sep, i|
+      if i+1 < @sep_map.length
+        if NYAConstants::STATE_DESCRIPTORS.include?("#{sep_map.reverse[i+1][:down]} #{sep[:down]}")
+          sep_map.reverse[i+1][:stripped] = [:state]
+          sep_map.reverse[i][:stripped] = [:state]
+        end
+      end
+    end
+  end
 end
 
 def strip_street_number_options
   first_sep = @sep_map[0]
   if first_sep[:text].length == 4 and first_sep[:text].numeric?
     first_sep[:stripped] = [:street_number]
+  end
+end
+
+def strip_street_name_options
+  found = false
+  @sep_map.each do |sep|
+    if found and sep[:stripped].include? :street_name
+      sep[:stripped].delete :street_name
+    elsif sep[:stripped].include? :street_name
+      found = true
+    end
   end
 end
 
@@ -208,7 +231,7 @@ def strip_city_options
   @sep_map.reverse.each do |sep|
     if sep[:stripped].include? :city
       break
-    elsif not sep[:stripped].include? :city and found_state
+    elsif not sep[:stripped].include? :city and found_state and not sep[:stripped].include? :state
       sep[:stripped].push(:city)
     elsif sep[:stripped].include? :state
       found_state = true
