@@ -74,6 +74,7 @@ class NYAddressorTest < MiniTest::Test
     # nyi.str = '1600 Pennsylvania Ave NE, Washington, DC 20202'
     # nyi.str = '4933 Yukon Ave N New Hope MN'
     nyi.str = '5301 Radford Rd, Water Town, South Dakota, USA'
+    # nyi.str = 'R.r. #4 Box 82, Keyser, WV 26726'
     nyi.clean_string
     nyi.separate
     nyi.create_sep_map
@@ -81,9 +82,6 @@ class NYAddressorTest < MiniTest::Test
     nyi.identify_all_by_location
     nyi.consolidate_identity_options
     nyi.strip_identity_options
-    for sep in nyi.sep_map do
-      puts "#{sep[:text]} - #{sep[:stripped]}"
-    end
 
     assert nyi.sep_map.select{|data| data[:text] == '5301'}.first[:stripped] == [:street_number]
     assert nyi.sep_map.select{|data| data[:text] == 'Radford'}.first[:stripped] == [:street_name]
@@ -94,4 +92,45 @@ class NYAddressorTest < MiniTest::Test
     assert nyi.sep_map.select{|data| data[:text] == 'Dakota'}.first[:stripped] == [:state]
     assert nyi.sep_map.select{|data| data[:text] == 'USA'}.first[:stripped] == [:country]
   end
+
+
+  def test_po_box
+    nyi = NYIdentifier.new
+    # nyi.str = '1600 Pennsylvania Ave NE, Washington, DC 20202'
+    # nyi.str = '4933 Yukon Ave N New Hope MN'
+    # nyi.str = '5301 Radford Rd, Water Town, South Dakota, USA'
+    # nyi.str = 'R.r. #4 Box 82, Keyser, WV 26726'
+    nyi.str = 'PO Box 1033 Los Angeles CA'
+    nyi.clean_string
+    nyi.separate
+    nyi.create_sep_map
+    nyi.identify_all_by_pattern
+    nyi.identify_all_by_location
+    nyi.consolidate_identity_options
+    nyi.strip_identity_options
+    nyi.check_po
+    assert nyi.sep_map.select{|data| data[:text] == 'PO'}.first[:stripped] == [:street_name]
+    assert nyi.sep_map.select{|data| data[:text] == 'Box'}.first[:stripped] == [:street_name]
+    assert nyi.sep_map.select{|data| data[:text] == '1033'}.first[:stripped] == [:street_number]
+    assert nyi.sep_map.select{|data| data[:text] == 'Los'}.first[:stripped] == [:city]
+    assert nyi.sep_map.select{|data| data[:text] == 'Angeles'}.first[:stripped] == [:city]
+    assert nyi.sep_map.select{|data| data[:text] == 'CA'}.first[:stripped] == [:state]
+    nyi.str = 'R.r. #4 Box 82, Keyser, WV 26726'
+    nyi.clean_string
+    nyi.separate
+    nyi.create_sep_map
+    nyi.identify_all_by_pattern
+    nyi.identify_all_by_location
+    nyi.consolidate_identity_options
+    nyi.strip_identity_options
+    nyi.check_po
+    assert nyi.sep_map.select{|data| data[:text] == 'R.r.'}.first[:stripped] == [:street_name]
+    assert nyi.sep_map.select{|data| data[:text] == '#4'}.first[:stripped] == [:street_name]
+    assert nyi.sep_map.select{|data| data[:text] == 'Box'}.first[:stripped] == [:street_number]
+    assert nyi.sep_map.select{|data| data[:text] == '82'}.first[:stripped] == [:street_number]
+    assert nyi.sep_map.select{|data| data[:text] == 'Keyser'}.first[:stripped] == [:city]
+    assert nyi.sep_map.select{|data| data[:text] == 'WV'}.first[:stripped] == [:state]
+    assert nyi.sep_map.select{|data| data[:text] == '26726'}.first[:stripped] == [:postal_code]
+  end
+
 end

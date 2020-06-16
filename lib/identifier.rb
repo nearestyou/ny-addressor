@@ -37,6 +37,7 @@ def identify
   identify_all_by_location
   consolidate_identity_options
   strip_identity_options
+  check_po
 end
 
 def create_sep_map
@@ -235,6 +236,25 @@ def strip_city_options
       sep[:stripped].push(:city)
     elsif sep[:stripped].include? :state
       found_state = true
+    end
+  end
+end
+
+def check_po
+  po_box = false
+  @sep_map.each do |sep|
+    if NYAConstants::POBOX_ALIAS.include? sep[:down]
+      po_box = true
+      break
+    end
+  end
+
+  if po_box
+    @sep_map[0][:stripped] = [:street_name]
+    @sep_map[1][:stripped] = [:street_name]
+    @sep_map[2][:stripped] = [:street_number]
+    if @sep_map[3][:down].numeric?
+      @sep_map[3][:stripped] = [:street_number]
     end
   end
 end

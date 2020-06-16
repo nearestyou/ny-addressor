@@ -72,4 +72,12 @@ class NYAConstants
   other_descriptors = []
   STATE_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values + CA_PROVINCES.keys + CA_PROVINCES.values + other_descriptors).map(&:downcase)
 
+  POBOX_ALIAS = [
+    "po",
+    "box",
+    "pobox",
+    "rr",
+    "r.r."
+  ]
+
 end
