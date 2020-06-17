@@ -27,12 +27,13 @@ end
 
 def identifications
   identify
-  { sep: @sep, sep_map: @sep_map, locale: @locale, bus: @bus, parts: @parts }
+  { sep: @sep, sep_map: @sep_map, sep_comma: @sep_comma, locale: @locale, bus: @bus, parts: @parts }
 end
 
 def identify
   separate
   create_sep_map
+  create_sep_comma
   identify_all_by_pattern
   identify_all_by_location
   consolidate_identity_options
@@ -43,6 +44,14 @@ end
 
 def create_sep_map
   @sep_map = @sep.map{|part| {text: part, down: part.gsub('.','').downcase, typified: AddressorUtils.typify(part)} }
+end
+
+def create_sep_comma
+  @sep_comma = []
+  @nya.orig.split(',').each do |section|
+    words = section.split(' ')
+    @sep_comma.push words
+  end
 end
 
 def separate
@@ -200,19 +209,31 @@ def strip_street_number_options
 end
 
 def strip_street_name_options
-  found = false
-  @sep_map.each do |sep|
-    if found and sep[:stripped].include? :street_name
-      sep[:stripped].delete :street_name
+  #Find start and stop points
+  name_start_index = 0
+  name_stop_index = 0
+  @sep_map.each_with_index do |sep, i|
+    if @sep_map.length > i+1
+      if name_start_index != 0 and name_stop_index == 0 and (sep[:stripped].include? :street_label or sep[:stripped].include? :street_direction or sep[:stripped].include? :city)
+        name_stop_index = i-1
+      elsif (sep[:stripped].include? :street_number or sep[:stripped].include? :street_direction) and name_start_index == 0 and not @sep_map[i+1][:stripped].include? :street_direction
+        name_start_index = i+1
+      end
+    end
+  end
+  #eliminate options
+  @sep_map.each_with_index do |sep, i|
+    if i >= name_start_index and i <= name_stop_index
+      sep[:stripped] = [:street_name]
     elsif sep[:stripped].include? :street_name
-      found = true
+      sep[:stripped].delete :street_name
     end
   end
 end
 
 def strip_direction_options
   @sep_map.each_with_index do |sep, i|
-    if sep[:stripped].include? :street_direction and @sep_map[i+1][:stripped].include? :city
+    if sep[:stripped].include? :street_direction and @sep_map[i+1][:stripped].include? :city and not sep[:stripped].include? :city
       sep[:stripped] = [:street_direction]
       break
     end
@@ -220,21 +241,30 @@ def strip_direction_options
 end
 
 def strip_street_label_options
+  found = false
   @sep_map.each_with_index do |sep, i|
-    if sep[:stripped].include? :street_label and @sep_map[i-1][:stripped].include? :street_name
+    if found and sep[:stripped].include? :street_label
+      sep[:stripped].delete :street_label
+    elsif sep[:stripped].include? :street_label and @sep_map[i-1][:stripped].include? :street_name
       sep[:stripped] = [:street_label]
-      break
+      found = true
     end
   end
 end
 
 def strip_city_options
   found_state = false
-  @sep_map.reverse.each do |sep|
-    if sep[:stripped].include? :city
+  @sep_map.reverse.each_with_index do |sep, i|
+    if sep[:stripped] == [:street_label] or sep[:stripped] == [:street_direction]
       break
     elsif not sep[:stripped].include? :city and found_state and not sep[:stripped].include? :state
       sep[:stripped].push(:city)
+    elsif sep[:stripped].include? :city and sep[:stripped] != [:city] and @sep_comma.length > 1
+      if @sep_comma[1].include? sep[:text]
+        sep[:stripped] = [:city]
+      else
+        sep[:stripped].delete :city
+      end
     elsif sep[:stripped].include? :state
       found_state = true
     end

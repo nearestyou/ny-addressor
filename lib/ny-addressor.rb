@@ -3,7 +3,7 @@ load 'lib/constants.rb'
 load 'lib/identifier.rb'
 
 class NYAddressor
-  attr_accessor :monitor, :str, :orig, :typified, :sep, :bus, :sep_map, :idr, :parts
+  attr_accessor :monitor, :str, :orig, :typified, :sep, :bus, :sep_map, :sep_comma, :idr, :parts
 
   def initialize(str)
     @monitor = false
@@ -17,6 +17,7 @@ class NYAddressor
     identification = @idr.identifications
     @sep = identification[:sep]
     @sep_map = identification[:sep_map]
+    @sep_comma = identification[:sep_comma]
     @bus = identification[:sep_map]
     @locale = identification[:locale]
     @parts = identification[:parts]
