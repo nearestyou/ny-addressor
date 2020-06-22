@@ -1,6 +1,6 @@
 require 'digest'
-load 'lib/constants.rb'
-load 'lib/identifier.rb'
+#load 'lib/constants.rb'
+#load 'lib/identifier.rb'
 
 class NYAddressor
   attr_accessor :monitor, :str, :orig, :typified, :sep, :bus, :sep_map, :idr
