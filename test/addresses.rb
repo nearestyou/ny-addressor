@@ -77,7 +77,7 @@ class AddressesTest < MiniTest::Test
 
   def test_999_main_st_s_minneapolis
     nya = NYAddressor.new('999 Main St S, Minneapolis, MN, 55555')
-    # assert nya.parts[:street_numer] == '999' #throws error but is correct??
+    assert nya.parts[:street_number] == '999'
     assert nya.parts[:street_name] == 'Main'
     assert nya.parts[:street_label] == 'St'
     assert nya.parts[:street_direction] == 'S'

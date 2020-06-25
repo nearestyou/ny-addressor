@@ -39,7 +39,7 @@ class NYAddressorTest < MiniTest::Test
 
   def test_country
     assert eq( "1600 North Pennsylvania Ave, Washington, DC, 20500, United States",  "1600 Pennsylvania Ave N, Washington, DC, 20500")
-    assert eq("89 Trinity Dr, Moncton, NB E1G 2J7","89 Trinity Dr, Moncton NB E1G 2J7, Canada") 
+    assert eq("89 Trinity Dr, Moncton, NB E1G 2J7","89 Trinity Dr, Moncton NB E1G 2J7, Canada")
   end
 
   def test_cross_street
@@ -49,7 +49,7 @@ class NYAddressorTest < MiniTest::Test
   def test_no_prezip_comma
     assert eq( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC, 20500")
     assert eq( "1600 Pennsylvania Ave, Washington, DC,20500",  "1600 Pennsylvania Ave, Washington, DC, 20500")
-    assert eq("89 Trinity Dr, Moncton NB E1G 2J7, Canada","89 Trinity Dr, Moncton, NB E1G 2J7, Canada") 
+    assert eq("89 Trinity Dr, Moncton NB E1G 2J7, Canada","89 Trinity Dr, Moncton, NB E1G 2J7, Canada")
   end
 
   def test_double_entry
