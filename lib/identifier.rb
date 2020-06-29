@@ -6,10 +6,10 @@ class NYIdentifier
 attr_accessor :str, :sep, :sep_map, :locale, :bus
 
 def initialize(nya = nil)
+  @bus = {}
   if @nya = nya
     clean_string
   end
-  @bus = {}
   self
 end
 
@@ -23,6 +23,8 @@ def clean_string
     @str = @str[0..first_open-1] + @str[first_close+1..-1]
   end
   @str = @str.gsub(',',' ').gsub(/\s+/,' ')
+  @str = @str.gsub('.', '')
+  # @str = @str.gsub('#', '')
 end
 
 def identifications
@@ -32,13 +34,15 @@ end
 
 def identify
   separate
-  create_sep_map
   create_sep_comma
+  remove_duplicates
+  create_sep_map
   identify_all_by_pattern
   identify_all_by_location
   consolidate_identity_options
   strip_identity_options
   check_po
+  standardize_aliases
   select_final_options
 end
 
@@ -57,6 +61,33 @@ end
 def separate
   @sep = @str.split(' ')
   @sep_map = @sep.map{|i| {}}
+end
+
+def remove_duplicates
+  @sep = @sep.uniq
+  @sep = @sep.map(&:downcase)
+
+  #Looking for different ways of saying usa
+  og = @nya.orig.downcase
+  alias_index = []
+  start_index = []
+  NYAConstants::US_ALIAS.each do |name|
+    if og.include? name
+      start = og.index(name)
+      if not start_index.include? start
+        start_index.push(start)
+        alias_index.push([start, name.length])
+      end
+    end
+  end
+  while alias_index.length > 1
+    abrev = og[alias_index[0][0], alias_index[0][1]]
+    abrev = abrev.split(' ')
+    abrev.each do |word|
+      @sep.delete(word)
+    end
+    alias_index.delete_at(0)
+  end
 end
 
 def identify_all_by_pattern
@@ -100,6 +131,8 @@ def potential_unit(part)
   return true if part[:down].start_with?('#')
   return true if part[:down].start_with?('apt')
   return true if part[:down].start_with?('ste')
+  return true if part[:down].start_with?('suite')
+  return true if part[:down].numeric?
   return false
 end
 
@@ -124,6 +157,8 @@ def potential_postal_code(part)
   when '=|= |=|'
     true
   when '=|='
+    true
+  when '|=|'
     true
   else
     false
@@ -150,7 +185,7 @@ def location_options(part, i, nParts)
   when 2
     [:street_name, :street_label, :street_unit]
   when nParts - 3
-    [:city, :state]
+    [:city, :state, :postal_code]
   when nParts - 2
     [:state, :postal_code]
   when nParts - 1
@@ -257,7 +292,7 @@ def strip_city_options
   @sep_map.reverse.each_with_index do |sep, i|
     if sep[:stripped] == [:street_label] or sep[:stripped] == [:street_direction]
       break
-    elsif not sep[:stripped].include? :city and found_state and not sep[:stripped].include? :state
+    elsif not sep[:stripped].include? :city and found_state and not sep[:stripped].include? :state and not sep[:text].numeric?
       sep[:stripped].push(:city)
     elsif sep[:stripped].include? :city and sep[:stripped] != [:city] and @sep_comma.length > 1
       if @sep_comma[1].include? sep[:text]
@@ -299,6 +334,26 @@ def select_final_options
       @parts[label] = part
     else
       @parts[label] = "#{@parts[label]} #{part}"
+    end
+  end
+  if @parts.size() < 4
+    @parts = nil
+  end
+end
+
+def standardize_aliases
+  @sep_map.each do |sep|
+    if sep[:stripped].include? :street_number and sep[:text].include? '-' or sep[:text].include? '/'
+      sep[:text] = sep[:text].reverse()[0,5].reverse()
+    elsif sep[:stripped].include? :street_name and NYAConstants::NUMBER_STREET.keys.include? sep[:down]
+      sep[:text] = NYAConstants::NUMBER_STREET[sep[:down]]
+    elsif sep[:stripped].include? :street_direction and NYAConstants::STREET_DIRECTIONS.keys.include? sep[:down]
+      sep[:text] = NYAConstants::STREET_DIRECTIONS[sep[:down]]
+    elsif sep[:stripped].include? :street_label and NYAConstants::STREET_LABELS.keys.include? sep[:text]
+      sep[:text] = NYAConstants::STREET_LABELS[sep[:text]]
+    elsif sep[:stripped].include? :state and NYAConstants::STATE_KEYS.include? sep[:down]
+      sep[:text] = NYAConstants::US_STATES[sep[:down].capitalize()] if NYAConstants::US_STATES[sep[:down].capitalize()]
+      sep[:text] = NYAConstants::CA_PROVINCES[sep[:down].capitalize()] if NYAConstants::CA_PROVINCES[sep[:down].capitalize()]
     end
   end
 end

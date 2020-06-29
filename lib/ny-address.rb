@@ -1,4 +1,5 @@
 require 'digest'
+require 'byebug'
 load 'lib/constants.rb'
 load 'lib/identifier.rb'
 
@@ -7,10 +8,12 @@ class NYAddress
 
   def initialize(str)
     @monitor = false
-    @orig = str # to keep an original
-    @str = str
-    @idr = NYIdentifier.new(self)
-    identify
+    if not str.nil?
+      @orig = str # to keep an original
+      @str = str
+      @idr = NYIdentifier.new(self)
+      identify
+    end
   end
 
   def identify
@@ -50,28 +53,33 @@ class NYAddress
   end
 
   def sns
-    @parsed ? ([@bus[:street_number] || @parsed.number || '',@parsed.street || '',@bus[:state] || @parsed.state].join('')&.downcase&.gsub('-','') || '') : ''
+    @parts ? "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}" : ''
   end
 
-  def eq(parsed_address, display = false)
-    return nil if @parsed.nil?
-    # for displaying errors (display ? puts(parsed_address, @parsed) : false)
-    return false if @parsed.number != parsed_address.number
-    return false if @parsed.postal_code != parsed_address.postal_code
-    return false if @parsed.street != parsed_address.street
-    return false if @parsed.unit != parsed_address.unit
-    return false if @parsed.city != parsed_address.city
-    return false if @parsed.street_type != parsed_address.street_type
+  def eq(address_parts, display = false)
+    # debugger
+    return nil if @parts.nil?
+
+    return false if @parts[:street_number].to_s.downcase != address_parts[:street_number].to_s.downcase
+    return false if @parts[:street_name].to_s.downcase != address_parts[:street_name].to_s.downcase
+    return false if @parts[:street_label].to_s.downcase != address_parts[:street_label].to_s.downcase and not @parts[:street_label].nil? and not address_parts[:street_label].nil?
+    return false if @parts[:street_direction].to_s.downcase != address_parts[:street_direction].to_s.downcase and not @parts[:street_direction].nil? and not address_parts[:street_direction].nil?
+    return false if @parts[:unit].to_s.downcase.reverse[0,3] != address_parts[:unit].to_s.downcase.reverse[0,3] and not @parts[:unit].nil? and not address_parts[:unit].nil?
+    return false if @parts[:city].to_s.downcase != address_parts[:city].to_s.downcase
+    return false if @parts[:state].to_s.downcase != address_parts[:state].to_s.downcase
+    return false if @parts[:postal_code].to_s.downcase[0,5] != address_parts[:postal_code].to_s.downcase[0,5] and not @parts[:postal_code].nil? and not address_parts[:postal_code].nil?
+    return false if @parts[:country].to_s.downcase != address_parts[:country].to_s.downcase and not @parts[:country].nil? and not address_parts[:country].nil?
+
     return true
   end
 
   def comp(parsed_address)
-    return 0 if @parsed.nil?
+    return 0 if @parts.nil?
     return 0 if parsed_address.nil?
     sims = 0
-    sims += 1 if @parsed.number == parsed_address.number
-    sims += 1 if @parsed.street == parsed_address.street
-    sims += 1 if @parsed.postal_code == parsed_address.postal_code
+    sims += 1 if @parts[:street_number] == parsed_address[:street_number]
+    sims += 1 if @parts[:street_name] == parsed_address[:street_name]
+    sims += 1 if @parts[:postal_code] == parsed_address[:postal_code]
     sims
   end
 
@@ -115,8 +123,8 @@ class NYAddress
   def self.determine_state(state_name, zip = nil)
     if zip
     else
-      return US_STATES[state_name] if US_STATES[state_name]
-      return CA_PROVINCES[state_name] if CA_PROVINCES[state_name]
+      return NYAConstants::US_STATES[state_name] if NYAConstants::US_STATES[state_name]
+      return NYAConstants::CA_PROVINCES[state_name] if NYAConstants::CA_PROVINCES[state_name]
       return 'ER'
     end
   end

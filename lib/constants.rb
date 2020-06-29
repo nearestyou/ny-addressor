@@ -71,6 +71,7 @@ class NYAConstants
 
   other_descriptors = []
   STATE_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values + CA_PROVINCES.keys + CA_PROVINCES.values + other_descriptors).map(&:downcase)
+  STATE_KEYS ||= (US_STATES.keys + CA_PROVINCES.keys).map(&:downcase)
 
   POBOX_ALIAS = [
     "po",
@@ -79,5 +80,61 @@ class NYAConstants
     "rr",
     "r.r."
   ]
+
+  US_ALIAS = [
+    'usa',
+    'us',
+    'united states of america',
+    'united states'
+  ]
+
+  NUMBER_STREET = {
+    'first' => '1st',
+    'second' => '2nd',
+    'third' => '3rd',
+    'fourth' => '4th',
+    'fifth' => '5th',
+    'sixth' => '6th',
+    'seventh' => '7th',
+    'eighth' => '8th',
+    'ninth' => '9th',
+    'tenth' => '10th',
+    'eleventh' => '11th',
+    'twelfth' => '12th'
+  }
+
+  STREET_DIRECTIONS = {
+    'no' => 'n',
+    'so' => 's',
+    'north' => 'n',
+    'south' => 's',
+    'east' => 'e',
+    'west' => 'w',
+    'northeast' => 'ne',
+    'northwest' => 'nw',
+    'southeast' => 'se',
+    'southwest' => 'sw'
+  }
+
+  STREET_LABELS = {
+    'avenue' => 'ave',
+    'boulevard' => 'blvd',
+    'circle' => 'cir',
+    'court' => 'ct',
+    'drive' => 'dr',
+    'expressway' => 'expy',
+    'highway' => 'hwy',
+    'lane' => 'ln',
+    'parkway' => 'pkwy',
+    'place' => 'pl',
+    'plaza' => 'plz',
+    'road' => 'rd',
+    'route' => 'rt',
+    'square' => 'sq',
+    'street' => 'st',
+    'terrace' => 'tr',
+    'trail' => 'trl',
+    'way' => 'wy'
+  }
 
 end
