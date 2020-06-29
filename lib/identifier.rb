@@ -8,23 +8,9 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
 def initialize(nya = nil)
   @bus = {}
   if @nya = nya
-    clean_string
+    # clean_string
   end
   self
-end
-
-def clean_string
-  @str ||= @nya.str
-  while @str.include?('(') and @str.include?(')')
-    first_open = @str.index('(')
-    first_close = @str.index(')')
-    @bus[:parentheses] ||= []
-    @bus[:parentheses] << @str[first_open+1..first_close-1]
-    @str = @str[0..first_open-1] + @str[first_close+1..-1]
-  end
-  @str = @str.gsub(',',' ').gsub(/\s+/,' ')
-  @str = @str.gsub('.', '')
-  # @str = @str.gsub('#', '')
 end
 
 def identifications
@@ -33,8 +19,9 @@ def identifications
 end
 
 def identify
-  separate
   create_sep_comma
+  remove_extraneous
+  separate
   remove_duplicates
   create_sep_map
   identify_all_by_pattern
@@ -94,6 +81,39 @@ def identify_all_by_pattern
   @sep_map.each_with_index do |part, i|
     @sep_map[i][:from_pattern] = pattern_options(part)
   end
+end
+
+def remove_extraneous
+  @bus = {}
+  ## Remove street corners
+  @sep_comma.each do |sep|
+    if sep.map(&:downcase).include? 'corner'
+      @sep_comma.delete(sep)
+      @bus[:corner] = sep.join(" ")
+    end
+  end
+  ## Update @str
+  @str = ""
+  @sep_comma.each do |sep|
+    sep.each do |part|
+      @str += part + ' '
+    end
+  end
+  @str = @str.chop
+  @str = @str.gsub('.', '')
+
+  ## Remove parentheses
+  while @str.include?('(') and @str.include?(')')
+    first_open = @str.index('(')
+    first_close = @str.index(')')
+    @bus[:parentheses] ||= []
+    @bus[:parentheses] << @str[first_open+1..first_close-1]
+    @str = @str[0..first_open-1] + @str[first_close+1..-1]
+  end
+
+  ##Remove punctuation
+  @str = @str.gsub(',', '')
+  @str = @str.gsub('.', '')
 end
 
 def pattern_options(part)
