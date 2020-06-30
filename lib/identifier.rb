@@ -87,9 +87,10 @@ def remove_extraneous
   @bus = {}
   ## Remove street corners
   @sep_comma.each do |sep|
-    if sep.map(&:downcase).include? 'corner' or sep.map(&:downcase).include? 'coner'
+    if sep.map(&:downcase).include? 'corner' or sep.map(&:downcase).include? 'coner' or sep.map(&:downcase).include? 'route'
       @sep_comma.delete(sep)
-      @bus[:corner] = sep.join(" ")
+      # @bus[:corner] = sep.join(" ")
+      (@bus[:extra] ||= []) << sep.join(" ") #creates :extra if not exist
     end
   end
   ## Update @str
@@ -265,14 +266,20 @@ end
 
 def strip_street_name_options
   #Find start and stop points
-  name_start_index = 0
+  name_start_index = -1
   name_stop_index = 0
   @sep_map.each_with_index do |sep, i|
     if @sep_map.length > i+1
-      if name_start_index != 0 and name_stop_index == 0 and (sep[:stripped].include? :street_label or sep[:stripped].include? :street_direction or sep[:stripped].include? :city)
+      if name_start_index != -1 and sep[:text] == 'plaza'
+        name_stop_index = i
+        break
+      elsif name_start_index != -1 and name_stop_index == 0 and (sep[:stripped].include? :street_label or sep[:stripped].include? :street_direction or sep[:stripped].include? :city)
         name_stop_index = i-1
-      elsif (sep[:stripped].include? :street_number or sep[:stripped].include? :street_direction) and name_start_index == 0 and not @sep_map[i+1][:stripped].include? :street_direction
+        break
+      elsif (sep[:stripped].include? :street_number or sep[:stripped].include? :street_direction) and name_start_index == -1 and not @sep_map[i+1][:stripped].include? :street_direction
         name_start_index = i+1
+      elsif i == 0 and not sep[:stripped].include? :street_number and not sep[:stripped].include? :street_direction
+        name_start_index = 0
       end
     end
   end
@@ -350,8 +357,10 @@ def select_final_options
   @sep_map.each do |sep|
     label = sep[:stripped].first
     part = sep[:text]
-    if @parts[label].nil?
+    if @parts[label].nil? and not label.nil?
       @parts[label] = part
+    elsif label.nil?
+      (@bus[:nil] ||= []) << part #creates :nil if does not exist
     else
       if label == :street_direction
         @parts[label] = "#{@parts[label]}#{part}"
