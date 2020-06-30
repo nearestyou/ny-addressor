@@ -55,6 +55,7 @@ class NYAConstants
     "Oklahoma" => "OK",
     "Oregon" => "OR",
     "Pennsylvania" => "PA",
+    "Puerto Rico" => "PR",
     "Rhode Island" => "RI",
     "South Carolina" => "SC",
     "South Dakota" => "SD",
@@ -115,6 +116,7 @@ class NYAConstants
     'southeast' => 'se',
     'southwest' => 'sw'
   }
+  DIRECTION_DESCRIPTORS ||= (STREET_DIRECTIONS.keys + STREET_DIRECTIONS.values)
 
   STREET_LABELS = {
     'avenue' => 'ave',
@@ -136,5 +138,14 @@ class NYAConstants
     'trail' => 'trl',
     'way' => 'wy'
   }
+  LABEL_DESCRIPTORS ||= (STREET_LABELS.keys + STREET_LABELS.values)
+
+  UNITS = {
+    'no' => '#',
+    'apartment' => 'apt',
+    'suite' => 'ste',
+    'room' => 'room'
+  }
+  UNIT_DESCRIPTORS ||= (UNITS.keys + UNITS.values)
 
 end
