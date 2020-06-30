@@ -87,7 +87,7 @@ def remove_extraneous
   @bus = {}
   ## Remove street corners
   @sep_comma.each do |sep|
-    if sep.map(&:downcase).include? 'corner'
+    if sep.map(&:downcase).include? 'corner' or sep.map(&:downcase).include? 'coner'
       @sep_comma.delete(sep)
       @bus[:corner] = sep.join(" ")
     end
@@ -203,7 +203,7 @@ def location_options(part, i, nParts)
   when 1
     [:street_number, :street_name, :street_direction]
   when 2
-    [:street_name, :street_label, :street_unit]
+    [:street_name, :street_label, :street_unit, :street_direction]
   when nParts - 3
     [:city, :state, :postal_code]
   when nParts - 2
@@ -353,9 +353,14 @@ def select_final_options
     if @parts[label].nil?
       @parts[label] = part
     else
-      @parts[label] = "#{@parts[label]} #{part}"
+      if label == :street_direction
+        @parts[label] = "#{@parts[label]}#{part}"
+      else
+        @parts[label] = "#{@parts[label]} #{part}"
+      end
     end
   end
+  @parts[:orig] = @nya.orig
   if @parts.size() < 4
     @parts = nil
   end

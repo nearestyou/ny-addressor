@@ -20,5 +20,16 @@ class AddressesTest < MiniTest::Test
     assert parts[:postal_code] == '29842'
   end
 
-  
+  def test_address1
+    parts = NYAddressor.new(@addresses[1]).output
+    assert parts[:street_number] == '4354'
+    assert parts[:street_name] == '23rd'
+    assert parts[:street_direction] == 'nw'
+    assert parts[:street_label] == 'ave'
+    assert parts[:city] == 'gainesville'
+    assert parts[:state] == 'fl'
+    assert parts[:postal_code] == '32606'
+  end
+
+
 end
