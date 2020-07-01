@@ -1,5 +1,4 @@
 load 'lib/addressor_utils.rb'
-load 'lib/constants.rb'
 load 'lib/extensions.rb'
 
 class NYIdentifier
@@ -27,7 +26,7 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
     identify_all_by_pattern
     identify_all_by_location
     consolidate_identity_options
-    strip_identity_options
+    confirm_identity_options
     # check_po #not working
     standardize_aliases
     select_final_options
@@ -133,12 +132,14 @@ def pattern_options(part)
 end
 
 def potential_street_number(part)
+  return false if NYAConstants::UNIT_DESCRIPTORS.include? part[:text]
   return true if some_numbers(part)
   return true if %w[box po].include?(part[:text])
 end
 
 def potential_street_name(part)
-  true
+  return false if NYAConstants::UNIT_DESCRIPTORS.include? part[:text]
+  return true
 end
 
 def potential_street_label(part)
@@ -220,42 +221,39 @@ def consolidate_identity_options
   end
 end
 
-def strip_identity_options
+def confirm_identity_options
   @sep_map.each do |sep|
-    sep[:stripped] = sep[:in_both]
+    sep[:confirmed] = sep[:in_both]
   end
-  # debugger
-  strip_state_options
-  strip_street_number_options
-  strip_street_name_options
-  strip_unit_options
-  strip_direction_options
-  strip_street_label_options
-  strip_city_options
+
+  confirm_state_options
+  confirm_street_number_options
+  confirm_unit_options
+  confirm_street_name_options
+  confirm_direction_options
+  confirm_street_label_options
+  confirm_city_options
 end
 
-def strip_unit_options
-  ## Finding units
-  unit_found = []
+def confirm_unit_options
   @sep_map.each_with_index do |sep, i|
-    if sep[:stripped] == [:unit] and unit_found.length == 0
-      unit_found.push sep[:text]
+    if sep[:confirmed] == [:unit]
       if not sep[:text].has_digits? and @sep_map[i+1][:text].has_digits?
-        @sep_map[i+1][:stripped] = [:unit]
-        unit_found.push @sep_map[i+1][:text]
+        @sep_map[i+1][:confirmed] = [:unit]
       end
+      break
     end
   end
-end ##End strip_unit_options
+end
 
-def strip_state_options
+def confirm_state_options
   found = false
   @sep_map.reverse.each do |sep|
-    if sep[:stripped].include? :state and found
-      sep[:stripped].delete(:state)
-    elsif sep[:stripped].include? :state
+    if sep[:confirmed].include? :state and found
+      sep[:confirmed].delete(:state)
+    elsif sep[:confirmed].include? :state
       found = true
-      sep[:stripped] = [:state]
+      sep[:confirmed] = [:state]
     end
   end
   #Check for compound state
@@ -263,105 +261,110 @@ def strip_state_options
     @sep_map.reverse.each_with_index do |sep, i|
       if i+1 < @sep_map.length
         if NYAConstants::STATE_DESCRIPTORS.include?("#{sep_map.reverse[i+1][:text]} #{sep[:text]}")
-          sep_map.reverse[i+1][:stripped] = [:state]
-          sep_map.reverse[i][:stripped] = [:state]
+          sep_map.reverse[i+1][:confirmed] = [:state]
+          sep_map.reverse[i][:confirmed] = [:state]
         end
       end
     end
   end
 end
 
-def strip_street_number_options
+def confirm_street_number_options
   first_sep = @sep_map[0]
   if first_sep[:text].length == 4 and first_sep[:text].numeric?
-    first_sep[:stripped] = [:street_number]
+    first_sep[:confirmed] = [:street_number]
   end
 end
 
-def strip_street_name_options
+def confirm_street_name_options
   #Find start and stop points
   name_start_index = -1
-  name_stop_index = 0
+  name_stop_index = -1
   @sep_map.each_with_index do |sep, i|
     if @sep_map.length > i+1
-      if name_start_index != -1 and sep[:text] == 'plaza'
-        name_stop_index = i-1
-        sep[:stripped] = [:street_label]
-        break
-      elsif name_start_index != -1 and name_stop_index == 0 and (sep[:stripped].include? :street_label or sep[:stripped].include? :street_direction or sep[:stripped].include? :city)
+      if name_start_index != -1 and name_stop_index == -1 and (sep[:confirmed].include? :street_label or sep[:confirmed].include? :street_direction or sep[:confirmed].include? :city)
         name_stop_index = i-1
         break
-      elsif (sep[:stripped].include? :street_number or sep[:stripped].include? :street_direction) and name_start_index == -1 and not @sep_map[i+1][:stripped].include? :street_direction
+      elsif (sep[:confirmed].include? :street_number or sep[:confirmed].include? :street_direction) and name_start_index == -1 and not @sep_map[i+1][:confirmed].include? :street_direction
         name_start_index = i+1
-      elsif i == 0 and not sep[:stripped].include? :street_number and not sep[:stripped].include? :street_direction and not sep[:stripped].include? :unit
+      elsif i == 0 and not sep[:confirmed].include? :street_number and not sep[:confirmed].include? :street_direction and not sep[:confirmed].include? :unit
         name_start_index = 0
       end
     end
   end
   #eliminate options
+  comma_index = -1
   @sep_map.each_with_index do |sep, i|
-    if i >= name_start_index and i <= name_stop_index
-      sep[:stripped] = [:street_name]
-    elsif sep[:stripped].include? :street_name
-      sep[:stripped].delete :street_name
+    if i >= name_start_index and i <= name_stop_index and name_start_index != -1 and name_stop_index != -1
+      sep[:confirmed] = [:street_name]
+    elsif sep[:confirmed].include? :street_name and name_start_index != -1 and name_stop_index != -1
+      sep[:confirmed].delete :street_name
+    elsif name_stop_index == -1 and comma_index == -1 and sep[:confirmed].include? :street_name
+      @sep_comma.each_with_index do |comma, ind|
+        if comma.include? sep[:text]
+          comma_index = ind
+        end
+      end
+    elsif name_stop_index == -1 and comma_index != -1 and sep[:confirmed].include? :street_name and not @sep_comma[comma_index].include? sep[:text]
+      sep[:confirmed].delete(:street_name)
     end
   end
 end
 
-def strip_direction_options
+def confirm_direction_options
   @sep_map.each_with_index do |sep, i|
-    if sep[:stripped].include? :street_direction and @sep_map[i+1][:stripped].include? :city and not sep[:stripped].include? :city
-      sep[:stripped] = [:street_direction]
+    if sep[:confirmed].include? :street_direction and @sep_map[i+1][:confirmed].include? :city and not sep[:confirmed].include? :city
+      sep[:confirmed] = [:street_direction]
       break
     end
   end
 end
 
-def strip_street_label_options
+def confirm_street_label_options
   found = false
   @sep_map.each_with_index do |sep, i|
-    if found and sep[:stripped].include? :street_label
-      sep[:stripped].delete :street_label
-    elsif sep[:stripped].include? :street_label and @sep_map[i-1][:stripped].include? :street_name
-      sep[:stripped] = [:street_label]
+    if found and sep[:confirmed].include? :street_label
+      sep[:confirmed].delete :street_label
+    elsif sep[:confirmed].include? :street_label and @sep_map[i-1][:confirmed].include? :street_name
+      sep[:confirmed] = [:street_label]
       found = true
     end
   end
 end
 
-def strip_city_options
+def confirm_city_options
   found_state = false
   @sep_map.reverse.each_with_index do |sep, i|
-    if sep[:stripped] == [:street_label] or sep[:stripped] == [:street_direction]
+    if sep[:confirmed] == [:street_label] or sep[:confirmed] == [:street_direction]
       break
-    elsif not sep[:stripped].include? :city and found_state and not sep[:stripped].include? :state and not sep[:text].numeric?
-      sep[:stripped].push(:city)
-    elsif sep[:stripped].include? :city and sep[:stripped] != [:city] and @sep_comma.length > i
+    elsif not sep[:confirmed].include? :city and found_state and not sep[:confirmed].include? :state and not sep[:text].numeric?
+      sep[:confirmed].push(:city)
+    elsif sep[:confirmed].include? :city and sep[:confirmed] != [:city] and @sep_comma.length > i
       if @sep_comma[i].include? sep[:text]
-        sep[:stripped] = [:city]
+        sep[:confirmed] = [:city]
       else
-        sep[:stripped].delete :city
+        sep[:confirmed].delete :city
       end
-    elsif sep[:stripped].include? :state
+    elsif sep[:confirmed].include? :state
       found_state = true
     end
   end
   ## If they are not in the same @sep_comma, they are not both cities
   city_comma = -1
   @sep_map.reverse.each do |sep|
-    if sep[:stripped].include? :city and city_comma == -1
+    if sep[:confirmed].include? :city and city_comma == -1
       @sep_comma.each_with_index do |sepc, i|
         if sepc.include? sep[:text]
           city_comma = i
         end
       end
-    elsif sep[:stripped].include? :city and city_comma != -1
+    elsif sep[:confirmed].include? :city and city_comma != -1
       if not @sep_comma[city_comma].include? sep[:text]
-        sep[:stripped].delete(:city)
+        sep[:confirmed].delete(:city)
       end
     end
   end
-end # end strip_city
+end # end confirm_city
 
 def check_po
   po_box = false
@@ -373,11 +376,11 @@ def check_po
   end
 
   if po_box
-    @sep_map[0][:stripped] = [:street_name]
-    @sep_map[1][:stripped] = [:street_name]
-    @sep_map[2][:stripped] = [:street_number]
+    @sep_map[0][:confirmed] = [:street_name]
+    @sep_map[1][:confirmed] = [:street_name]
+    @sep_map[2][:confirmed] = [:street_number]
     if @sep_map[3][:text].numeric?
-      @sep_map[3][:stripped] = [:street_number]
+      @sep_map[3][:confirmed] = [:street_number]
     end
   end
 end
@@ -385,7 +388,7 @@ end
 def select_final_options
   @parts = {}
   @sep_map.each do |sep|
-    label = sep[:stripped].first
+    label = sep[:confirmed].first
     part = sep[:text]
     if @parts[label].nil? and not label.nil?
       @parts[label] = part
@@ -405,15 +408,15 @@ end
 
 def standardize_aliases
   @sep_map.each do |sep|
-    if sep[:stripped].include? :street_number and sep[:text].include? '-' or sep[:text].include? '/'
+    if sep[:confirmed].include? :street_number and sep[:text].include? '-' or sep[:text].include? '/'
       sep[:text] = sep[:text].reverse()[0,5].reverse()
-    elsif sep[:stripped].include? :street_name and NYAConstants::NUMBER_STREET.keys.include? sep[:text]
+    elsif sep[:confirmed].include? :street_name and NYAConstants::NUMBER_STREET.keys.include? sep[:text]
       sep[:text] = NYAConstants::NUMBER_STREET[sep[:text]]
-    elsif sep[:stripped].include? :street_direction and NYAConstants::STREET_DIRECTIONS.keys.include? sep[:text]
+    elsif sep[:confirmed].include? :street_direction and NYAConstants::STREET_DIRECTIONS.keys.include? sep[:text]
       sep[:text] = NYAConstants::STREET_DIRECTIONS[sep[:text]]
-    elsif sep[:stripped].include? :street_label and NYAConstants::STREET_LABELS.keys.include? sep[:text]
+    elsif sep[:confirmed].include? :street_label and NYAConstants::STREET_LABELS.keys.include? sep[:text]
       sep[:text] = NYAConstants::STREET_LABELS[sep[:text]]
-    elsif sep[:stripped].include? :state and NYAConstants::STATE_KEYS.include? sep[:text]
+    elsif sep[:confirmed].include? :state and NYAConstants::STATE_KEYS.include? sep[:text]
       sep[:text] = NYAConstants::US_STATES[sep[:text].capitalize()] if NYAConstants::US_STATES[sep[:text].capitalize()]
       sep[:text] = NYAConstants::CA_PROVINCES[sep[:text].capitalize()] if NYAConstants::CA_PROVINCES[sep[:text].capitalize()]
     end
@@ -421,15 +424,52 @@ def standardize_aliases
 end
 
 def check_requirements
+  #Street number but no name?
   if @parts[:street_name].nil? and not @parts[:street_number].nil?
     @parts[:street_name] = @parts[:street_number]
     @parts.delete(:street_number)
   end
 
+  #Number/unit but no name?
+  if @parts[:street_name].nil? and (not @parts[:unit].nil? or not @parts[:street_number].nil?)
+    if not @bus[:extra_street].nil?
+      @parts[:street_name] = ""
+      @sep_comma.each do |comma|
+        if @parts[:street_name] != ""
+          @parts[:street_name] = @parts[:street_name].chop
+          break
+        else
+          comma.each do |word|
+            if @bus[:extra_street].include? word
+              debugger #this is here because it's never been triggered before
+              @parts[:street_name] += word + ' '
+              @bus[:extra_street].delete(word)
+            end
+          end
+        end
+      end
+    elsif not @bus[:nil].nil?
+      @parts[:street_name] = ""
+      @sep_comma.each do |comma|
+        if @parts[:street_name] != ""
+          @parts[:street_name] = @parts[:street_name].chop
+          break
+        else
+          comma.each do |word|
+            if @bus[:nil].include? word
+              @parts[:street_name] += word + ' '
+              @bus[:nil].delete(word)
+            end
+          end
+        end
+      end
+    end
+  end
+
   if @parts.size() < 4
     @parts = nil
   end
-end
+end #End check requirements
 
 def letters_only(part)
   !part[:typified].include?('|')

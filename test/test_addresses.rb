@@ -84,6 +84,7 @@ class AddressesTest < MiniTest::Test
   def test_address13
     parts = NYAddressor.new(@addresses[13]).output
     assert parts[:unit] == 'room 2b1080'
+    assert parts[:street_name] == 'the pentagon'
     assert parts[:city] == 'arlington'
     assert parts[:state] == 'va'
     assert parts[:postal_code] == '22202'
