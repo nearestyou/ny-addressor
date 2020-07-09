@@ -53,7 +53,11 @@ class NYAddress
   end
 
   def sns
-    @parts ? "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}" : ''
+    if not @parts[:street_number].nil? and not @parts[:street_name].nil? and not @parts[:state].nil?
+      return "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}"
+    else
+      return ""
+    end
   end
 
   def eq(address_parts, display = false)

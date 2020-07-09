@@ -198,10 +198,10 @@ class NYAddressorTest < MiniTest::Test
     assert eq("1505&1507 10TH AVE, SEATTLE, WA 98120", "1507 10TH AVE, SEATTLE, WA 98120")
   end
 
-  # def test_missing_street_number
-  #   assert NYAddressor.new("Main St,AURORA,OR,97002").sns == ''
-  # end
-  #
+  def test_missing_street_number
+    assert NYAddress.new("Main St,AURORA,OR,97002").sns == ''
+  end
+
   # def test_wisconsin_addresses
   #   #assert NYAddressor.new("W204N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
   #   assert NYAddressor.new("W204 N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
