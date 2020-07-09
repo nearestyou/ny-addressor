@@ -54,7 +54,7 @@ class NYAddress
 
   def sns
     if not @parts[:street_number].nil? and not @parts[:street_name].nil? and not @parts[:state].nil?
-      return "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}"
+      return "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}".delete(' ')
     else
       return ""
     end

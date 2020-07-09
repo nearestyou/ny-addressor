@@ -202,11 +202,11 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddress.new("Main St,AURORA,OR,97002").sns == ''
   end
 
-  # def test_wisconsin_addresses
-  #   #assert NYAddressor.new("W204N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
-  #   assert NYAddressor.new("W204 N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
-  # end
-  #
+  def test_wisconsin_addresses
+    assert NYAddress.new("W204N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
+    assert NYAddress.new("W204 N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
+  end
+
   # def test_expressway_abbreviation
   #   assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main Express way,AURORA,OR,97002").hash
   #   assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main Expressway,AURORA,OR,97002").hash
