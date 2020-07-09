@@ -193,11 +193,11 @@ class NYAddressorTest < MiniTest::Test
     #idk what hash does
   end
 
-  # def test_two_adjacent_locations
-  #   assert eq("1505 & 1507 10TH AVE, SEATTLE, WA 98120", "1507 10TH AVE, SEATTLE, WA 98120")
-  #   assert eq("1505&1507 10TH AVE, SEATTLE, WA 98120", "1507 10TH AVE, SEATTLE, WA 98120")
-  # end
-  #
+  def test_two_adjacent_locations
+    assert eq("1505 & 1507 10TH AVE, SEATTLE, WA 98120", "1507 10TH AVE, SEATTLE, WA 98120")
+    assert eq("1505&1507 10TH AVE, SEATTLE, WA 98120", "1507 10TH AVE, SEATTLE, WA 98120")
+  end
+
   # def test_missing_street_number
   #   assert NYAddressor.new("Main St,AURORA,OR,97002").sns == ''
   # end

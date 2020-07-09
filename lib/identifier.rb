@@ -51,6 +51,16 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
         @str = @str.gsub('-', '')
       end
     end
+    if @str.include? '&'
+      amp = @str.index('&')
+      if amp < 6 and (@str[amp-1].numeric? or @str[amp-2].numeric?) and (@str[amp+1].numeric? or @str[amp+2].numeric?)
+        first_number = amp + 1
+        if @str[first_number] == ' '
+          first_number += 1
+        end
+        @str = @str[first_number, 9000]
+      end
+    end
 
     ## Lowercase
     @str = @str.downcase
