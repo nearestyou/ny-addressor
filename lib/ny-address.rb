@@ -35,6 +35,7 @@ class NYAddress
   end
 
   def construct(opts = {})
+    sns
   end
 
   def hash

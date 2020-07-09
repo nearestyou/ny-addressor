@@ -189,8 +189,7 @@ class NYAddressorTest < MiniTest::Test
 
   def test_STE
     assert eq("15355 Main Ave #456, Surrey, MN, 55082", "15355 Main Ave STE 456, Surrey, MN, 55082")
-    # assert !NYAddress.new("15355 Main Ave STE G&H, Surrey, MN, 55082").hash.nil?
-    #idk what hash does
+    assert !NYAddress.new("15355 Main Ave STE G&H, Surrey, MN, 55082").hash.nil?
   end
 
   def test_two_adjacent_locations
@@ -207,13 +206,13 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddress.new("W204 N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
   end
 
-  # def test_expressway_abbreviation
-  #   assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main Express way,AURORA,OR,97002").hash
-  #   assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main Expressway,AURORA,OR,97002").hash
-  #   assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main EXPWY,AURORA,OR,97002").hash
-  #   assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main EXWY,AURORA,OR,97002").hash
-  # end
-  #
+  def test_expressway_abbreviation
+    assert NYAddress.new("333 Main Expy,AURORA,OR,97002").hash == NYAddress.new("333 Main Express way,AURORA,OR,97002").hash
+    assert NYAddress.new("333 Main Expy,AURORA,OR,97002").hash == NYAddress.new("333 Main Expressway,AURORA,OR,97002").hash
+    assert NYAddress.new("333 Main Expy,AURORA,OR,97002").hash == NYAddress.new("333 Main EXPWY,AURORA,OR,97002").hash
+    assert NYAddress.new("333 Main Expy,AURORA,OR,97002").hash == NYAddress.new("333 Main EXWY,AURORA,OR,97002").hash
+  end
+
   # def test_unitless_hash
   #   assert NYAddressor.new( "1600 Pennsylvania Ave #3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
   #   assert NYAddressor.new( "1600 Pennsylvania Ave, APT 3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
