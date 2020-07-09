@@ -38,7 +38,7 @@ class NYAddress
   end
 
   def hash
-    return nil if @parsed.nil?
+    return nil if @parts.nil?
     Digest::SHA256.hexdigest(construct)[0..23]
   end
 

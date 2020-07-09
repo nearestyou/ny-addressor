@@ -187,11 +187,12 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddress.new("21317 OR-99E,AURORA,OR,97002").sns == '21317or99eor'
   end
 
-  # def test_STE
-  #   assert eq("15355 Main Ave #456, Surrey, MN, 55082", "15355 Main Ave STE 456, Surrey, MN, 55082")
-  #   assert !NYAddressor.new("15355 Main Ave STE G&H, Surrey, MN, 55082").hash.nil?
-  # end
-  #
+  def test_STE
+    assert eq("15355 Main Ave #456, Surrey, MN, 55082", "15355 Main Ave STE 456, Surrey, MN, 55082")
+    # assert !NYAddress.new("15355 Main Ave STE G&H, Surrey, MN, 55082").hash.nil?
+    #idk what hash does
+  end
+
   # def test_two_adjacent_locations
   #   assert eq("1505 & 1507 10TH AVE, SEATTLE, WA 98120", "1507 10TH AVE, SEATTLE, WA 98120")
   #   assert eq("1505&1507 10TH AVE, SEATTLE, WA 98120", "1507 10TH AVE, SEATTLE, WA 98120")
