@@ -182,10 +182,10 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddress.new( "1600 1st Ave, Washington, DC, 20500").sns == '16001stdc'
   end
 
-  # def test_highways
-  #   assert NYAddress.new("21317 OR99E,AURORA,OR,97002").sns == '21317or99eor'
-  #   assert NYAddress.new("21317 OR-99E,AURORA,OR,97002").sns == '21317or99eor'
-  # end
+  def test_highways
+    assert NYAddress.new("21317 OR99E,AURORA,OR,97002").sns == '21317or99eor'
+    assert NYAddress.new("21317 OR-99E,AURORA,OR,97002").sns == '21317or99eor'
+  end
 
   # def test_STE
   #   assert eq("15355 Main Ave #456, Surrey, MN, 55082", "15355 Main Ave STE 456, Surrey, MN, 55082")

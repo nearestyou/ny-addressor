@@ -45,9 +45,18 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
 
     ## Remove punctuation
     @str = @str.gsub('.', '')
+    if @str.include? '-'
+      dash = @str.index('-')
+      if not @str[dash-1].numeric? or not @str[dash+1].numeric?
+        @str = @str.gsub('-', '')
+      end
+    end
 
     ## Lowercase
     @str = @str.downcase
+
+    ## Remove duplicates
+    # @str = @str.split(' ').reverse.uniq.reverse.join(' ')
   end
 
   def create_sep_comma
@@ -61,7 +70,7 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
   def extra_sep_comma
     ## removing extra street data
     @sep_comma.reverse.each do |sep|
-      if sep.map.include? 'corner' or sep.map.include? 'coner' or sep.map.include? 'route' or sep.map.include? 'plaza' and @sep_comma.length > 3
+      if sep.map.include? 'corner' or sep.map.include? 'coner' or sep.map.include? 'route' or sep.map.include? 'plaza' or sep.map.include? 'shopping' and @sep_comma.length > 3
         @sep_comma.delete(sep)
         @bus[:extra_street] = sep.join(' ')
       end
@@ -428,6 +437,23 @@ def check_requirements
   if @parts[:street_name].nil? and not @parts[:street_number].nil?
     @parts[:street_name] = @parts[:street_number]
     @parts.delete(:street_number)
+  end
+
+  #Street name but no number?
+  if @parts[:street_number].nil? and not @parts[:street_name].nil? and @parts[:street_name].include? ' '
+    parts = @parts[:street_name].split(' ')
+    @parts[:street_name] = ""
+    @parts[:street_number] = ""
+    found_num = false
+    parts.each do |part|
+      if part.numeric? and not found_num
+        @parts[:street_number] = part
+        found_num = true
+      else
+        @parts[:street_name] << part + ' '
+      end
+    end
+    @parts[:street_name] = @parts[:street_name].chop()
   end
 
   #Number/unit but no name?

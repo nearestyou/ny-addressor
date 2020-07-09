@@ -33,10 +33,10 @@ class AddressesTest < MiniTest::Test
 
   def test_address2
     parts = NYAddressor.new(@addresses[2]).output
-    assert parts[:street_number] == '2040' #155
+    assert parts[:street_number] == '2040'
     assert parts[:street_name] == 'western'
     assert parts[:street_label] == 'ave'
-    assert parts[:city] == 'guilderland' #route western guilderland
+    assert parts[:city] == 'guilderland'
     assert parts[:state] == 'ny'
     assert parts[:postal_code] == '12203'
   end
@@ -88,6 +88,16 @@ class AddressesTest < MiniTest::Test
     assert parts[:city] == 'arlington'
     assert parts[:state] == 'va'
     assert parts[:postal_code] == '22202'
+  end
+
+  def test_address16
+    parts = NYAddressor.new(@addresses[16]).output
+    # assert parts[:street_number] == '3133'
+    # assert parts[:street_name] == 'lee'
+    # assert parts[:street_label] == 'hwy'
+    # assert parts[:city] == 'arlington'
+    # assert parts[:state] == 'va'
+    # assert parts[:postal_code] == '22201'
   end
 
 
