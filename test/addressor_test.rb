@@ -213,12 +213,12 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddress.new("333 Main Expy,AURORA,OR,97002").hash == NYAddress.new("333 Main EXWY,AURORA,OR,97002").hash
   end
 
-  # def test_unitless_hash
-  #   assert NYAddressor.new( "1600 Pennsylvania Ave #3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
-  #   assert NYAddressor.new( "1600 Pennsylvania Ave, APT 3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
-  #   assert NYAddressor.new( "1600 Pennsylvania Ave Ste 3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
-  # end
-  #
+  def test_unitless_hash
+    assert NYAddress.new( "1600 Pennsylvania Ave #3, Washington, DC, 20500").unitless_hash == NYAddress.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
+    assert NYAddress.new( "1600 Pennsylvania Ave, APT 3, Washington, DC, 20500").unitless_hash == NYAddress.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
+    assert NYAddress.new( "1600 Pennsylvania Ave Ste 3, Washington, DC, 20500").unitless_hash == NYAddress.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
+  end
+
   def test_canadian_hiway
     assert NYAddress.new("2070 BC-3, Cawston, BC V0X 1C2, Canada").sns == "2070bc3bc"
   end

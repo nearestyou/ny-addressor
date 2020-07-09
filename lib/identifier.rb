@@ -500,11 +500,13 @@ def check_requirements
         end
       end
     end
-  end
+  end 
 
+  #Make sure there are enough parts
   if @parts.size() < 4
     @parts = nil
   end
+
 end #End check requirements
 
 def letters_only(part)
