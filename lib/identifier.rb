@@ -99,7 +99,11 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
 
   def post_extra
     ## Remove duplicates
-    # @sep = @sep.uniq
+    @sep.each_with_index do |word, i|
+      if word == @sep[i+1]
+        @sep.delete_at i
+      end
+    end
 
     ## Remove different ways to say 'usa'
     og = @nya.orig.downcase
@@ -511,6 +515,7 @@ def confirm_city_options
     @sep_comma.each_with_index do |comma, comi|
       if comma.include? @sep_map[city_stop_index][:text]
         comma_index = comi
+        break
       end
     end
 
@@ -649,7 +654,7 @@ def check_requirements
       end
     end
 
-    ##Make sure it comes before the state
+    #Make sure it comes before the state
     dir_ind = @nya.orig.downcase.index possible_dir
     state_ind = nil
     @sep_map.each do |sep|
@@ -667,6 +672,11 @@ def check_requirements
       end
     end
   end #if @parts[:street_direction].nil?
+
+  ## Remove duplicate city
+  if not @parts[:city].nil?
+    @parts[:city] = @parts[:city].split(' ').uniq.join(' ')
+  end
 
   #Make sure there are enough parts
   if @parts.size() < 4
