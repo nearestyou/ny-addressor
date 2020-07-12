@@ -313,8 +313,14 @@ end
 
 def confirm_street_number_options
   first_sep = @sep_map[0]
-  if (first_sep[:text].numeric? or first_sep[:typified] == '||||-||' or first_sep[:typified] == '|||-|||||' or first_sep[:typified] == '|||/|||||') and first_sep[:in_both].include? :street_number
+  if (first_sep[:text].numeric? or first_sep[:typified] == '||||-||' or first_sep[:typified] == '|||-|||||' or first_sep[:typified] == '|||/|||||' or first_sep[:typified] == '=|||=|||||') and first_sep[:in_both].include? :street_number
     first_sep[:confirmed] = [:street_number]
+  elsif first_sep[:typified] == '=|||' and @sep_map[1][:typified] == '=|||||' #canadian
+    first_sep[:confirmed] = [:street_number]
+    first_sep[:orig] = first_sep[:text]
+    first_sep[:text] = first_sep[:text] + @sep_map[1][:text]
+    @bus[:street_num] = @sep_map[1][:text]
+    @sep_map.delete_at 1
   end
 end
 
