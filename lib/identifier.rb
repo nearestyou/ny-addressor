@@ -247,6 +247,7 @@ def confirm_identity_options
     sep[:confirmed] = []
   end
 
+  confirm_country
   confirm_postal_code
   confirm_state_options
   confirm_street_number_options
@@ -255,6 +256,13 @@ def confirm_identity_options
   confirm_direction_options
   confirm_street_name_options
   confirm_city_options
+end
+
+def confirm_country
+  last_sep = @sep_map.last
+  if @sep_map.last[:in_both].include? :country
+    @sep_map.last[:confirmed] = [:country]
+  end
 end
 
 def confirm_postal_code
@@ -301,7 +309,7 @@ end
 
 def confirm_street_number_options
   first_sep = @sep_map[0]
-  if (first_sep[:text].numeric? or first_sep[:typified] == '||||-||') and first_sep[:in_both].include? :street_number
+  if (first_sep[:text].numeric? or first_sep[:typified] == '||||-||' or first_sep[:typified] == '|||-|||||' or first_sep[:typified] == '|||/|||||') and first_sep[:in_both].include? :street_number
     first_sep[:confirmed] = [:street_number]
   end
 end
@@ -357,6 +365,38 @@ def confirm_street_name_options
     end
   end
 
+  ##If start wasnt found
+  if name_start_index == -1
+    @sep_map.each_with_index do |sep, i| #find the first word without numbers
+      if not sep[:text].has_digits?
+        name_start_index = i
+        break
+      end
+    end
+  end
+
+  #make sure start and stop are in the same sep_comma
+  if name_stop_index != -1
+    first_word = @sep_map[name_start_index][:text]
+    last_word = @sep_map[name_stop_index][:text]
+    @sep_comma.each do |comma|
+      if comma.include? first_word and not comma.include? last_word
+        name_stop_index = -1
+      end
+    end
+  end
+
+  #if stop wasn't found
+  if name_stop_index == -1
+    #find the last word in the first sep_comma
+    last_word = @sep_comma[0].last
+    @sep_map.each_with_index do |sep, i|
+      if sep[:text] == last_word
+        name_stop_index = i
+      end
+    end
+  end
+
   ## Select the street name
   if name_start_index != -1 and name_stop_index != -1
     (name_start_index..name_stop_index).each do |index|
@@ -365,7 +405,8 @@ def confirm_street_name_options
       end
     end
   else
-    puts "THIS WAS CALLED: confirm_street_name_options name_stop_index = #{name_stop_index} || name_start_index = #{name_start_index}"
+
+    puts "THIS WAS CALLED: confirm_street_name_options name_stop_index = #{name_stop_index} || name_start_index = #{name_start_index} from: #{@nya.orig}"
   end
 
 end #confirm_street_name_options
@@ -506,13 +547,20 @@ end
 
 def standardize_aliases
   @sep_map.each do |sep|
-    if sep[:confirmed].include? :street_number and sep[:text].include? '-' or sep[:text].include? '/'
+    if sep[:confirmed].include? :street_number and (sep[:text].include? '-' or sep[:text].include? '/')
+      dash = sep[:text].index '-'
+      if dash.nil?
+        dash = sep[:text].index '/'
+      end
+      #seperate the dashes
       if sep[:text][0,4].numeric?
-        @bus[:street_num] = sep[:text][4,999]
-        sep[:text] = sep[:text][0,4]
+        sep[:orig] = sep[:text]
+        @bus[:street_num] = sep[:text][dash,999]
+        sep[:text] = sep[:text][0,dash]
       elsif sep[:text].reverse()[0,4].numeric?
-        @bus[:street_num] = sep[:text].reverse[4,999].reverse
-        sep[:text] = sep[:text].reverse()[0,4].reverse()
+        sep[:orig] = sep[:text]
+        @bus[:street_num] = sep[:text][0,dash]
+        sep[:text] = sep[:text][dash+1,999]
       end
     elsif sep[:confirmed].include? :street_name and NYAConstants::NUMBER_STREET.keys.include? sep[:text]
       sep[:text] = NYAConstants::NUMBER_STREET[sep[:text]]
