@@ -470,20 +470,24 @@ def confirm_direction_options
 end #End direction options
 
 def confirm_street_label_options
-  #confirmed street_number and state
-  found_state = false
+  #we know: number and state
   found_label = false
   @sep_map.reverse.each_with_index do |sep, i|
-    if sep[:confirmed] == [:state] and not found_state
-      found_state = true
-    elsif not found_label and sep[:from_pattern].include? :street_label
+    if not found_label and sep[:from_pattern].include? :street_label
       sep[:confirmed] = [:street_label]
       found_label = true
-    elsif found_label and sep[:in_both].include? :street_label
-      sep[:in_both].delete :street_label
+      if sep[:text] == 'way' #check for compound label (ex: express way, high way, park way)
+        compound = @sep_map[i-1][:text] + sep[:text]
+        if NYAConstants::LABEL_DESCRIPTORS.include? compound
+          @sep_map[i-1][:confirmed] = [:street_label]
+          @sep_map[i-1][:orig] = @sep_map[i-1][:text]
+          @sep_map[i-1][:text] = compound
+          sep[:confirmed] = []
+        end
+      end
     end
   end
-end
+end #end confirm_street_label_options
 
 
 def confirm_city_options
