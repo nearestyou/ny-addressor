@@ -511,7 +511,7 @@ def confirm_city_options
     end
 
     (city_start_index..city_stop_index).each do |index|
-      if @sep_map[index][:confirmed] == []
+      if @sep_map[index][:confirmed] == [] and not @sep_map[index][:text].has_digits?
         if comma_index == -1
           @sep_map[index][:confirmed] = [:city]
         elsif @sep_comma[comma_index].include? @sep_map[index][:text] #make sure they're in the same sep comma
