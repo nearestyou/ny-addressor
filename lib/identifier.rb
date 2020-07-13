@@ -178,7 +178,7 @@ def potential_unit(part)
   return true if NYAConstants::UNIT_DESCRIPTORS.include? part[:text]
   return true if part[:text].numeric? and part[:text].length < 4
   return true if part[:text].include? '#'
-  return true if not part[:text].numeric? and part[:text].length == 1
+  return true if not part[:text].numeric? and part[:text].length == 1 and not 'nsew'.include? part[:text]
   return false
 end
 
@@ -257,8 +257,8 @@ def confirm_identity_options
   confirm_state_options
   confirm_street_number_options
   confirm_street_label_options
-  confirm_unit_options
   confirm_direction_options
+  confirm_unit_options
   confirm_street_name_options
   confirm_city_options
 end
@@ -280,11 +280,11 @@ end
 
 def confirm_unit_options
   @sep_map.each_with_index do |sep, i|
-    if sep[:from_pattern].include? :unit and sep[:confirmed] == [] and @sep_map[i-1][:confirmed] != [:street_label] #ex: Highway 19
-      if not sep[:text].has_digits? and @sep_map[i+1][:text].has_digits?
+    if sep[:from_pattern].include? :unit and sep[:confirmed] == [] and not sep[:text].numeric?
+      sep[:confirmed] = [:unit]
+      if @sep_map[i+1][:text].has_digits?
         @sep_map[i+1][:confirmed] = [:unit]
       end
-      sep[:confirmed] = [:unit]
       break
     elsif sep[:typified][-1] == '=' and sep[:confirmed] == [:street_number] #if the unit is in the street number
       ind = -1
@@ -295,7 +295,7 @@ def confirm_unit_options
           break
         end
       end
-      
+
       #update the street number
       if ind != -1
         sep[:orig] = sep[:text]
