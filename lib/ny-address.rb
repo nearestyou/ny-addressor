@@ -37,7 +37,9 @@ class NYAddress
   def construct(opts = {})
     opts = {include_unit: true}.merge(opts)
     addr = sns
-    opts[:include_unit] ? addr << @parts[:unit].to_s :
+    if addr.length > 0
+      opts[:include_unit] ? addr << @parts[:unit].to_s : nil
+    end
     addr
   end
 
@@ -57,8 +59,8 @@ class NYAddress
   end
 
   def sns
-    if not @parts[:street_number].nil? and not @parts[:street_name].nil? and not @parts[:state].nil?
-      return "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}".delete(' ')
+    if @parts[:street_number].length > 0 and @parts[:street_name].length > 0 and @parts[:state].length > 0
+      return "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}".delete(' ').delete('-')
     else
       return ""
     end

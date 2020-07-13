@@ -44,12 +44,12 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
 
     ## Remove punctuation
     @str = @str.gsub('.', '')
-    if @str.include? '-'
-      dash = @str.index('-')
-      if not @str[dash-1].numeric? or not @str[dash+1].numeric?
-        @str = @str.gsub('-', '')
-      end
-    end
+    # if @str.include? '-'
+    #   dash = @str.index('-')
+    #   if not @str[dash-1].numeric? or not @str[dash+1].numeric?
+    #     @str = @str.gsub('-', '')
+    #   end
+    # end
     if @str.include? '&'
       amp = @str.index('&')
       if amp < 6 and (@str[amp-1].numeric? or @str[amp-2].numeric?) and (@str[amp+1].numeric? or @str[amp+2].numeric?)
@@ -81,7 +81,7 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
   def extra_sep_comma
     ## removing extra street data
     @sep_comma.reverse.each do |sep|
-      if sep.map.include? 'corner' or sep.map.include? 'coner' or sep.map.include? 'route' or sep.map.include? 'plaza' or sep.map.include? 'shopping' and @sep_comma.length > 3
+      if sep.map.include? 'corner' or sep.map.include? 'coner' or sep.map.include? 'route' or sep.map.include? 'plaza' or sep.map.include? 'shopping' and @sep_comma.length > 4
         @sep_comma.delete(sep)
         @bus[:extra_street] = sep.join(' ')
       end
@@ -177,6 +177,7 @@ end
 def potential_unit(part)
   return true if NYAConstants::UNIT_DESCRIPTORS.include? part[:text]
   return true if part[:text].numeric? and part[:text].length < 4
+  return true if part[:text].include? '#'
   return false
 end
 
@@ -250,7 +251,6 @@ def confirm_identity_options
   @sep_map.each do |sep|
     sep[:confirmed] = []
   end
-
   confirm_country
   confirm_postal_code
   confirm_state_options
@@ -279,11 +279,29 @@ end
 
 def confirm_unit_options
   @sep_map.each_with_index do |sep, i|
-    if sep[:in_both] == [:unit]
+    if sep[:from_pattern].include? :unit and sep[:confirmed] == []
       if not sep[:text].has_digits? and @sep_map[i+1][:text].has_digits?
         @sep_map[i+1][:confirmed] = [:unit]
       end
+      sep[:confirmed] = [:unit]
       break
+    elsif sep[:typified][-1] == '=' and sep[:confirmed] == [:street_number]
+      ind = -1
+      #find where the number stops and the unit begins
+      sep[:text].split(//).each_with_index do |char, chari|
+        if not char.numeric?
+          ind = chari
+        end
+      end
+
+      #update the street number
+      if ind != -1
+        sep[:orig] = sep[:text]
+        unit = sep[:text][ind-1,999].delete '-'
+        sep[:text] = sep[:text][0,ind+1]
+        #append the unit
+        @sep_map << {text: unit, confirmed: [:unit], in_both: [:unit], from_pattern: [:unit], from_location: [:unit], typified: "g"}
+      end
     end
   end
 end
@@ -321,6 +339,8 @@ def confirm_street_number_options
     first_sep[:text] = first_sep[:text] + @sep_map[1][:text]
     @bus[:street_num] = @sep_map[1][:text]
     @sep_map.delete_at 1
+  elsif first_sep[:typified][-1] == '=' and first_sep[:text].reverse[1,999].numeric?
+    first_sep[:confirmed] = [:street_number]
   end
 end
 
@@ -342,7 +362,6 @@ def confirm_street_name_options
       break
     end
   end
-
   # Find start and stop index
   name_start_index = -1
   name_stop_index = -1
@@ -356,15 +375,16 @@ def confirm_street_name_options
     else
       name_stop_index = lab_ind - 1
     end
-  elsif num_ind != -1 and dir_ind != -1
+  elsif num_ind != -1 and dir_ind != -1 and num_ind+1 != dir_ind
     name_start_index = num_ind + 1
     name_stop_index = dir_ind - 1
-  elsif num_ind != -1 and lab_ind == -1 and dir_ind == -1 #find the sep comma
+  elsif num_ind != -1 #find the sep comma
     name_start_index = num_ind + 1
     comma_index = -1
     @sep_comma.each_with_index do |com, comi|
       if com.include? @sep_map[name_start_index][:text]
         comma_index = comi
+        break
       end
     end
     last_word = @sep_comma[comma_index].last
@@ -427,6 +447,7 @@ def confirm_direction_options
   #we know: state, unit, number, street
   directions_found = []
   street_number = ""
+  comma_removed = []
   #Find all directions
   @sep_map.each_with_index do |sep, i|
     if sep[:confirmed] == [:street_number]
@@ -447,9 +468,15 @@ def confirm_direction_options
         directions_found << sep
         #remove it from being used again
         ind = @sep_comma[num_comma].index sep[:text]
+        comma_removed << [num_comma, ind, sep[:text]]
         @sep_comma[num_comma].delete_at ind #remove it from being used twice
       end
     end
+  end #@sep_map.each_with_index
+
+  #Add back the directions that were removed from sep_comma
+  comma_removed.each do |remove|
+    @sep_comma[remove[0]].insert(remove[1], remove[2])
   end
 
   #chose between directions
@@ -483,16 +510,35 @@ def confirm_street_label_options
   #we know: number and state
   found_label = false
   @sep_map.reverse.each_with_index do |sep, i|
-    if not found_label and sep[:from_pattern].include? :street_label
-      sep[:confirmed] = [:street_label]
-      found_label = true
-      if sep[:text] == 'way' #check for compound label (ex: express way, high way, park way)
-        compound = @sep_map[i-1][:text] + sep[:text]
-        if NYAConstants::LABEL_DESCRIPTORS.include? compound
-          @sep_map[i-1][:confirmed] = [:street_label]
-          @sep_map[i-1][:orig] = @sep_map[i-1][:text]
-          @sep_map[i-1][:text] = compound
-          sep[:confirmed] = []
+    if not found_label and sep[:from_pattern].include? :street_label and sep[:confirmed] == []
+
+      ## Find the street number
+      snum = ""
+      @sep_map.each do |sep2|
+        if sep2[:confirmed] == [:street_number]
+          if sep2[:orig].nil?
+            snum = sep2[:text]
+          else
+            snum = sep2[:orig]
+          end
+        end
+      end
+      #Make sure it's in the same sep_comma as number
+      if snum.length > 0
+        @sep_comma.each do |comma|
+          if comma.include? snum and comma.include? sep[:text]
+            sep[:confirmed] = [:street_label]
+            found_label = true
+            if sep[:text] == 'way' #check for compound label (ex: express way, high way, park way)
+              compound = @sep_map[i-1][:text] + sep[:text]
+              if NYAConstants::LABEL_DESCRIPTORS.include? compound
+                @sep_map[i-1][:confirmed] = [:street_label]
+                @sep_map[i-1][:orig] = @sep_map[i-1][:text]
+                @sep_map[i-1][:text] = compound
+                sep[:confirmed] = []
+              end
+            end
+          end
         end
       end
     end
@@ -626,7 +672,6 @@ def check_requirements
         else
           comma.each do |word|
             if @bus[:extra_street].include? word
-              debugger #this is here because it's never been triggered before
               @parts[:street_name] += word + ' '
               @bus[:extra_street].delete(word)
             end
