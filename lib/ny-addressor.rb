@@ -37,7 +37,7 @@ class NYAddressor
 
   def set_locale
     typify
-    @locale = if @typified.include?('=|= |=|')
+    @locale = if (@typified.include?('=|= |=|') or @typified.include?('=|=|=|'))
       :ca 
     else
       :us
@@ -47,6 +47,11 @@ class NYAddressor
   def pre_scrub_logic
     case @locale
     when :ca
+      if @typified.include?('=|=|=|')
+        start = @typified.index('=|=|=|')
+        @str = [@str[0..(start + 2)], @str[(start + 3)..-1]].join(' ')
+        typify
+      end
       start = @typified.index('=|= |=|')
       @bus[:postal_code] = @str.slice(start..(start + 6))
       parts = @str.split(@bus[:postal_code])

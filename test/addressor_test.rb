@@ -120,6 +120,8 @@ class NYAddressorTest < MiniTest::Test
   def test_canadian_zip
     zip = 'H0H 0H0'
     assert NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip).zip == zip
+    zip_no_space = zip.gsub(' ','')
+    assert NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip_no_space).zip == zip
   end
 
   def test_determine_state
