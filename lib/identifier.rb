@@ -79,11 +79,11 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
   end
 
   def extra_sep_comma
-    ## removing extra street data
-    @sep_comma.reverse.each do |sep|
-      if sep.map.include? 'corner' or sep.map.include? 'coner' or sep.map.include? 'route' or sep.map.include? 'plaza' or sep.map.include? 'shopping' and @sep_comma.length > 4
-        @sep_comma.delete(sep)
+    ## Remove extraneous information from the address
+    @sep_comma.each_with_index do |sep, i|
+      if ( (sep[0] == 'corner' or sep[1] == 'coner') and sep[1] == 'of') or (sep[0] == 'on' and sep[2] == 'corner')
         @bus[:extra_street] = sep.join(' ')
+        @sep_comma.delete sep
       end
     end
   end
@@ -449,7 +449,6 @@ def confirm_direction_options
   #we know: state, unit, number, street
   directions_found = []
   street_number = ""
-  comma_removed = []
   #Find all directions
   @sep_map.each_with_index do |sep, i|
     if sep[:confirmed] == [:street_number]
@@ -457,29 +456,24 @@ def confirm_direction_options
     elsif sep[:in_both].include? :street_direction and @sep_map[i+1][:confirmed] == [:street_label]
       sep[:in_both].delete :street_direction
     elsif sep[:from_pattern].include? :street_direction
-      #make sure it's in the same sep_comma as street_number
+      ## Find what sep_comma the number is in
       num_comma = -1
       @sep_comma.each_with_index do |comma, comi|
         if comma.include? street_number
           num_comma = comi
+          break
         end
       end
-      if num_comma == -1
-        directions_found << sep
-      elsif @sep_comma[num_comma].include? sep[:text]
-        directions_found << sep
-        #remove it from being used again
-        ind = @sep_comma[num_comma].index sep[:text]
-        comma_removed << [num_comma, ind, sep[:text]]
-        @sep_comma[num_comma].delete_at ind #remove it from being used twice
+
+      @sep_comma.each_with_index do |comma, comi|
+        if comma.include? street_number and comma.include? sep[:text]
+          directions_found << sep
+        elsif comma.include? sep[:text] and comi == num_comma+1 and comma.length == 1
+          directions_found << sep
+        end
       end
     end
   end #@sep_map.each_with_index
-
-  #Add back the directions that were removed from sep_comma
-  comma_removed.each do |remove|
-    @sep_comma[remove[0]].insert(remove[1], remove[2])
-  end
 
   #chose between directions
   if directions_found.length > 1
@@ -641,7 +635,7 @@ end
 
 def check_requirements
   #Street number but no name?
-  if @parts[:street_name].nil? and not @parts[:street_number].nil?
+  if @parts[:street_name].nil? and not @parts[:street_number].nil? and not @parts[:street_number].numeric?
     @parts[:street_name] = @parts[:street_number]
     @parts.delete(:street_number)
   end
@@ -663,40 +657,44 @@ def check_requirements
     @parts[:street_name] = @parts[:street_name].chop()
   end
 
-  #Number/unit but no name?
-  if @parts[:street_name].nil? and (not @parts[:unit].nil? or not @parts[:street_number].nil?)
-    if not @bus[:extra_street].nil?
-      @parts[:street_name] = ""
-      @sep_comma.each do |comma|
-        if @parts[:street_name] != ""
-          @parts[:street_name] = @parts[:street_name].chop
-          break
-        else
-          comma.each do |word|
-            if @bus[:extra_street].include? word
-              @parts[:street_name] += word + ' '
-              @bus[:extra_street].delete(word)
-            end
-          end
-        end
-      end
-    elsif not @bus[:nil].nil?
-      @parts[:street_name] = ""
-      @sep_comma.each do |comma|
-        if @parts[:street_name] != ""
-          @parts[:street_name] = @parts[:street_name].chop
-          break
-        else
-          comma.each do |word|
-            if @bus[:nil].include? word
-              @parts[:street_name] += word + ' '
-              @bus[:nil].delete(word)
-            end
-          end
-        end
-      end
-    end
+  #Unit but no name
+  if @parts[:street_name].nil? and not @parts[:unit].nil? and not @parts[:unit].to_s.has_digits?
+    @parts[:street_name] = @parts[:unit]
+    @parts[:unit] = nil
   end
+  # if @parts[:street_name].nil? and (not @parts[:unit].nil? or not @parts[:street_number].nil?)
+  #   if not @bus[:extra_street].nil?
+  #     @parts[:street_name] = ""
+  #     @sep_comma.each do |comma|
+  #       if @parts[:street_name] != ""
+  #         @parts[:street_name] = @parts[:street_name].chop
+  #         break
+  #       else
+  #         comma.each do |word|
+  #           if @bus[:extra_street].include? word
+  #             @parts[:street_name] += word + ' '
+  #             @bus[:extra_street].delete(word)
+  #           end
+  #         end
+  #       end
+  #     end
+  #   elsif not @bus[:nil].nil?
+  #     @parts[:street_name] = ""
+  #     @sep_comma.each do |comma|
+  #       if @parts[:street_name] != ""
+  #         @parts[:street_name] = @parts[:street_name].chop
+  #         break
+  #       else
+  #         comma.each do |word|
+  #           if @bus[:nil].include? word
+  #             @parts[:street_name] += word + ' '
+  #             @bus[:nil].delete(word)
+  #           end
+  #         end
+  #       end
+  #     end
+  #   end
+  # end
 
   ## No street direction? check the bus
   if @parts[:street_direction].nil? and not @bus[:nil].nil?
