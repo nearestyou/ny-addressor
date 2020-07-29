@@ -44,8 +44,9 @@ class NYAddress
   end
 
   def hash
-    return nil if @parts.nil?
-    Digest::SHA256.hexdigest(construct)[0..23]
+    key = construct
+    return nil if key.length == 0
+    Digest::SHA256.hexdigest(key)[0..23]
   end
 
   def hash99999 # for searching by missing/erroneous ZIP
@@ -60,7 +61,7 @@ class NYAddress
 
   def sns
     begin
-      if @parts[:street_number].length > 0 and @parts[:street_name] > 0 and @parts[:state].length > 0
+      if @parts[:street_number].length > 0 and @parts[:street_name].length > 0 and @parts[:state].length > 0
         return "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}".delete(' ').delete('-')
       else
         return ""
