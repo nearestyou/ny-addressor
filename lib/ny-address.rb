@@ -59,15 +59,18 @@ class NYAddress
   end
 
   def sns
-    if @parts[:street_number].length > 0 and @parts[:street_name].length > 0 and @parts[:state].length > 0
-      return "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}".delete(' ').delete('-')
-    else
+    begin
+      if @parts[:street_number].length > 0 and @parts[:street_name] > 0 and @parts[:state].length > 0
+        return "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}".delete(' ').delete('-')
+      else
+        return ""
+      end
+    rescue
       return ""
     end
   end
 
   def eq(address_parts, display = false)
-    # debugger
     return nil if @parts.nil?
 
     return false if @parts[:street_number].to_s.downcase != address_parts[:street_number].to_s.downcase
