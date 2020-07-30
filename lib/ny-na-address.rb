@@ -36,6 +36,7 @@ class NYAddress
 
   def construct(opts = {})
     opts = {include_unit: false, include_label: false, include_dir: false, include_postal: false}.merge(opts)
+
     addr = "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:city]}#{@parts[:state]}"
     opts[:include_unit] ? addr << @parts[:unit].to_s : nil
     opts[:include_label] ? addr << @parts[:street_label].to_s : nil
