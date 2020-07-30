@@ -35,7 +35,7 @@ class NYAddress
   end
 
   def construct(opts = {})
-    opts = {include_unit: false, include_label: false, include_dir: false, include_postal: false}.merge(opts)
+    opts = {include_unit: true, include_label: false, include_dir: false, include_postal: true}.merge(opts)
 
     addr = "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:city]}#{@parts[:state]}"
     opts[:include_unit] ? addr << @parts[:unit].to_s : nil
@@ -47,6 +47,12 @@ class NYAddress
 
   def hash
     key = construct
+    return nil if key.length == 0
+    Digest::SHA256.hexdigest(key)[0..23]
+  end
+
+  def unitlesshash
+    key = construct(opts={include_unit: false})
     return nil if key.length == 0
     Digest::SHA256.hexdigest(key)[0..23]
   end
