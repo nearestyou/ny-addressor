@@ -35,12 +35,13 @@ class NYAddress
   end
 
   def construct(opts = {})
-    opts = {include_unit: true}.merge(opts)
-    addr = sns
-    if addr.length > 0
-      opts[:include_unit] ? addr << @parts[:unit].to_s : nil
-    end
-    addr
+    opts = {include_unit: false, include_label: false, include_dir: false, include_postal: false}.merge(opts)
+    addr = "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:city]}#{@parts[:state]}"
+    opts[:include_unit] ? addr << @parts[:unit].to_s : nil
+    opts[:include_label] ? addr << @parts[:street_label].to_s : nil
+    opts[:include_dir] ? addr << @parts[:street_direction].to_s : nil
+    opts[:include_postal] ? addr << @parts[:postal_code].to_s : nil
+    addr.delete(' ').delete('-')
   end
 
   def hash
@@ -52,11 +53,6 @@ class NYAddress
   def hash99999 # for searching by missing/erroneous ZIP
     return nil if @parts.nil?
     Digest::SHA256.hexdigest(construct[0..-6] + "99999")[0..23]
-  end
-
-  def unitless_hash
-    return nil if @parts.nil?
-    Digest::SHA256.hexdigest(construct({include_unit: false}))[0..23]
   end
 
   def sns
