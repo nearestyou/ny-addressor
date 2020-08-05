@@ -207,6 +207,8 @@ def potential_postal_code(part)
     true
   when '|=|'
     true
+  when '=|=|=|'
+    true
   else
     false
   end
