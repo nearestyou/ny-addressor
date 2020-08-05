@@ -3,7 +3,7 @@ require 'byebug'
 load 'lib/constants.rb'
 load 'lib/identifier.rb'
 
-class NYAddress
+class NYUSAddress
   attr_accessor :monitor, :str, :orig, :typified, :sep, :bus, :sep_map, :sep_comma, :idr, :parts
 
   def initialize(str)

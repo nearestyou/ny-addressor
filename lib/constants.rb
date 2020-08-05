@@ -71,6 +71,7 @@ class NYAConstants
   }
 
   other_descriptors = []
+  US_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values).map(&:downcase)
   STATE_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values + CA_PROVINCES.keys + CA_PROVINCES.values + other_descriptors).map(&:downcase)
   STATE_KEYS ||= (US_STATES.keys + CA_PROVINCES.keys).map(&:downcase)
 
