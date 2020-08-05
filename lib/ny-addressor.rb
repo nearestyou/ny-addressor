@@ -53,5 +53,7 @@ class NYAddressor
   def hash99999; @addressor.hash99999; end
   def unitlesshash; @addressor.unitlesshash; end
   def sns; @addressor.sns; end
+
+  def self.string_inclusion(str1, str2, numeric_failure = false); AddressorUtils.string_inclusion(str1, str2, numeric_failure); end
   
 end
