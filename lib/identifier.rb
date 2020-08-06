@@ -37,9 +37,13 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
     while @str.include?('(') and @str.include?(')')
       open = @str.index('(')
       close = @str.index(')')
-      @bus[:parentheses] ||= []
-      @bus[:parentheses] << @str[open+1..close-1]
-      @str = @str[0..open-1] + @str[close+1..-1]
+      if open > close
+        @str = @str.gsub('(', '').gsub(')','') 
+      else
+        @bus[:parentheses] ||= []
+        @bus[:parentheses] << @str[open+1..close-1]
+        @str = @str[0..open-1] + @str[close+1..-1]
+      end
     end
 
     ## Remove punctuation
