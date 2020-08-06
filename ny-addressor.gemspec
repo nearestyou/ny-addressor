@@ -16,5 +16,4 @@ Gem::Specification.new do |s|
     "lib/extensions.rb",
     "lib/identifier.rb"
   ]
-  s.require_paths = ["lib"]
 end
