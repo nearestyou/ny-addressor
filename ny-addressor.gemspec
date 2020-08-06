@@ -7,7 +7,14 @@ Gem::Specification.new do |s|
   s.email = 'peter@puzzlesandwich.com'
   s.homepage = 'http://www.puzzlesandwich.com'
   s.files = [
-    "lib/ny-addressor.rb"
+    "lib/ny-addressor.rb",
+    "lib/ny-ca-address.rb",
+    "lib/ny-non-address.rb",
+    "lib/ny-us-address.rb",
+    "lib/addressor_utils.rb",
+    "lib/constants.rb",
+    "lib/extensions.rb",
+    "lib/identifier.rb"
   ]
   s.require_paths = ["lib"]
 end
