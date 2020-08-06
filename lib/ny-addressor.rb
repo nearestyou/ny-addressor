@@ -1,9 +1,15 @@
-load 'lib/ny-us-address.rb'
-load 'lib/ny-ca-address.rb'
-load 'lib/ny-non-address.rb'
-load 'lib/identifier.rb'
-load 'lib/constants.rb'
-load 'lib/extensions.rb'
+load 'ny-us-address.rb'
+load 'ny-ca-address.rb'
+load 'ny-non-address.rb'
+load 'identifier.rb'
+load 'constants.rb'
+load 'extensions.rb'
+#load 'lib/ny-us-address.rb'
+#load 'lib/ny-ca-address.rb'
+#load 'lib/ny-non-address.rb'
+#load 'lib/identifier.rb'
+#load 'lib/constants.rb'
+#load 'lib/extensions.rb'
 
 class NYAddressor
   attr_accessor :input, :region, :addressor
