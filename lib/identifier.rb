@@ -1,5 +1,5 @@
-load 'lib/addressor_utils.rb'
-load 'lib/extensions.rb'
+#load 'lib/addressor_utils.rb'
+#load 'lib/extensions.rb'
 
 class NYIdentifier
 attr_accessor :str, :sep, :sep_map, :locale, :bus

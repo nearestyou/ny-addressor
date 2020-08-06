@@ -1,7 +1,7 @@
 require 'digest'
-require 'byebug'
-load 'lib/constants.rb'
-load 'lib/identifier.rb'
+#require 'byebug'
+#load 'lib/constants.rb'
+#load 'lib/identifier.rb'
 
 class NYUSAddress
   attr_accessor :monitor, :str, :orig, :typified, :sep, :bus, :sep_map, :sep_comma, :idr, :parts
