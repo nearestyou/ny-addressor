@@ -39,6 +39,10 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
       close = @str.index(')')
       if open > close
         @str = @str.gsub('(', '').gsub(')','') 
+      elsif open == 0
+        @bus[:parentheses] ||= []
+        @bus[:parentheses] << @str[0..close-1]
+        @str = @str[close+1..-1]
       else
         @bus[:parentheses] ||= []
         @bus[:parentheses] << @str[open+1..close-1]
