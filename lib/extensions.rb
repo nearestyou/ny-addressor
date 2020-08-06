@@ -12,4 +12,10 @@ class String
     self.split("").each {|char| return true if alphabet.include? char}
     false
   end
+
+  def letter_count
+    ct = 0
+    self.split("").each {|char| ct += 1 if not char.numeric?}
+    ct
+  end
 end

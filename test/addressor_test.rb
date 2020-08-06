@@ -137,7 +137,6 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_ohs_in_zip
-    skip
     assert eq( "1600 First Ave, Washington, DC, 20500",  "1600 First Ave, Washington, DC, 205Oo")
   end
 
@@ -167,12 +166,10 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_missing_unit_designation
-    skip # FIXME
     assert eq("15355 24 Ave,700 (at Peninsula Village), Surrey BC V4A 2H9, Canada", "15355 24 Ave,#700 (at Peninsula Village), Surrey BC V4A 2H9, Canada")
   end
 
   def test_leading_unit_designations
-    skip # FIXME the 700 in all three of these address is the unit number
     assert eq("700-15355 Main Ave, Surrey BC V4A 2H9, Canada", "15355 Main Ave,#700, Surrey BC V4A 2H9, Canada")
     assert eq("700/15355 Main Ave, Surrey BC V4A 2H9, Canada", "15355 Main Ave,#700, Surrey BC V4A 2H9, Canada")
   end
@@ -188,7 +185,6 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_STE
-    skip # FIXME
     assert eq("15355 Main Ave #456, Surrey, MN, 55082", "15355 Main Ave STE 456, Surrey, MN, 55082")
     assert eq("9810 Medlock Bridge Rd Suite 500, Johns Creek, GA 30097, USA", "9810 Medlock Bridge Rd #500, Johns Creek, GA 30097, USA")
     assert !NYAddressor.new("15355 Main Ave STE G&H, Surrey, MN, 55082").hash.nil?

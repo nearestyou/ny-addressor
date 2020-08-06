@@ -44,12 +44,6 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
 
     ## Remove punctuation
     @str = @str.gsub('.', '')
-    # if @str.include? '-'
-    #   dash = @str.index('-')
-    #   if not @str[dash-1].numeric? or not @str[dash+1].numeric?
-    #     @str = @str.gsub('-', '')
-    #   end
-    # end
     if @str.include? '&'
       amp = @str.index('&')
       if amp < 6 and (@str[amp-1].numeric? or @str[amp-2].numeric?) and (@str[amp+1].numeric? or @str[amp+2].numeric?)
@@ -210,6 +204,7 @@ def potential_postal_code(part)
   when '=|=|=|'
     true
   else
+    return true if part[:text].delete('o').numeric? and part[:text].length > 3
     false
   end
 end
@@ -288,10 +283,13 @@ def confirm_unit_options
         @sep_map[i+1][:confirmed] = [:unit]
       end
       break
+    elsif sep[:in_both].include? :unit and sep[:confirmed] == [] #this may have broken some things
+      sep[:confirmed] = [:unit]
     elsif sep[:typified][-1] == '=' and sep[:confirmed] == [:street_number] #if the unit is in the street number
       ind = -1
-      #find where the number stops and the unit begins
-      sep[:text].split(//).each_with_index do |char, chari|
+      # find where the number stops and the unit begins
+      # sep[:text].split(//).each_with_index do |char, chari|
+      sep[:text].split("").each_with_index do |char, chari|
         if not char.numeric? or char == '-'
           ind = chari
           break
@@ -627,13 +625,18 @@ def standardize_aliases
       sep[:text] = NYAConstants::STREET_DIRECTIONS[sep[:text]]
     elsif sep[:confirmed].include? :street_label and NYAConstants::STREET_LABELS.keys.include? sep[:text]
       sep[:text] = NYAConstants::STREET_LABELS[sep[:text]]
+    elsif sep[:confirmed].include? :unit
+      sep[:text] = sep[:text].delete '#'
+      sep[:text] = sep[:text].tr('a-z', '') if sep[:text].letter_count > 1
     elsif sep[:confirmed].include? :state and NYAConstants::STATE_KEYS.include? sep[:text]
       sep[:orig] = sep[:text]
       sep[:text] = NYAConstants::US_STATES[sep[:text].capitalize()] if NYAConstants::US_STATES[sep[:text].capitalize()]
       sep[:text] = NYAConstants::CA_PROVINCES[sep[:text].capitalize()] if NYAConstants::CA_PROVINCES[sep[:text].capitalize()]
+    elsif sep[:confirmed].include? :postal_code and sep[:text].include? 'o'
+      sep[:text] = sep[:text].gsub('o', '0')
     end
   end
-end
+end #def standardize_aliases
 
 def check_requirements
   #Street number but no name?
@@ -664,39 +667,6 @@ def check_requirements
     @parts[:street_name] = @parts[:unit]
     @parts[:unit] = nil
   end
-  # if @parts[:street_name].nil? and (not @parts[:unit].nil? or not @parts[:street_number].nil?)
-  #   if not @bus[:extra_street].nil?
-  #     @parts[:street_name] = ""
-  #     @sep_comma.each do |comma|
-  #       if @parts[:street_name] != ""
-  #         @parts[:street_name] = @parts[:street_name].chop
-  #         break
-  #       else
-  #         comma.each do |word|
-  #           if @bus[:extra_street].include? word
-  #             @parts[:street_name] += word + ' '
-  #             @bus[:extra_street].delete(word)
-  #           end
-  #         end
-  #       end
-  #     end
-  #   elsif not @bus[:nil].nil?
-  #     @parts[:street_name] = ""
-  #     @sep_comma.each do |comma|
-  #       if @parts[:street_name] != ""
-  #         @parts[:street_name] = @parts[:street_name].chop
-  #         break
-  #       else
-  #         comma.each do |word|
-  #           if @bus[:nil].include? word
-  #             @parts[:street_name] += word + ' '
-  #             @bus[:nil].delete(word)
-  #           end
-  #         end
-  #       end
-  #     end
-  #   end
-  # end
 
   ## No street direction? check the bus
   if @parts[:street_direction].nil? and not @bus[:nil].nil?
@@ -725,6 +695,11 @@ def check_requirements
       end
     end
   end #if @parts[:street_direction].nil?
+
+  ## No unit? check the bus
+  if @parts[:unit].nil? and not @bus[:street_num].nil?
+    @parts[:unit] = @bus[:street_num]
+  end
 
   ## Remove duplicate city
   if not @parts[:city].nil?

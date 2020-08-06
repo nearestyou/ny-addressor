@@ -2,10 +2,9 @@ load 'lib/ny-us-address.rb'
 load 'lib/ny-ca-address.rb'
 load 'lib/ny-non-address.rb'
 load 'lib/identifier.rb'
-# load 'lib/constants.rb'
 
 class NYAddressor
-  attr_accessor :input, :output, :region, :addressor
+  attr_accessor :input, :region, :addressor
 
   def initialize(input)
     if input.nil?
@@ -20,9 +19,6 @@ class NYAddressor
 
     if potential_region.length == 1
       @region = potential_region[0]
-      # puts "#{input} failed"
-    # else
-    #   puts "#{input} failed"
     elsif potential_region.length > 1
       @region = :CA
     end
@@ -61,5 +57,5 @@ class NYAddressor
 
   def self.string_inclusion(str1, str2, numeric_failure = false); AddressorUtils.string_inclusion(str1, str2, numeric_failure); end
   def self.determine_state(state_name, postal_code = nil); AddressorUtils.determine_state(state_name, postal_code); end
-  
+
 end
