@@ -1,7 +1,7 @@
-load 'lib/ny-us-address.rb'
-load 'lib/ny-ca-address.rb'
-load 'lib/ny-non-address.rb'
-load 'lib/identifier.rb'
+#load 'lib/ny-us-address.rb'
+#load 'lib/ny-ca-address.rb'
+#load 'lib/ny-non-address.rb'
+#load 'lib/identifier.rb'
 
 class NYAddressor
   attr_accessor :input, :region, :addressor
