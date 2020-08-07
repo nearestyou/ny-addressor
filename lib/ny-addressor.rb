@@ -1,16 +1,19 @@
-require 'ny-us-address.rb'
-require 'ny-ca-address.rb'
-require 'ny-non-address.rb'
-require 'identifier.rb'
-require 'constants.rb'
-require 'extensions.rb'
-require 'addressor_utils.rb'
-#load 'lib/ny-us-address.rb'
-#load 'lib/ny-ca-address.rb'
-#load 'lib/ny-non-address.rb'
-#load 'lib/identifier.rb'
-#load 'lib/constants.rb'
-#load 'lib/extensions.rb'
+if ENV['LOCAL_DEPENDENCIES']
+  load 'lib/ny-us-address.rb'
+  load 'lib/ny-ca-address.rb'
+  load 'lib/ny-non-address.rb'
+  load 'lib/identifier.rb'
+  load 'lib/constants.rb'
+  load 'lib/extensions.rb'
+else
+  require 'ny-us-address.rb'
+  require 'ny-ca-address.rb'
+  require 'ny-non-address.rb'
+  require 'identifier.rb'
+  require 'constants.rb'
+  require 'extensions.rb'
+  require 'addressor_utils.rb'
+end
 
 class NYAddressor
   attr_accessor :input, :region, :addressor
@@ -50,8 +53,10 @@ class NYAddressor
     case @region
     when :US
       @addressor = NYUSAddress.new(@input)
+      @addressor = NYNONAddress.new if @addressor.parts.keys.count < 1
     when :CA
       @addressor = NYCAAddress.new(@input)
+      @addressor = NYNONAddress.new if @addressor.parts.keys.count < 1
     else
       @addressor = NYNONAddress.new
     end
