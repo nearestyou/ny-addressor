@@ -12,7 +12,7 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
 
   def identifications
     identify
-    { sep: @sep, sep_map: @sep_map, sep_comma: @sep_comma, locale: @locale, bus: @bus, parts: @parts }
+    { sep: @sep, sep_map: @sep_map, sep_comma: @sep_comma, locale: @locale, bus: @bus, parts: @parts || {} }
   end
 
   def identify
