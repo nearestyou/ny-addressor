@@ -91,16 +91,6 @@ class NYUSAddress
     return true
   end
 
-  def comp(parsed_address)
-    return 0 if @parts.nil?
-    return 0 if parsed_address.nil?
-    sims = 0
-    sims += 1 if @parts[:street_number] == parsed_address[:street_number]
-    sims += 1 if @parts[:street_name] == parsed_address[:street_name]
-    sims += 1 if @parts[:postal_code] == parsed_address[:postal_code]
-    sims
-  end
-
   def ordinalize_street(street)
     {
       'first' => '1st', 'second' => '2nd', 'third' => '3rd', 'fourth' => '4th', 'fifth' => '5th', 'sixth' => '6th', 'seventh' => '7th', 'eighth' => '8th', 'ninth' => '9th', 'tenth' => '10th', 'eleventh' => '11th', 'twelfth' => '12th'

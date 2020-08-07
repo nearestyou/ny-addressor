@@ -5,6 +5,7 @@ if ENV['LOCAL_DEPENDENCIES']
   load 'lib/identifier.rb'
   load 'lib/constants.rb'
   load 'lib/extensions.rb'
+  load 'lib/addressor_utils.rb'
 else
   require 'ny-us-address.rb'
   require 'ny-ca-address.rb'
@@ -68,8 +69,11 @@ class NYAddressor
   def hash99999; @addressor.hash99999; end
   def unitless_hash; @addressor.unitless_hash; end
   def sns; @addressor.sns; end
+  def comp(nya, comparison_keys = [:street_number, :street_name, :postal_code]); AddressorUtils.comp(@addressor.parts, nya.addressor.parts, comparison_keys); end 
 
   def self.string_inclusion(str1, str2, numeric_failure = false); AddressorUtils.string_inclusion(str1, str2, numeric_failure); end
   def self.determine_state(state_name, postal_code = nil); AddressorUtils.determine_state(state_name, postal_code); end
+  #def self.comp(parts1, parts2, comparison_keys = [:street_number, :street_name, :postal_code]); AddressorUtils.comp(parts1, parts2, comparison_keys); end
+  def self.comp(*args); AddressorUtils.comp(*args); end
 
 end

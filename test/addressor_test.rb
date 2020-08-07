@@ -8,7 +8,7 @@ class NYAddressorTest < MiniTest::Test
 
   def comp(str1, str2)
     address = NYAddressor.new(str1)
-    address.comp(NYAddressor.new(str2).addressor.parts)
+    address.comp(NYAddressor.new(str2))
   end
 
   ############
@@ -72,26 +72,26 @@ class NYAddressorTest < MiniTest::Test
     assert eq( "1600 Pennsylvania Ave, Washington 2, DC, 99999",  "1600 Pennsylvania Ave, Washington, DC 99999")
   end
 
-  #def test_great_match
-  #  assert_equal comp( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 3
-  #end
+  def test_great_match
+    assert_equal comp( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 3
+  end
 
-  #def test_okay_match
-  #  assert_equal comp( "1500 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 2
-  #end
+  def test_okay_match
+    assert_equal comp( "1500 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 2
+  end
 
-  #def test_bad_match
-  #  assert_equal comp( "1500 Bennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 1
-  #end
+  def test_bad_match
+    assert_equal comp( "1500 Bennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 1
+  end
 
-  #def test_non_match
-  #  assert_equal comp( "1500 Bennsylvania Ave, Washington, DC 20400",  "1600 Pennsylvania Ave, Washington, DC 20500"), 0
-  #end
+  def test_non_match
+    assert_equal comp( "1500 Bennsylvania Ave, Washington, DC 20400",  "1600 Pennsylvania Ave, Washington, DC 20500"), 0
+  end
 
-  #def test_error_match
-  #  assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20400', 'kjhghjkjhghjkjhg'), 0
-  #  assert_equal comp( 'kjhghjkjhghjkjhg', '1500 Bennsylvania Ave, Washington, DC 20400'), 0
-  #end
+  def test_error_match
+    assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20400', 'kjhghjkjhghjkjhg'), 0
+    assert_equal comp( 'kjhghjkjhghjkjhg', '1500 Bennsylvania Ave, Washington, DC 20400'), 0
+  end
 
   def test_error_parse
     assert_nil NYAddressor.new('ghjkjhghjkjhghjkjhghjkjhghjk').addressor.parts

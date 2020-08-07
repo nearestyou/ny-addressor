@@ -45,5 +45,15 @@ def determine_state(state_name, postal_code = nil)
   end
 end
 
+def comp(parts1, parts2, comparison_keys = [:street_number, :street_name, :postal_code])
+  return 0 if parts1.nil?
+  return 0 if parts2.nil?
+  sims = 0
+  comparison_keys.each do |k|
+    sims += 1 if parts1[k] == parts2[k]
+  end
+  sims
+end
+
 end
 end
