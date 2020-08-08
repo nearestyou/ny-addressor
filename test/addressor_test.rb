@@ -239,6 +239,7 @@ class NYAddressorTest < MiniTest::Test
   def test_unit_in_street_num
     assert NYAddressor.new('1600A Pennsylvania Ave N, New Minneapolis, MN 55555').unitless_hash  == NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash
     assert NYAddressor.new('1600-A Pennsylvania Ave N, New Minneapolis, MN 55555').unitless_hash == NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash
+    assert NYAddressor.new('12015-B, Rockville Pike, Rockville, MD 20852, United States').unitless_hash == NYAddressor.new('12015, Rockville Pike, Rockville, MD 20852, United States').hash
   end
 
 end

@@ -426,6 +426,8 @@ def confirm_street_name_options
     @sep_comma.each do |comma|
       if comma.include? first_word and not comma.include? last_word
         name_stop_index = -1
+      elsif comma.include? first_word and comma.include? last_word
+        break
       end
     end
   end
