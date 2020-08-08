@@ -149,7 +149,8 @@ class NYAConstants
     'no' => '#',
     'apartment' => 'apt',
     'suite' => 'ste',
-    'room' => 'room'
+    'room' => 'room',
+    'unit' => '#'
   }
   UNIT_DESCRIPTORS ||= (UNITS.keys + UNITS.values)
 

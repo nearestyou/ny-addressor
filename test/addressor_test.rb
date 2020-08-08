@@ -1,4 +1,5 @@
 require 'minitest/autorun'
+require 'byebug'
 load 'lib/ny-addressor.rb'
 
 class NYAddressorTest < MiniTest::Test
@@ -219,6 +220,25 @@ class NYAddressorTest < MiniTest::Test
 
   def test_canadian_hiway
     assert NYAddressor.new("2070 BC-3, Cawston, BC V0X 1C2, Canada").sns == "2070bc3bc"
+  end
+
+  def test_pre_unit
+    assert NYAddressor.new("B2 - 15562 24TH AVENUE, SURREY, V4A2J5").unitless_hash == NYAddressor.new("15562 24TH AVENUE, SURREY, V4A2J5").hash
+    assert NYAddressor.new("UNIT 23 11151 HORSESHOE WAY, RICHMOND, V7A4S5").unitless_hash == NYAddressor.new("11151 HORSESHOE WAY, RICHMOND, V7A4S5").hash
+    assert NYAddressor.new("150 - 19288 22ND AVENUE, SURREY, V3S3S9").unitless_hash == NYAddressor.new("19288 22ND AVENUE, SURREY, V3S3S9").hash
+  end
+
+  def test_old_hash
+    assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash == "f7dfa569dc3cfbf0e12ab2bd"
+    assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash99999 == "d802689082fef112da4b72d0"
+    assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').sns == "1600pennsylvaniamn"
+    assert NYAddressor.new('1600 Pennsylvania Ave N #500, New Minneapolis, MN 55555').hash == "6e50ab83ed7320048f67c3eb"
+    assert NYAddressor.new('1600 Pennsylvania Ave N #500, New Minneapolis, MN 55555').unitless_hash == "f7dfa569dc3cfbf0e12ab2bd"
+  end
+
+  def test_unit_in_street_num
+    assert NYAddressor.new('1600A Pennsylvania Ave N, New Minneapolis, MN 55555').unitless_hash  == NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash
+    assert NYAddressor.new('1600-A Pennsylvania Ave N, New Minneapolis, MN 55555').unitless_hash == NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash
   end
 
 end

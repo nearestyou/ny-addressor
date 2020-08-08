@@ -97,6 +97,9 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
       if word == @sep[i+1]
         @sep.delete_at i
       end
+      if word == '-'
+        @sep.delete_at i
+      end
     end
 
     ## Remove different ways to say 'usa'
@@ -173,6 +176,7 @@ def potential_unit(part)
   return true if part[:text].numeric? and part[:text].length < 4
   return true if part[:text].include? '#'
   return true if not part[:text].numeric? and part[:text].length == 1 and not 'nsew'.include? part[:text]
+  return true if part[:typified] == '=|' or part[:typified] == '|='
   return false
 end
 
@@ -227,7 +231,7 @@ def location_options(part, i, nParts)
   when 1
     [:street_number, :street_name, :street_direction, :street_label]
   when 2
-    [:street_name, :street_label, :street_unit, :street_direction]
+    [:street_number, :street_name, :street_label, :street_unit, :street_direction]
   when nParts - 3
     [:city, :state, :postal_code]
   when nParts - 2
@@ -252,10 +256,11 @@ def confirm_identity_options
   confirm_country
   confirm_postal_code
   confirm_state_options
+  confirm_unit_options
   confirm_street_number_options
+  check_street_number_unit
   confirm_street_label_options
   confirm_direction_options
-  confirm_unit_options
   confirm_street_name_options
   confirm_city_options
 end
@@ -277,32 +282,16 @@ end
 
 def confirm_unit_options
   @sep_map.each_with_index do |sep, i|
-    if sep[:from_pattern].include? :unit and sep[:confirmed] == [] and not sep[:text].numeric?
+    if sep[:from_pattern].include? :unit and sep[:confirmed] == [] and not sep[:text].has_digits?
       sep[:confirmed] = [:unit]
       if @sep_map[i+1][:text].has_digits?
         @sep_map[i+1][:confirmed] = [:unit]
       end
       break
-    elsif sep[:in_both].include? :unit and sep[:confirmed] == [] #this may have broken some things
-      sep[:confirmed] = [:unit]
-    elsif sep[:typified][-1] == '=' and sep[:confirmed] == [:street_number] #if the unit is in the street number
-      ind = -1
-      # find where the number stops and the unit begins
-      # sep[:text].split(//).each_with_index do |char, chari|
-      sep[:text].split("").each_with_index do |char, chari|
-        if not char.numeric? or char == '-'
-          ind = chari
-          break
-        end
-      end
-
-      #update the street number
-      if ind != -1
-        sep[:orig] = sep[:text]
-        unit = sep[:text][ind,999].delete '-'
-        sep[:text] = sep[:text][0,ind]
-        #append the unit
-        @sep_map << {text: unit, confirmed: [:unit], in_both: [:unit], from_pattern: [:unit], from_location: [:unit], typified: "g"}
+    elsif sep[:in_both].include? :unit and sep[:confirmed] == []
+      if i == 0 and not @sep_map[1][:text].numeric?
+      else
+        sep[:confirmed] = [:unit]
       end
     end
   end
@@ -333,6 +322,14 @@ end
 
 def confirm_street_number_options
   first_sep = @sep_map[0]
+  ## Find first sep that's not confirmed
+  @sep_map.each do |sep|
+    if sep[:confirmed] == []
+      first_sep = sep
+      break
+    end
+  end
+
   if (first_sep[:text].numeric? or first_sep[:typified] == '||||-||' or first_sep[:typified] == '|||-|||||' or first_sep[:typified] == '|||/|||||' or first_sep[:typified] == '=|||=|||||') and first_sep[:in_both].include? :street_number
     first_sep[:confirmed] = [:street_number]
   elsif first_sep[:typified] == '=|||' and @sep_map[1][:typified] == '=|||||' #canadian
@@ -344,8 +341,23 @@ def confirm_street_number_options
   elsif first_sep[:typified][-1] == '=' and first_sep[:text].reverse[1,999].numeric?
     first_sep[:confirmed] = [:street_number]
   end
-end
+end #confirm_street_number_options
 
+ ## Check if the unit is in the street number
+def check_street_number_unit
+  @sep_map.each_with_index do |sep, i|
+    if sep[:confirmed] == [:street_number] and sep[:typified][-1] == '=' #if there is a letter at the end of the number
+      number = sep[:text][0..-2]
+      unit = sep[:text][-1]
+
+      #update street_number
+      sep[:orig] = sep[:text]
+      sep[:text] = number
+      new_sep = {text: unit, confirmed: [:unit], in_both: [:unit], from_pattern: [:unit], from_location: [:unit], typified: '='}
+      @sep_map << new_sep
+    end
+  end
+end #check_street_number_unit
 
 def confirm_street_name_options
   #we know: state, num, unit, label, dir
