@@ -11,7 +11,7 @@ class NYUSAddress
     if not str.nil?
       @orig = str # to keep an original
       @str = str
-      @idr = NYIdentifier.new(self)
+      @idr = USIdentifier.new(self)
       identify
     end
   end
@@ -36,6 +36,7 @@ class NYUSAddress
 
   def construct(opts = {})
     opts = {include_unit: true, include_label: true, include_dir: true, include_postal: true}.merge(opts)
+    return nil if @parts.nil?
 
     addr = "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:city]}#{@parts[:state]}"
     opts[:include_unit] ? addr << @parts[:unit].to_s : nil
@@ -48,13 +49,13 @@ class NYUSAddress
 
   def hash
     key = construct
-    return nil if key.length == 0
+    return nil if key.nil?
     Digest::SHA256.hexdigest(key)[0..23]
   end
 
   def unitless_hash
     key = construct(opts={include_unit: false})
-    return nil if key.length == 0
+    return nil if key.nil?
     Digest::SHA256.hexdigest(key)[0..23]
   end
 

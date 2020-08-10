@@ -9,6 +9,7 @@ load 'lib/ny-us-address.rb'
 load 'lib/ny-ca-address.rb'
 load 'lib/ny-non-address.rb'
 load 'lib/identifier.rb'
+load 'lib/usidentifier.rb'
 load 'lib/constants.rb'
 load 'lib/extensions.rb'
 load 'lib/addressor_utils.rb'
@@ -17,7 +18,7 @@ class NYAddressor
   attr_accessor :input, :region, :addressor
 
   def initialize(input)
-    if input.nil?
+    if input.nil? or input.length < 4
       set_region_addressor
       return
     end
@@ -54,7 +55,10 @@ class NYAddressor
     when :CA
       @addressor = NYCAAddress.new(@input)
     else
-      @addressor = NYNONAddress.new
+      ### Temporarily routing through US !
+
+      # @addressor = NYNONAddress.new
+      @addressor = NYUSAddress.new(@input)
     end
   end
 

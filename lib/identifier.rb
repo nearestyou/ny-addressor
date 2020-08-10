@@ -186,6 +186,7 @@ end
 
 def potential_state(part)
   return true if NYAConstants::STATE_DESCRIPTORS.include?(part[:text])
+  return true if NYAConstants::CB_ISLANDS.include? part[:text]
   return false
 end
 
@@ -207,8 +208,10 @@ def potential_postal_code(part)
     true
   when '=|=|=|'
     true
+  when '==||' #burmuda
+    true
   else
-    return true if part[:text].delete('o').numeric? and part[:text].length > 3
+    return true if part[:text].delete('o').numeric? and part[:text].length > 3 #This can be better !!
     false
   end
 end
@@ -266,8 +269,7 @@ def confirm_identity_options
 end
 
 def confirm_country
-  last_sep = @sep_map.last
-  if @sep_map.last[:in_both].include? :country
+  if @sep_map.last[:in_both].include? :country and @sep_map.last[:text] != 'islands'
     @sep_map.last[:confirmed] = [:country]
   end
 end
@@ -299,12 +301,16 @@ end
 
 def confirm_state_options
   found = false
-  @sep_map.reverse.each do |sep|
+  @sep_map.reverse.each_with_index do |sep, i|
     if sep[:in_both].include? :state and found
       sep[:in_both].delete(:state)
     elsif sep[:in_both].include? :state
       found = true
       sep[:confirmed] = [:state]
+      if NYAConstants::CB_ISLANDS.include? sep[:text] and NYAConstants::CB_ISLANDS.include? @sep_map.reverse[i+1][:text]
+        # debugger
+        @sep_map.reverse[i+1][:confirmed] = [:state]
+      end
     end
   end
   #Check for compound state
@@ -713,6 +719,26 @@ def check_requirements
   ## No unit? check the bus
   if @parts[:unit].nil? and not @bus[:street_num].nil?
     @parts[:unit] = @bus[:street_num]
+  end
+
+  ## Country but no city?
+  if not @parts[:country].nil? and @parts[:city].nil?
+    @parts[:city] = @parts[:country]
+    @parts[:country] = ""
+    #Check the sep_comma (because it could be a compound city)
+    if not @bus[:nil].nil?
+      @sep_comma.reverse.each_with_index do |comma, i|
+        if comma.include? @parts[:city]
+          @parts[:city] = ""
+          comma.each do |word|
+            @parts[:city] += word + ' '
+          end
+          @parts[:city].chop
+          break
+          debugger
+        end
+      end
+    end
   end
 
   ## Remove duplicate city
