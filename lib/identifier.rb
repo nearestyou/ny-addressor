@@ -12,7 +12,7 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
 
   def identifications
     identify
-    { sep: @sep, sep_map: @sep_map, sep_comma: @sep_comma, locale: @locale, bus: @bus, parts: @parts }
+    { sep: @sep, sep_map: @sep_map, sep_comma: @sep_comma, locale: @locale, bus: @bus, parts: @parts || {} }
   end
 
   def identify
@@ -37,9 +37,17 @@ attr_accessor :str, :sep, :sep_map, :locale, :bus
     while @str.include?('(') and @str.include?(')')
       open = @str.index('(')
       close = @str.index(')')
-      @bus[:parentheses] ||= []
-      @bus[:parentheses] << @str[open+1..close-1]
-      @str = @str[0..open-1] + @str[close+1..-1]
+      if open > close
+        @str = @str.gsub('(', '').gsub(')','') 
+      elsif open == 0
+        @bus[:parentheses] ||= []
+        @bus[:parentheses] << @str[0..close-1]
+        @str = @str[close+1..-1]
+      else
+        @bus[:parentheses] ||= []
+        @bus[:parentheses] << @str[open+1..close-1]
+        @str = @str[0..open-1] + @str[close+1..-1]
+      end
     end
 
     ## Remove punctuation

@@ -1,18 +1,20 @@
-# require 'ny-us-address.rb'
-# require 'ny-ca-address.rb'
-# require 'ny-non-address.rb'
-# require 'identifier.rb'
-# require 'constants.rb'
-# require 'extensions.rb'
-# require 'addressor_utils.rb'
-load 'lib/ny-us-address.rb'
-load 'lib/ny-ca-address.rb'
-load 'lib/ny-non-address.rb'
-load 'lib/identifier.rb'
-load 'lib/usidentifier.rb'
-load 'lib/constants.rb'
-load 'lib/extensions.rb'
-load 'lib/addressor_utils.rb'
+if ENV['LOCAL_DEPENDENCIES']
+  load 'lib/ny-us-address.rb'
+  load 'lib/ny-ca-address.rb'
+  load 'lib/ny-non-address.rb'
+  load 'lib/identifier.rb'
+  load 'lib/constants.rb'
+  load 'lib/extensions.rb'
+  load 'lib/addressor_utils.rb'
+else
+  require 'ny-us-address.rb'
+  require 'ny-ca-address.rb'
+  require 'ny-non-address.rb'
+  require 'identifier.rb'
+  require 'constants.rb'
+  require 'extensions.rb'
+  require 'addressor_utils.rb'
+end
 
 class NYAddressor
   attr_accessor :input, :region, :addressor
@@ -52,8 +54,10 @@ class NYAddressor
     case @region
     when :US
       @addressor = NYUSAddress.new(@input)
+      @addressor = NYNONAddress.new if @addressor.parts.keys.count < 1
     when :CA
       @addressor = NYCAAddress.new(@input)
+      @addressor = NYNONAddress.new if @addressor.parts.keys.count < 1
     else
       ### Temporarily routing through US !
 
@@ -68,8 +72,11 @@ class NYAddressor
   def hash99999; @addressor.hash99999; end
   def unitless_hash; @addressor.unitless_hash; end
   def sns; @addressor.sns; end
+  def comp(nya, comparison_keys = [:street_number, :street_name, :postal_code]); AddressorUtils.comp(@addressor.parts, nya.addressor.parts, comparison_keys); end
 
   def self.string_inclusion(str1, str2, numeric_failure = false); AddressorUtils.string_inclusion(str1, str2, numeric_failure); end
   def self.determine_state(state_name, postal_code = nil); AddressorUtils.determine_state(state_name, postal_code); end
+  #def self.comp(parts1, parts2, comparison_keys = [:street_number, :street_name, :postal_code]); AddressorUtils.comp(parts1, parts2, comparison_keys); end
+  def self.comp(*args); AddressorUtils.comp(*args); end
 
 end
