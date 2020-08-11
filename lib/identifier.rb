@@ -743,7 +743,6 @@ def check_requirements
           end
           @parts[:city].chop
           break
-          debugger
         end
       end
     end
@@ -755,7 +754,7 @@ def check_requirements
   end
 
   #Make sure there are enough parts
-  if @parts.size() < 4
+  if @parts.size < 4
     @parts = nil
   end
 

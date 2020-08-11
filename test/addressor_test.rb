@@ -242,4 +242,10 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddressor.new('12015-B, Rockville Pike, Rockville, MD 20852, United States').unitless_hash == NYAddressor.new('12015, Rockville Pike, Rockville, MD 20852, United States').hash
   end
 
+  def test_cb_island
+    addy = NYAddressor.new('79 Bush Road, St Maarten')
+    assert addy.addressor.parts[:state] == 'st maarten'
+    assert addy.hash == 'f16791829233546575c22c6a'
+  end
+
 end

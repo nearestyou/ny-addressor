@@ -23,7 +23,7 @@ class NYUSAddress
     @sep_comma = identification[:sep_comma]
     @bus = identification[:sep_map]
     @locale = identification[:locale]
-    @parts = identification[:parts]
+    @parts = identification[:parts] if identification[:parts].size > 0
   end
 
   def reset_str(str = @orig)
@@ -37,8 +37,9 @@ class NYUSAddress
   def construct(opts = {})
     opts = {include_unit: true, include_label: true, include_dir: true, include_postal: true}.merge(opts)
     return nil if @parts.nil?
-
     addr = "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:city]}#{@parts[:state]}"
+    return nil if addr.length < 2
+
     opts[:include_unit] ? addr << @parts[:unit].to_s : nil
     opts[:include_label] ? addr << @parts[:street_label].to_s : nil
     opts[:include_dir] ? addr << @parts[:street_direction].to_s : nil
