@@ -316,7 +316,6 @@ def confirm_state_options
       found = true
       sep[:confirmed] = [:state]
       if NYAConstants::CB_ISLANDS.include? sep[:text] and NYAConstants::CB_ISLANDS.include? @sep_map.reverse[i+1][:text]
-        # debugger
         @sep_map.reverse[i+1][:confirmed] = [:state]
       end
     end
