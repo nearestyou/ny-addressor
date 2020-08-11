@@ -1,23 +1,22 @@
-if ENV['LOCAL_DEPENDENCIES']
-  load 'lib/ny-us-address.rb'
-  load 'lib/ny-ca-address.rb'
-  load 'lib/ny-non-address.rb'
+# if ENV['LOCAL_DEPENDENCIES']
   load 'lib/identifier.rb'
+  load 'lib/usidentifier.rb'
   load 'lib/constants.rb'
   load 'lib/extensions.rb'
   load 'lib/addressor_utils.rb'
-else
-  require 'ny-us-address.rb'
-  require 'ny-ca-address.rb'
-  require 'ny-non-address.rb'
-  require 'identifier.rb'
-  require 'constants.rb'
-  require 'extensions.rb'
-  require 'addressor_utils.rb'
-end
+# else
+#   require 'ny-us-address.rb'
+#   require 'ny-ca-address.rb'
+#   require 'ny-non-address.rb'
+#   require 'identifier.rb'
+#   require 'constants.rb'
+#   require 'extensions.rb'
+#   require 'addressor_utils.rb'
+# end
+require 'digest'
 
 class NYAddressor
-  attr_accessor :input, :region, :addressor
+  attr_accessor :input, :region, :parts
 
   def initialize(input)
     if input.nil? or input.length < 4
@@ -26,23 +25,25 @@ class NYAddressor
     end
     @input = input
     @clean = input&.gsub(',',' ')&.delete("'")&.downcase&.split(' ')
-    potential_region = []
-    potential_region << :US if potential_us
-    potential_region << :CA if potential_ca
+    @region = set_region
+  end
 
-    if potential_region.length == 1
-      @region = potential_region[0]
-    elsif potential_region.length > 1
-      @region = :CA
+  def set_region
+    regions = []
+    regions << :CA if potential_ca
+    regions << :US if potential_us
+    case regions.length
+    when 0
+      return :NO
+    when 1
+      return regions[0]
+    else
+      return elim_region(regions)
     end
-    set_region_addressor
   end
 
   def potential_us
     return (NYAConstants::US_DESCRIPTORS & (@clean&.map(&:downcase) || [])).count > 0
-    #state = (NYAConstants::US_DESCRIPTORS & @clean.map(&:downcase)).count > 0
-    #zip = !@clean.last.has_letters? # what if there's no ZIP? What if there's a country?
-    #state and zip
   end
 
   def potential_ca
@@ -50,28 +51,79 @@ class NYAddressor
     typified.include?('=|= |=|') or typified.include?('=|=|=|')
   end
 
-  def set_region_addressor
-    case @region
-    when :US
-      @addressor = NYUSAddress.new(@input)
-      @addressor = NYNONAddress.new if @addressor.parts.keys.count < 1
-    when :CA
-      @addressor = NYCAAddress.new(@input)
-      @addressor = NYNONAddress.new if @addressor.parts.keys.count < 1
-    else
-      ### Temporarily routing through US !
+  def elim_region(regions)
+    regions[0]
+  end
 
-      # @addressor = NYNONAddress.new
-      @addressor = NYUSAddress.new(@input)
+  # def set_region_addressor
+  #   case @region
+  #   when :US
+  #     puts "united states address"
+  #   when :CA
+  #     puts "canadian address"
+  #   else
+  #     puts "could not identify region"
+  #   end
+  # end
+
+  def construct(opts = {})
+    opts = {include_unit: true, include_label: true, include_dir: true, include_postal: true}.merge(opts)
+    return nil if @parts.nil?
+
+    addr = "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:city]}#{@parts[:state]}"
+    opts[:include_unit] ? addr << @parts[:unit].to_s : nil
+    opts[:include_label] ? addr << @parts[:street_label].to_s : nil
+    opts[:include_dir] ? addr << @parts[:street_direction].to_s : nil
+    postal_code = @parts[:postal_code] || '99999'
+    opts[:include_postal] ? addr << postal_code.to_s[0..4] : nil
+    addr.delete(' ').delete('-').downcase
+  end
+
+  def hash
+    key = construct
+    return nil if key.nil?
+    Digest::SHA256.hexdigest(key)[0..23]
+  end
+
+  def unitless_hash
+    key = construct(opts={include_unit: false})
+    return nil if key.nil?
+    Digest::SHA256.hexdigest(key)[0..23]
+  end
+
+  def hash99999 # for searching by missing/erroneous ZIP
+    return nil if @parts.nil?
+    Digest::SHA256.hexdigest(construct[0..-6] + "99999")[0..23]
+  end
+
+  def sns
+    begin
+      if @parts[:street_number].length > 0 and @parts[:street_name].length > 0 and @parts[:state].length > 0
+        return "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}".delete(' ').delete('-')
+      else
+        return ""
+      end
+    rescue
+      return ""
     end
   end
 
-  ## Manually inheriting methods from region specific addressor
-  def construct(opts = {}); @addressor.construct(opts); end
-  def hash; @addressor.hash; end
-  def hash99999; @addressor.hash99999; end
-  def unitless_hash; @addressor.unitless_hash; end
-  def sns; @addressor.sns; end
+  def eq(address_parts, display = false)
+    return nil if @parts.nil?
+
+    return false if @parts[:street_number].to_s.downcase != address_parts[:street_number].to_s.downcase
+    return false if @parts[:street_name].to_s.downcase != address_parts[:street_name].to_s.downcase
+    return false if @parts[:street_label].to_s.downcase != address_parts[:street_label].to_s.downcase and not @parts[:street_label].nil? and not address_parts[:street_label].nil?
+    return false if @parts[:street_direction].to_s.downcase != address_parts[:street_direction].to_s.downcase and not @parts[:street_direction].nil? and not address_parts[:street_direction].nil?
+    return false if @parts[:unit].to_s.downcase.reverse[0,3] != address_parts[:unit].to_s.downcase.reverse[0,3] and not @parts[:unit].nil? and not address_parts[:unit].nil?
+    return false if @parts[:city].to_s.downcase != address_parts[:city].to_s.downcase
+    return false if @parts[:state].to_s.downcase != address_parts[:state].to_s.downcase
+    return false if @parts[:postal_code].to_s.downcase[0,5] != address_parts[:postal_code].to_s.downcase[0,5] and not @parts[:postal_code].nil? and not address_parts[:postal_code].nil?
+    return false if @parts[:country].to_s.downcase != address_parts[:country].to_s.downcase and not @parts[:country].nil? and not address_parts[:country].nil?
+    return true
+  end
+
+
   def comp(nya, comparison_keys = [:street_number, :street_name, :postal_code]); AddressorUtils.comp(@addressor.parts, nya.addressor.parts, comparison_keys); end
 
   def self.string_inclusion(str1, str2, numeric_failure = false); AddressorUtils.string_inclusion(str1, str2, numeric_failure); end
