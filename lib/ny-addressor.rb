@@ -1,4 +1,4 @@
-# if ENV['LOCAL_DEPENDENCIES']
+if ENV['LOCAL_DEPENDENCIES']
   load 'lib/ny-us-address.rb'
   load 'lib/ny-ca-address.rb'
   load 'lib/ny-non-address.rb'
@@ -6,7 +6,6 @@
   load 'lib/constants.rb'
   load 'lib/extensions.rb'
   load 'lib/addressor_utils.rb'
-if true
 else
   require 'ny-us-address.rb'
   require 'ny-ca-address.rb'
