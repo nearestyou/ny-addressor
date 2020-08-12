@@ -221,4 +221,8 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddressor.new("2070 BC-3, Cawston, BC V0X 1C2, Canada").sns == "2070bc3bc"
   end
 
+  def test_canadian_boul
+    assert NYAddressor.new('5850, boul. Jean XXIII, Trois-Rivières, QC, G8Z 4B5').addressor.parts[:street_label] == 'blvd'
+  end
+
 end

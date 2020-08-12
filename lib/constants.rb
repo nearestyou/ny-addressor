@@ -123,6 +123,7 @@ class NYAConstants
   STREET_LABELS = {
     'avenue' => 'ave',
     'boulevard' => 'blvd',
+    'boul' => 'blvd',
     'circle' => 'cir',
     'court' => 'ct',
     'drive' => 'dr',
