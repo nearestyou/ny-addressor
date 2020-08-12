@@ -1,6 +1,6 @@
 # if ENV['LOCAL_DEPENDENCIES']
   load 'lib/identifier.rb'
-  load 'lib/usidentifier.rb'
+  load 'lib/us-identifier.rb'
   load 'lib/constants.rb'
   load 'lib/extensions.rb'
   load 'lib/addressor_utils.rb'
@@ -16,16 +16,26 @@
 require 'digest'
 
 class NYAddressor
-  attr_accessor :input, :region, :parts
+  attr_accessor :input, :region, :parts, :identity
 
   def initialize(input)
     if input.nil? or input.length < 4
-      set_region_addressor
+      @region = :NO
       return
     end
     @input = input
     @clean = input&.gsub(',',' ')&.delete("'")&.downcase&.split(' ')
     @region = set_region
+    @identity = identify
+  end
+
+  def identify
+    case @region
+    when :US
+      return USIdentifier.new(@input)
+    else
+      return nil
+    end
   end
 
   def set_region
@@ -54,17 +64,6 @@ class NYAddressor
   def elim_region(regions)
     regions[0]
   end
-
-  # def set_region_addressor
-  #   case @region
-  #   when :US
-  #     puts "united states address"
-  #   when :CA
-  #     puts "canadian address"
-  #   else
-  #     puts "could not identify region"
-  #   end
-  # end
 
   def construct(opts = {})
     opts = {include_unit: true, include_label: true, include_dir: true, include_postal: true}.merge(opts)

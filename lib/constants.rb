@@ -24,7 +24,7 @@ class NYAConstants
     "Colorado" => "CO",
     "Connecticut" => "CT",
     "Delaware" => "DE",
-    "District of Columbia" => "DC",
+    # "District of Columbia" => "DC",
     "D.C." => "DC",
     "Florida" => "FL",
     "Georgia" => "GA",
@@ -46,33 +46,36 @@ class NYAConstants
     "Montana" => "MT",
     "Nebraska" => "NE",
     "Nevada" => "NV",
-    "New Hampshire" => "NH",
-    "New Jersey" => "NJ",
-    "New Mexico" => "NM",
-    "New York" => "NY",
-    "North Carolina" => "NC",
-    "North Dakota" => "ND",
     "Ohio" => "OH",
     "Oklahoma" => "OK",
     "Oregon" => "OR",
     "Pennsylvania" => "PA",
-    "Puerto Rico" => "PR",
-    "Rhode Island" => "RI",
-    "South Carolina" => "SC",
-    "South Dakota" => "SD",
     "Tennessee" => "TN",
     "Texas" => "TX",
     "Utah" => "UT",
     "Vermont" => "VT",
     "Virginia" => "VA",
     "Washington" => "WA",
-    "West Virginia" => "WV",
     "Wisconsin" => "WI",
     "Wyoming" => "WY"
   }
+  US_COMPOUND_STATES = {
+    "District of Columbia" => 'DC',
+    "New Hampshire" => "NH",
+    "New Jersey" => "NJ",
+    "New Mexico" => "NM",
+    "New York" => "NY",
+    "North Carolina" => "NC",
+    "North Dakota" => "ND",
+    "Puerto Rico" => "PR",
+    "Rhode Island" => "RI",
+    "South Carolina" => "SC",
+    "South Dakota" => "SD",
+    "West Virginia" => "WV"
+  }
 
   other_descriptors = []
-  US_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values).map(&:downcase)
+  US_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values + ['Columbia', 'Hampshire', 'Jersey', 'Mexico', 'York', 'Carolina', 'Dakota', 'Puerto', 'Rhode', 'Virginia'] + US_COMPOUND_STATES.values).map(&:downcase)
   STATE_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values + CA_PROVINCES.keys + CA_PROVINCES.values + other_descriptors).map(&:downcase)
   STATE_KEYS ||= (US_STATES.keys + CA_PROVINCES.keys).map(&:downcase)
 
@@ -82,13 +85,6 @@ class NYAConstants
     "pobox",
     "rr",
     "r.r."
-  ]
-
-  US_ALIAS = [
-    'usa',
-    'us',
-    'united states of america',
-    'united states'
   ]
 
   NUMBER_STREET = {
