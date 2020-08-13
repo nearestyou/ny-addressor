@@ -16,7 +16,7 @@
 require 'digest'
 
 class NYAddressor
-  attr_accessor :input, :region, :parts, :identity
+  attr_accessor :input, :region, :identity, :parts
 
   def initialize(input)
     if input.nil? or input.length < 4
@@ -27,6 +27,7 @@ class NYAddressor
     @clean = input&.gsub(',',' ')&.delete("'")&.downcase&.split(' ')
     @region = set_region
     @identity = identify
+    @parts = @identity.parts if @identity
   end
 
   def identify

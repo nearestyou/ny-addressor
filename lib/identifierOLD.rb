@@ -95,41 +95,11 @@ def select_final_options
   @parts[:bus] = @bus
 end
 
-def standardize_aliases
-  @sep_map.each do |sep|
-    if sep[:confirmed].include? :street_number and (sep[:text].include? '-' or sep[:text].include? '/')
-      dash = sep[:text].index '-'
-      if dash.nil?
-        dash = sep[:text].index '/'
-      end
-      #seperate the dashes
-      if sep[:text][0,4].numeric?
-        sep[:orig] = sep[:text]
-        @bus[:street_num] = sep[:text][dash,999]
-        sep[:text] = sep[:text][0,dash]
-      elsif sep[:text].reverse()[0,4].numeric?
-        sep[:orig] = sep[:text]
-        @bus[:street_num] = sep[:text][0,dash]
-        sep[:text] = sep[:text][dash+1,999]
-      end
-    elsif sep[:confirmed].include? :street_name and NYAConstants::NUMBER_STREET.keys.include? sep[:text]
-      sep[:text] = NYAConstants::NUMBER_STREET[sep[:text]]
-    elsif sep[:confirmed].include? :street_direction and NYAConstants::STREET_DIRECTIONS.keys.include? sep[:text]
-      sep[:text] = NYAConstants::STREET_DIRECTIONS[sep[:text]]
-    elsif sep[:confirmed].include? :street_label and NYAConstants::STREET_LABELS.keys.include? sep[:text]
-      sep[:text] = NYAConstants::STREET_LABELS[sep[:text]]
-    elsif sep[:confirmed].include? :unit
-      sep[:text] = sep[:text].delete '#'
-      sep[:text] = sep[:text].tr('a-z', '') if sep[:text].letter_count > 1
+  #STATE ALIASES
     # elsif sep[:confirmed].include? :state and NYAConstants::STATE_KEYS.include? sep[:text]
     #   sep[:orig] = sep[:text]
     #   sep[:text] = NYAConstants::US_STATES[sep[:text].capitalize()] if NYAConstants::US_STATES[sep[:text].capitalize()]
     #   sep[:text] = NYAConstants::CA_PROVINCES[sep[:text].capitalize()] if NYAConstants::CA_PROVINCES[sep[:text].capitalize()]
-    elsif sep[:confirmed].include? :postal_code and sep[:text].include? 'o'
-      sep[:text] = sep[:text].gsub('o', '0')
-    end
-  end
-end #def standardize_aliases
 
 def check_requirements
   #Street number but no name?

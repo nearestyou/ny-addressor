@@ -6,13 +6,14 @@ class USIdentifier < NYIdentifier
 
   def identify
     condense_usa
-    #find compound state here?
+    check_compound_state
     super
-    identify_all_by_location
     identify_all_by_pattern
     consolidate_identity_options
     confirm_identity_options
     standardize_aliases
+    select_final_options
+    check_requirements
   end
 
   #Convert United States of America to usa
@@ -22,6 +23,13 @@ class USIdentifier < NYIdentifier
     us_alias.each do |name|
       @str = @str.gsub(name, 'usa') if og.include? name
     end
+  end
+
+  #Looks for states like 'North Dakota' to combine them
+  def check_compound_state
+    states = NYAConstants::US_COMPOUND_STATES
+    keys = states.keys.map(&:downcase)
+    keys.each {|key| @str = @str.gsub(key, states[key.split.map(&:capitalize).join(' ')].downcase) if @str.include? key }
   end
 
   ###Pattern Options###
@@ -46,8 +54,10 @@ class USIdentifier < NYIdentifier
   end
 
   def potential_postal_code(part)
-    part[:typified]
     return true if part[:typified] == '|||||'
+    return true if part[:text].delete('-').numeric? and (part[:text].length == 9 or part[:text].length == 10)
+    return true if part[:text].delete('o').numeric? and part[:text].length == 5
+    false
   end
 
   def potential_country(part)
@@ -96,11 +106,25 @@ class USIdentifier < NYIdentifier
   def standardize_aliases
     super
     @sep_map.each do |sep|
-      # If there's a full state, abrev it
-      if sep[:confirmed] == :postal_code and sep[:text].include? 'o'
-        sep[:text] = sep[:text].gsub('o', '0')
+      case sep[:confirmed]
+      when :state
+        #If there's a full state, abrev it
+        sep[:text] = NYAConstants::US_STATES[sep[:text].capitalize].downcase if sep[:confirmed] == :state and NYAConstants::US_STATES.keys.map(&:downcase).include? sep[:text]
+
+      when :postal_code
+        #If there's a o in the zipcode, remove it
+        sep[:text] = sep[:text].gsub('o', '0') if sep[:text].include? 'o'
+
+        #If there is a zip extension, remove it
+        sep[:text] = sep[:text][0..5] if sep[:text].length > 5
       end
     end
+  end
+
+  def check_requirements
+    super
+    # Remove duplicate city
+    @parts[:city] = @parts[:city].split(' ').uniq.join(' ') if not @parts[:city].nil?
   end
 
 

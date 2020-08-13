@@ -77,7 +77,6 @@ class NYAConstants
   other_descriptors = []
   US_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values + ['Columbia', 'Hampshire', 'Jersey', 'Mexico', 'York', 'Carolina', 'Dakota', 'Puerto', 'Rhode', 'Virginia'] + US_COMPOUND_STATES.values).map(&:downcase)
   STATE_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values + CA_PROVINCES.keys + CA_PROVINCES.values + other_descriptors).map(&:downcase)
-  STATE_KEYS ||= (US_STATES.keys + CA_PROVINCES.keys).map(&:downcase)
 
   POBOX_ALIAS = [
     "po",
@@ -119,6 +118,7 @@ class NYAConstants
   STREET_LABELS = {
     'avenue' => 'ave',
     'boulevard' => 'blvd',
+    'boul' => 'blvd',
     'circle' => 'cir',
     'court' => 'ct',
     'drive' => 'dr',

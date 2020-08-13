@@ -1,5 +1,5 @@
 class NYIdentifier
-attr_accessor :str, :sep, :sep_map, :bus
+attr_accessor :str, :sep, :sep_map, :bus, :parts
   def initialize(str = nil)
     @orig = str
     @str = str.downcase
@@ -225,7 +225,8 @@ attr_accessor :str, :sep, :sep_map, :bus
 
   def confirm_label
     found = false
-    snum = search_confirmed(:street_number)[:orig]
+    snum = search_confirmed(:street_number)
+    snum = snum[:orig] if snum
     @sep_map.reverse.each_with_index do |sep, i|
       if not found and sep[:from_pattern].include? :street_label and sep[:confirmed].nil?
         if snum.nil?
@@ -256,6 +257,7 @@ attr_accessor :str, :sep, :sep_map, :bus
   def confirm_direction
     directions = []
     snum = search_confirmed(:street_number)[:orig]
+    snum = snum[:orig] if snum
 
     #find all directions
     @sep_map.each_with_index do |sep, i|
@@ -395,6 +397,34 @@ attr_accessor :str, :sep, :sep_map, :bus
     end
   end
   ######Standardization######
+
+  def select_final_options
+    @parts = {:orig => @orig}
+
+    @sep_map.each do |sep|
+      label = sep[:confirmed]
+      part = sep[:text]
+
+      if label.nil? #this part was not assigned a label
+        (@bus[:nil] ||= []) << part #creates nil if not exist
+
+      elsif @parts[label].nil? #first part with that label added
+        @parts[label] = part
+
+      else #label already exists
+        label == :street_direction ? @parts[label] = "#{@parts[label]}#{part}" : @parts[label] = "#{@parts[label]} #{part}"
+      end
+      @parts[:bus] = @bus
+    end
+  end #select_final_options
+
+  ###Check Requirements###
+
+  def check_requirements
+    #nothing here yet
+  end #check_requirements
+
+  ######Check Requirements######
 
   def unconfirmed_sep
     @sep_map.each { |sep| return sep if sep[:confirmed].nil? }
