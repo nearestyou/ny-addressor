@@ -6,9 +6,8 @@ if ENV['LOCAL_DEPENDENCIES']
   load 'lib/extensions.rb'
   load 'lib/addressor_utils.rb'
 else
-  require 'ny-us-address.rb'
-  require 'ny-ca-address.rb'
-  require 'ny-non-address.rb'
+  require 'us-identifier.rb'
+  require 'ca-identifier.rb'
   require 'identifier.rb'
   require 'constants.rb'
   require 'extensions.rb'
@@ -66,6 +65,8 @@ class NYAddressor
   end
 
   def elim_region(regions)
+    #put some logic here to determine country possibly???
+
     regions[0] #this is temporary !
   end
 
