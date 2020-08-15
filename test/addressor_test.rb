@@ -206,7 +206,6 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_wisconsin_addresses
-    skip
     assert NYAddressor.new("W204N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
     assert NYAddressor.new("W204 N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
   end
@@ -225,19 +224,18 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_canadian_hiway
-    skip
+    skip #Canadian
     assert NYAddressor.new("2070 BC-3, Cawston, BC V0X 1C2, Canada").sns == "2070bc3bc"
   end
 
   def test_pre_unit
-    skip
+    skip #Canadian
     assert NYAddressor.new("B2 - 15562 24TH AVENUE, SURREY, V4A2J5").unitless_hash == NYAddressor.new("15562 24TH AVENUE, SURREY, V4A2J5").hash
     assert NYAddressor.new("UNIT 23 11151 HORSESHOE WAY, RICHMOND, V7A4S5").unitless_hash == NYAddressor.new("11151 HORSESHOE WAY, RICHMOND, V7A4S5").hash
     assert NYAddressor.new("150 - 19288 22ND AVENUE, SURREY, V3S3S9").unitless_hash == NYAddressor.new("19288 22ND AVENUE, SURREY, V3S3S9").hash
   end
 
   def test_old_hash
-    skip
     assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash == "f7dfa569dc3cfbf0e12ab2bd"
     assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash99999 == "d802689082fef112da4b72d0"
     assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').sns == "1600pennsylvaniamn"
@@ -252,7 +250,6 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_comma_before_name
-    skip
     assert eq("4933 Yukon Ave N, New Hope, MN, 55428", "4933, Yukon Ave N, New Hope, MN, 55428")
   end
 

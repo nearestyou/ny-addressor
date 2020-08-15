@@ -233,7 +233,7 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
           found = true
           sep[:confirmed] = :street_label
         else
-          if common_sep_comma(sep[:orig], snum)
+          if common_sep_comma(sep[:orig], snum) or search_sep_comma(snum).length == 1
             sep[:confirmed] = :street_label
             found = true
 
@@ -256,13 +256,13 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
 
   def confirm_direction
     directions = []
-    snum = search_confirmed(:street_number)[:orig]
+    snum = search_confirmed(:street_number)
     snum = snum[:orig] if snum
 
     #find all directions
     @sep_map.each_with_index do |sep, i|
       if sep[:from_pattern].include? :street_direction and sep[:confirmed].nil? and not @sep_map[i+1][:confirmed] == :street_label
-        snum.nil? ? directions << sep : directions << sep if common_sep_comma(snum, sep[:orig])
+        snum.nil? ? directions << sep : directions << sep if common_sep_comma(snum, sep[:orig]) or search_sep_comma(snum).length == 1
       end
     end
 
@@ -313,14 +313,14 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
     ## if start wasn't found
     name_start = @sep_map.index(unconfirmed_sep) if name_start.nil?
 
-    ## make sure they're in the same sep comma
-    name_stop = nil if not common_sep_comma(@sep_map[name_start][:orig], @sep_map[name_stop][:orig])
-
-    ## if the stop wasn't found
+    ##if stop wasn't found
     if name_stop.nil?
-      comma = search_sep_comma(@sep_comma[name_start][:orig])
+      comma = search_sep_comma(@sep_comma[name_start][0])
       @sep_map.each_with_index {|sep, i| name_stop = i if sep[:orig] == comma.last}
     end
+
+    ## make sure they're in the same sep comma
+    name_stop = nil if not common_sep_comma(@sep_map[name_start][:orig], @sep_map[name_stop][:orig])
 
     ## Select the street name
     if not name_start.nil? and not name_stop.nil?
