@@ -3,18 +3,24 @@ class NYAConstants
   CA_PROVINCES ||= {
     "Ontario" => "ON",
     "Quebec" => "QC",
-    "Nova Scotia" => "NS",
-    "New Brunswick" => "NB",
     "Manitoba" => "MB",
-    "British Columbia" => "BC",
-    "Prince Edward Island" => "PE",
     "Saskatchewan" => "SK",
     "Alberta" => "AB",
-    "Newfoundland and Labrador" => "NL",
-    "Northwest Territories" => "NT",
     "Yukon" => "YT",
     "Nunavut" => "NU",
   }
+
+  CA_COMPOUND_PROVINCES ||= {
+    "Nova Scotia" => "NS",
+    "New Brunswick" => "NB",
+    "British Columbia" => "BC",
+    "Prince Edward Island" => "PE",
+    "Newfoundland and Labrador" => "NL",
+    "Northwest Territories" => "NT"
+  }
+
+  CA_DESCRIPTORS ||= (CA_PROVINCES.keys + CA_PROVINCES.values + CA_COMPOUND_PROVINCES.values).map(&:downcase)
+
   US_STATES ||= {
     "Alabama" => "AL",
     "Alaska" => "AK",
@@ -75,8 +81,8 @@ class NYAConstants
   }
 
   other_descriptors = []
-  US_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values + ['Columbia', 'Hampshire', 'Jersey', 'Mexico', 'York', 'Carolina', 'Dakota', 'Puerto', 'Rhode', 'Virginia'] + US_COMPOUND_STATES.values).map(&:downcase)
-  STATE_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values + CA_PROVINCES.keys + CA_PROVINCES.values + other_descriptors).map(&:downcase)
+  # US_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values + ['Columbia', 'Hampshire', 'Jersey', 'Mexico', 'York', 'Carolina', 'Dakota', 'Puerto', 'Rhode', 'Virginia'] + US_COMPOUND_STATES.values).map(&:downcase)
+  US_DESCRIPTORS ||= (US_STATES.keys + US_STATES.values + US_COMPOUND_STATES.values).map(&:downcase)
 
   POBOX_ALIAS = [
     "po",

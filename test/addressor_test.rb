@@ -36,7 +36,6 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_country
-    skip #Canadian
     assert eq( "1600 North Pennsylvania Ave, Washington, DC, 20500, United States",  "1600 Pennsylvania Ave N, Washington, DC, 20500")
     assert eq("89 Trinity Dr, Moncton, NB E1G 2J7","89 Trinity Dr, Moncton NB E1G 2J7, Canada")
   end
@@ -46,7 +45,6 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_no_prezip_comma
-    skip #Canadian
     assert eq( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC, 20500")
     assert eq( "1600 Pennsylvania Ave, Washington, DC,20500",  "1600 Pennsylvania Ave, Washington, DC, 20500")
     assert eq("89 Trinity Dr, Moncton NB E1G 2J7, Canada","89 Trinity Dr, Moncton, NB E1G 2J7, Canada")
@@ -75,26 +73,26 @@ class NYAddressorTest < MiniTest::Test
     assert eq( "1600 Pennsylvania Ave, Washington 2, DC, 99999",  "1600 Pennsylvania Ave, Washington, DC 99999")
   end
 
-  # def test_great_match
-  #   assert_equal comp( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 3
-  # end
-  #
-  # def test_okay_match
-  #   assert_equal comp( "1500 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 2
-  # end
-  #
-  # def test_bad_match
-  #   assert_equal comp( "1500 Bennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 1
-  # end
-  #
-  # def test_non_match
-  #   assert_equal comp( "1500 Bennsylvania Ave, Washington, DC 20400",  "1600 Pennsylvania Ave, Washington, DC 20500"), 0
-  # end
-  #
-  # def test_error_match
-  #   assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20400', 'kjhghjkjhghjkjhg'), 0
-  #   assert_equal comp( 'kjhghjkjhghjkjhg', '1500 Bennsylvania Ave, Washington, DC 20400'), 0
-  # end
+  def test_great_match
+    assert_equal comp( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 3
+  end
+
+  def test_okay_match
+    assert_equal comp( "1500 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 2
+  end
+
+  def test_bad_match
+    assert_equal comp( "1500 Bennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 1
+  end
+
+  def test_non_match
+    assert_equal comp( "1500 Bennsylvania Ave, Washington, DC 20400",  "1600 Pennsylvania Ave, Washington, DC 20500"), 0
+  end
+
+  def test_error_match
+    assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20400', 'kjhghjkjhghjkjhg'), 0
+    assert_equal comp( 'kjhghjkjhghjkjhg', '1500 Bennsylvania Ave, Washington, DC 20400'), 0
+  end
 
   def test_error_parse
     assert_nil NYAddressor.new('ghjkjhghjkjhghjkjhghjkjhghjk').parts
@@ -118,9 +116,8 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_canadian_zip
-    skip #Canadian
     zip = 'H0H 0H0'
-    assert NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip).addressor.parts[:postal_code] == zip.downcase
+    assert NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip).parts[:postal_code] == zip.downcase
     zip_no_space = zip.gsub(' ','')
     assert NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip_no_space).hash == NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip).hash
   end
@@ -170,12 +167,10 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_missing_unit_designation
-    skip #Canadian
     assert eq("15355 24 Ave,700 (at Peninsula Village), Surrey BC V4A 2H9, Canada", "15355 24 Ave,#700 (at Peninsula Village), Surrey BC V4A 2H9, Canada")
   end
 
   def test_leading_unit_designations
-    skip #Canadian
     assert eq("700-15355 Main Ave, Surrey BC V4A 2H9, Canada", "15355 Main Ave,#700, Surrey BC V4A 2H9, Canada")
     assert eq("700/15355 Main Ave, Surrey BC V4A 2H9, Canada", "15355 Main Ave,#700, Surrey BC V4A 2H9, Canada")
   end
@@ -224,12 +219,10 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_canadian_hiway
-    skip #Canadian
     assert NYAddressor.new("2070 BC-3, Cawston, BC V0X 1C2, Canada").sns == "2070bc3bc"
   end
 
   def test_pre_unit
-    skip #Canadian
     assert NYAddressor.new("B2 - 15562 24TH AVENUE, SURREY, V4A2J5").unitless_hash == NYAddressor.new("15562 24TH AVENUE, SURREY, V4A2J5").hash
     assert NYAddressor.new("UNIT 23 11151 HORSESHOE WAY, RICHMOND, V7A4S5").unitless_hash == NYAddressor.new("11151 HORSESHOE WAY, RICHMOND, V7A4S5").hash
     assert NYAddressor.new("150 - 19288 22ND AVENUE, SURREY, V3S3S9").unitless_hash == NYAddressor.new("19288 22ND AVENUE, SURREY, V3S3S9").hash

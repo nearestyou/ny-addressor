@@ -28,8 +28,7 @@ class USIdentifier < NYIdentifier
   #Looks for states like 'North Dakota' to combine them
   def check_compound_state
     states = NYAConstants::US_COMPOUND_STATES
-    keys = states.keys.map(&:downcase)
-    keys.each {|key| @str = @str.gsub(key, states[key.split.map(&:capitalize).join(' ')].downcase) if @str.include? key }
+    states.keys.map(&:downcase).each {|key| @str = @str.gsub(key, states[key.split.map(&:capitalize).join(' ')].downcase) if @str.include? key }
   end
 
   ###Pattern Options###
@@ -48,9 +47,7 @@ class USIdentifier < NYIdentifier
   end
 
   def potential_state(part)
-    return true if (NYAConstants::US_STATES.keys + NYAConstants::US_STATES.values + NYAConstants::US_COMPOUND_STATES.values).map(&:downcase).include? part[:text]
-    NYAConstants::US_COMPOUND_STATES.keys.map(&:downcase).each {|state| return true if state.include? part[:text] }
-    return false
+    NYAConstants::US_DESCRIPTORS.include? part[:text]
   end
 
   def potential_postal_code(part)
@@ -66,42 +63,6 @@ class USIdentifier < NYIdentifier
   ######Pattern Options######
 
 
-  ###Confirm Identity###
-  def confirm_identity_options
-    confirm_country
-    confirm_postal_code
-    confirm_state
-    confirm_unit
-    confirm_street_number
-    check_street_number_unit
-    confirm_label
-    confirm_direction
-    confirm_street_name
-    confirm_city
-  end
-
-  def confirm_state
-    found = false
-    @sep_map.reverse.each_with_index do |sep, i|
-      if sep[:in_both].include? :state
-        if found
-          #Check for compound state
-          if NYAConstants::US_COMPOUND_STATES.keys.map(&:downcase).include? "#{sep[:text]} #{@sep_map.reverse[i-1][:text]}" and @sep_map.reverse[i-1][:confirmed] == :state
-            sep[:confirmed] = :state
-          else
-            #this method will give 'North' the :state attribute
-            #so it gets removed once the actual state is found
-            sep[:in_both].delete :state
-          end
-        else #if found
-          sep[:confirmed] = :state
-          found = true
-        end
-      end
-    end
-  end #confirm_state_options
-
-  ######Confirm Identity######
 
   def standardize_aliases
     super
@@ -109,14 +70,15 @@ class USIdentifier < NYIdentifier
       case sep[:confirmed]
       when :state
         #If there's a full state, abrev it
-        sep[:text] = NYAConstants::US_STATES[sep[:text].capitalize].downcase if sep[:confirmed] == :state and NYAConstants::US_STATES.keys.map(&:downcase).include? sep[:text]
+        states = NYAConstants::US_STATES
+        sep[:text] = states[sep[:text].capitalize].downcase if states.keys.map(&:downcase).include? sep[:text]
 
       when :postal_code
         #If there's a o in the zipcode, remove it
         sep[:text] = sep[:text].gsub('o', '0') if sep[:text].include? 'o'
 
         #If there is a zip extension, remove it
-        sep[:text] = sep[:text][0..5] if sep[:text].length > 5
+        sep[:text] = sep[:text][0..4] if sep[:text].length > 5
       end
     end
   end

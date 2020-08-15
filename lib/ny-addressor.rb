@@ -1,6 +1,7 @@
 # if ENV['LOCAL_DEPENDENCIES']
   load 'lib/identifier.rb'
   load 'lib/us-identifier.rb'
+  load 'lib/ca-identifier.rb'
   load 'lib/constants.rb'
   load 'lib/extensions.rb'
   load 'lib/addressor_utils.rb'
@@ -34,6 +35,8 @@ class NYAddressor
     case @region
     when :US
       return USIdentifier.new(@input)
+    when :CA
+      return CAIdentifier.new(@input)
     else
       return nil
     end
@@ -63,7 +66,7 @@ class NYAddressor
   end
 
   def elim_region(regions)
-    regions[0]
+    regions[0] #this is temporary !
   end
 
   def construct(opts = {})
@@ -75,7 +78,7 @@ class NYAddressor
     opts[:include_label] ? addr << @parts[:street_label].to_s : nil
     opts[:include_dir] ? addr << @parts[:street_direction].to_s : nil
     postal_code = @parts[:postal_code] || '99999'
-    opts[:include_postal] ? addr << postal_code.to_s[0..4] : nil
+    opts[:include_postal] ? addr << postal_code.to_s : nil
     addr.delete(' ').delete('-').downcase
   end
 
@@ -124,7 +127,7 @@ class NYAddressor
   end
 
 
-  def comp(nya, comparison_keys = [:street_number, :street_name, :postal_code]); AddressorUtils.comp(@addressor.parts, nya.addressor.parts, comparison_keys); end
+  def comp(nya, comparison_keys = [:street_number, :street_name, :postal_code]); AddressorUtils.comp(@parts, nya.parts, comparison_keys); end
 
   def self.string_inclusion(str1, str2, numeric_failure = false); AddressorUtils.string_inclusion(str1, str2, numeric_failure); end
   def self.determine_state(state_name, postal_code = nil); AddressorUtils.determine_state(state_name, postal_code); end

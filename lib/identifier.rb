@@ -173,6 +173,19 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
   end
 
   ### Confirm Identity ###
+  def confirm_identity_options
+    confirm_country
+    confirm_postal_code
+    confirm_state
+    confirm_unit
+    confirm_street_number
+    check_street_number_unit
+    confirm_label
+    confirm_direction
+    confirm_street_name
+    confirm_city
+  end
+
   def confirm_country
     @sep_map.last[:confirmed] = :country if @sep_map.last[:from_pattern].include? :country
   end
@@ -181,6 +194,15 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
     @sep_map.reverse.each do |sep|
       sep[:confirmed] = :postal_code if sep[:in_both].include? :postal_code
       break if not sep[:from_location].include? :postal_code
+    end
+  end
+
+  def confirm_state
+    @sep_map.reverse.each_with_index do |sep, i|
+      if sep[:in_both].include? :state
+        sep[:confirmed] = :state
+        break
+      end
     end
   end
 
@@ -319,13 +341,11 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
       @sep_map.each_with_index {|sep, i| name_stop = i if sep[:orig] == comma.last}
     end
 
-    ## make sure they're in the same sep comma
-    name_stop = nil if not common_sep_comma(@sep_map[name_start][:orig], @sep_map[name_stop][:orig])
-
     ## Select the street name
     if not name_start.nil? and not name_stop.nil?
       (name_start..name_stop).each do |index|
-        @sep_map[index][:confirmed] = :street_name if @sep_map[index][:confirmed].nil?
+        #if in same sep comma and unconfirmed
+        @sep_map[index][:confirmed] = :street_name if @sep_map[index][:confirmed].nil? and common_sep_comma(@sep_map[name_start][:orig], @sep_map[index][:orig])
       end
     else
       raise "Erorr occured while finding street name...\nstart: #{name_start}\nstop: #{name_stop}\nfrom address #{@orig}"
@@ -421,7 +441,10 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
   ###Check Requirements###
 
   def check_requirements
-    #nothing here yet
+    #if there is no unit but an extra part to the street_number...
+    if @parts[:unit].nil? and not @bus[:street_num].nil?
+      @parts[:unit] = @bus[:street_num] if @bus[:street_num].numeric?
+    end
   end #check_requirements
 
   ######Check Requirements######
