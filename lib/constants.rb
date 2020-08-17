@@ -123,6 +123,7 @@ class NYAConstants
   STREET_LABELS = {
     'avenue' => 'ave',
     'boulevard' => 'blvd',
+    'boul' => 'blvd',
     'circle' => 'cir',
     'court' => 'ct',
     'drive' => 'dr',
@@ -151,6 +152,8 @@ class NYAConstants
     'suite' => 'ste',
     'room' => 'room',
     'unit' => '#'
+    'p.o.box' => 'po',
+    'pobox' => 'po'
   }
   UNIT_DESCRIPTORS ||= (UNITS.keys + UNITS.values)
   CB_ISLANDS = ['st', 'maarten', 'bermuda', 'anguilla', 'bvis', 'virgin', 'islands', 'cayman', 'bahamas', 'trinidad', 'cotto', 'laurel', 'santa', 'isabel', 'british', 'devonshire']
