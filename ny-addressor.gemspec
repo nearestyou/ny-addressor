@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "ny-addressor"
-  s.version = "0.1.0"
+  s.version = "0.1.1"
   s.date = "2020-08-05"
   s.summary = 'A purely custom implementation that standardizes addresses for comparison to other addresses'
   s.author = 'P Kirwin'
