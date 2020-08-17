@@ -61,8 +61,8 @@ class NYAddressor
     else
       ### Temporarily routing through US !
 
-      # @addressor = NYNONAddress.new
-      @addressor = NYUSAddress.new(@input)
+      @addressor = NYNONAddress.new
+      #@addressor = NYUSAddress.new(@input)
     end
   end
 

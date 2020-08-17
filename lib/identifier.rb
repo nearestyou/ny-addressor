@@ -549,7 +549,7 @@ def confirm_street_label_options
       end
       #Make sure it's in the same sep_comma as number
       if snum.length > 0
-        @sep_comma.each do |comma|
+        @sep_comma.each_with_index do |comma, comi|
           if comma.include? snum and comma.include? sep[:text]
             sep[:confirmed] = [:street_label]
             found_label = true
@@ -562,6 +562,8 @@ def confirm_street_label_options
                 sep[:confirmed] = []
               end
             end
+          elsif comma.include? snum and comma.length == 1 and @sep_comma[comi+1].include? sep[:text]
+            sep[:confirmed] = [:street_label]
           end
         end
       end

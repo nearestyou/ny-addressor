@@ -11,7 +11,7 @@ class NYUSAddress
     if not str.nil?
       @orig = str # to keep an original
       @str = str
-      @idr = USIdentifier.new(self)
+      @idr = NYIdentifier.new(self)
       identify
     end
   end
