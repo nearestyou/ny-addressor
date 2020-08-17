@@ -249,6 +249,18 @@ class NYAddressorTest < MiniTest::Test
     assert addy.hash == 'f16791829233546575c22c6a'
   end
 
+  def test_cb_island_with_city
+    addy = NYAddressor.new('79 Bush Road, Simpson Bay, St Maarten')
+    assert addy.addressor.parts[:state] == 'st maarten'
+    assert addy.addressor.parts[:city] == 'simpson bay'
+  end
+
+  def test_dutch_saint
+    addy = NYAddressor.new('79 Bush Road, Simpson Bay, Sint Maarten')
+    assert addy.addressor.parts[:state] == 'sint maarten' # or should this be st maarten
+    assert addy.addressor.parts[:city] == 'simpson bay'
+  end
+
   def test_canadian_boul
     assert NYAddressor.new('5850, boul. Jean XXIII, Trois-Rivières, QC, G8Z 4B5').addressor.parts[:street_label] == 'blvd'
   end
