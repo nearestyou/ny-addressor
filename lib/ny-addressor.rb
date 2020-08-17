@@ -64,6 +64,8 @@ class NYAddressor
       @addressor = NYNONAddress.new
       # @addressor = NYUSAddress.new(@input)
     end
+  rescue Exception => e
+    @addressor = NYNONAddress.new
   end
 
   ## Manually inheriting methods from region specific addressor
