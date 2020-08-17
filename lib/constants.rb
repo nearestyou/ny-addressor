@@ -156,7 +156,7 @@ class NYAConstants
     'pobox' => 'po'
   }
   UNIT_DESCRIPTORS ||= (UNITS.keys + UNITS.values)
-  CB_ISLAND_NAMES = ['saint maarten', 'st maarten', 'saint martin', 'st martin', 'bermuda', 'anguilla', 'us virgin islands', 'bahamas', 'puerto rico', 'cayman islands', 'montserrat', 'british virgin islands', 'trinidad', 'tobago', 'saint vincent', 'st vincent', 'grenadines', 'saint lucia', 'st lucia', 'saint kitts', 'st kitts', 'nevis', 'aruba', 'jamaica', 'grenada', 'haiti', 'guadeloupe', 'martinique', 'saint barthelemy', 'st barthelemy', 'barbados', 'antigua']
+  CB_ISLAND_NAMES = ['saint maarten', 'sint maarten', 'st maarten', 'saint martin', 'st martin', 'bermuda', 'anguilla', 'us virgin islands', 'bahamas', 'puerto rico', 'cayman islands', 'montserrat', 'british virgin islands', 'trinidad', 'tobago', 'saint vincent', 'st vincent', 'grenadines', 'saint lucia', 'st lucia', 'saint kitts', 'st kitts', 'nevis', 'aruba', 'jamaica', 'grenada', 'haiti', 'guadeloupe', 'martinique', 'saint barthelemy', 'st barthelemy', 'barbados', 'antigua']
   CB_ISLANDS = ['st', 'maarten', 'bermuda', 'anguilla', 'bvis', 'virgin', 'islands', 'cayman', 'bahamas', 'trinidad', 'cotto', 'laurel', 'santa', 'isabel', 'british', 'devonshire', 'sint']
 
 end

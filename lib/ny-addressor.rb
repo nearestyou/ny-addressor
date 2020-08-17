@@ -54,15 +54,15 @@ class NYAddressor
     case @region
     when :US
       @addressor = NYUSAddress.new(@input)
-      @addressor = NYNONAddress.new if @addressor.parts.keys.count < 1
+      @addressor = NYNONAddress.new if (@addressor.parts.nil? or @addressor.parts.keys.count < 1)
     when :CA
       @addressor = NYCAAddress.new(@input)
-      @addressor = NYNONAddress.new if @addressor.parts.keys.count < 1
+      @addressor = NYNONAddress.new if (@addressor.parts.nil? or @addressor.parts.keys.count < 1)
     else
       ### Temporarily routing through US !
 
-      # @addressor = NYNONAddress.new
-      @addressor = NYUSAddress.new(@input)
+      @addressor = NYNONAddress.new
+      # @addressor = NYUSAddress.new(@input)
     end
   end
 
