@@ -1,5 +1,6 @@
 require 'minitest/autorun'
 require 'byebug'
+ENV['LOCAL_DEPENDENCIES'] = 'true'
 load 'lib/ny-addressor.rb'
 
 class NYAddressorTest < MiniTest::Test
@@ -222,7 +223,6 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddressor.new("2070 BC-3, Cawston, BC V0X 1C2, Canada").sns == "2070bc3bc"
   end
 
-<<<<<<< HEAD
   def test_pre_unit
     assert NYAddressor.new("B2 - 15562 24TH AVENUE, SURREY, V4A2J5").unitless_hash == NYAddressor.new("15562 24TH AVENUE, SURREY, V4A2J5").hash
     assert NYAddressor.new("UNIT 23 11151 HORSESHOE WAY, RICHMOND, V7A4S5").unitless_hash == NYAddressor.new("11151 HORSESHOE WAY, RICHMOND, V7A4S5").hash
@@ -247,10 +247,10 @@ class NYAddressorTest < MiniTest::Test
     addy = NYAddressor.new('79 Bush Road, St Maarten')
     assert addy.addressor.parts[:state] == 'st maarten'
     assert addy.hash == 'f16791829233546575c22c6a'
-=======
+  end
+
   def test_canadian_boul
     assert NYAddressor.new('5850, boul. Jean XXIII, Trois-Rivières, QC, G8Z 4B5').addressor.parts[:street_label] == 'blvd'
->>>>>>> a98ccbe7b121ee05a9169db0915ea356c82c9231
   end
 
 end

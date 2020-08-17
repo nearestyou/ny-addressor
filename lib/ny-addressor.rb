@@ -39,10 +39,10 @@ class NYAddressor
   end
 
   def potential_us
-    return (NYAConstants::US_DESCRIPTORS & (@clean&.map(&:downcase) || [])).count > 0
-    #state = (NYAConstants::US_DESCRIPTORS & @clean.map(&:downcase)).count > 0
-    #zip = !@clean.last.has_letters? # what if there's no ZIP? What if there's a country?
-    #state and zip
+    return 1 if (NYAConstants::US_DESCRIPTORS & (@clean&.map(&:downcase) || [])).count > 0
+    down = @input.downcase
+    return 2 if NYAConstants::CB_ISLAND_NAMES.map{|island| down.include?(island)}.any?
+    return false
   end
 
   def potential_ca
