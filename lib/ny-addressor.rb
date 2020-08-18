@@ -2,12 +2,14 @@
   load 'lib/identifier.rb'
   load 'lib/us-identifier.rb'
   load 'lib/ca-identifier.rb'
+  load 'lib/cb-identifier.rb'
   load 'lib/constants.rb'
   load 'lib/extensions.rb'
   load 'lib/addressor_utils.rb'
 # else
 #   require 'us-identifier.rb'
 #   require 'ca-identifier.rb'
+#   require 'cb-identifier.rb'
 #   require 'identifier.rb'
 #   require 'constants.rb'
 #   require 'extensions.rb'
@@ -36,6 +38,8 @@ class NYAddressor
       return USIdentifier.new(@input)
     when :CA
       return CAIdentifier.new(@input)
+    when :CB
+      return CBIdentifier.new(@input)
     else
       return nil
     end
@@ -43,6 +47,7 @@ class NYAddressor
 
   def set_region
     regions = []
+    regions << :CB if potential_cb
     regions << :CA if potential_ca
     regions << :US if potential_us
     case regions.length
@@ -62,6 +67,10 @@ class NYAddressor
   def potential_ca
     typified = AddressorUtils.typify(@input)
     typified.include?('=|= |=|') or typified.include?('=|=|=|')
+  end
+
+  def potential_cb #caribbean
+    NYAConstants::CB_ISLANDS.each { |name| return true if @input.include? name}
   end
 
   def elim_region(regions)

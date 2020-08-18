@@ -72,9 +72,4 @@ class CAIdentifier < NYIdentifier
     end
   end
 
-  # def check_saint(sep)
-  #   saint = NYAConstants::CA_SAINTS.any? { |word| }
-  #   # if sep[:confirmed] != :street_label
-  # end
-
 end #CAIdentifier
