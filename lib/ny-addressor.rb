@@ -1,18 +1,18 @@
-if ENV['LOCAL_DEPENDENCIES']
+# if ENV['LOCAL_DEPENDENCIES']
   load 'lib/identifier.rb'
   load 'lib/us-identifier.rb'
   load 'lib/ca-identifier.rb'
   load 'lib/constants.rb'
   load 'lib/extensions.rb'
   load 'lib/addressor_utils.rb'
-else
-  require 'us-identifier.rb'
-  require 'ca-identifier.rb'
-  require 'identifier.rb'
-  require 'constants.rb'
-  require 'extensions.rb'
-  require 'addressor_utils.rb'
-end
+# else
+#   require 'us-identifier.rb'
+#   require 'ca-identifier.rb'
+#   require 'identifier.rb'
+#   require 'constants.rb'
+#   require 'extensions.rb'
+#   require 'addressor_utils.rb'
+# end
 require 'digest'
 
 class NYAddressor

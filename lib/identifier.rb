@@ -12,7 +12,7 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
     extra_sep_comma
     seperate
     post_extra
-    #update_sep_comma
+    #update_sep_comma #this may not be nescessary
     create_sep_map
     identify_all_by_location
   end
@@ -52,7 +52,7 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
     @sep_comma = []
     @str.split(',').each do |comma|
       words = comma.split(' ')
-      @sep_comma.push comma.split(' ')
+      @sep_comma.push words if words != []
     end
   end #create_sep_comma
 
@@ -294,10 +294,10 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
     elsif directions.length > 1
       short_dir_found = false
       #short dir is typically the correct one (EX: N > North)
-      directions.each { |dir| short_dir_found = true if direction[:text].length < 3 }
+      directions.each { |dir| short_dir_found = true if dir[:text].length < 3 }
 
       #remove non-short dirs
-      directions.each { |dir| directions.delete(dir) if direction[:text].length > 2 } if short_dir_found
+      directions.each { |dir| directions.delete(dir) if dir[:text].length > 2 } if short_dir_found
 
       #Typically the latter dir is the correct one
       directions.last[:confirmed] = :street_direction
@@ -348,6 +348,7 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
         @sep_map[index][:confirmed] = :street_name if @sep_map[index][:confirmed].nil? and common_sep_comma(@sep_map[name_start][:orig], @sep_map[index][:orig])
       end
     else
+      #This should only trigger if street name was not given
       raise "Erorr occured while finding street name...\nstart: #{name_start}\nstop: #{name_stop}\nfrom address #{@orig}"
     end
   end #confirm_street_name
@@ -460,7 +461,7 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
 
   def search_sep_comma(text)
     @sep_comma.each {|comma| return comma if comma.include? text}
-    nil
+    []
   end
 
   def search_confirmed(partId)

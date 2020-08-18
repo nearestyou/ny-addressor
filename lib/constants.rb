@@ -150,11 +150,14 @@ class NYAConstants
   UNITS = {
     'no' => '#',
     'apartment' => 'apt',
-    'suite' => 'ste',
+    # 'suite' => 'ste',
     'room' => 'room',
     'unit' => '#'
   }
   UNIT_DESCRIPTORS ||= (UNITS.keys + UNITS.values)
+
+  CA_SAINTS = ['st', 'saint', 'sainte'] #convert to ste
+
   CB_ISLANDS = ['st', 'maarten', 'bermuda', 'anguilla', 'bvis', 'virgin', 'islands', 'cayman', 'bahamas', 'trinidad', 'cotto', 'laurel', 'santa', 'isabel', 'british', 'devonshire']
 
 end

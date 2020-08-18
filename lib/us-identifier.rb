@@ -40,10 +40,17 @@ class USIdentifier < NYIdentifier
 
   def pattern_options(part)
     opts = super
+    opts << :unit if potential_unit(part)
     opts << :state if potential_state(part)
     opts << :postal_code if potential_postal_code(part)
     opts << :country if potential_country(part)
     opts
+  end
+
+  def potential_unit(part)
+    return true if super
+    return true if part[:text].include? 'ste' or part[:text].include? 'suite'
+    return false
   end
 
   def potential_state(part)

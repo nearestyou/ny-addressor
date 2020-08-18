@@ -55,6 +55,7 @@ class CAIdentifier < NYIdentifier
   def standardize_aliases
     super
     @sep_map.each do |sep|
+
       case sep[:confirmed]
       when :state
         #If theres a full providence, abrev it
@@ -63,8 +64,17 @@ class CAIdentifier < NYIdentifier
 
       when :postal_code
         sep[:text] = sep[:text].delete(' ')
-      end
+
+      end #case sep[:confirmed]
+
+      #Replace Saint with Ste
+      NYAConstants::CA_SAINTS.each { |st| sep[:text] = sep[:text].gsub(st, 'ste') if sep[:text] == st or sep[:text].include? "#{st}." or sep[:text].include? "#{st}-"} if sep[:confirmed] != :street_label and sep[:text].include? 's'
     end
   end
+
+  # def check_saint(sep)
+  #   saint = NYAConstants::CA_SAINTS.any? { |word| }
+  #   # if sep[:confirmed] != :street_label
+  # end
 
 end #CAIdentifier
