@@ -71,6 +71,9 @@ class NYAddressor
 
   def potential_cb #caribbean
     NYAConstants::CB_ISLANDS.each { |name| return true if @input.include? name}
+    typified = AddressorUtils.typify(@input)
+    return true if typified.split(' ').last == '==||' #bermuda postal code
+    return false
   end
 
   def elim_region(regions)
