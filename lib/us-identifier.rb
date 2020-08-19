@@ -1,19 +1,9 @@
 class USIdentifier < NYIdentifier
-  def initialize(str = nil)
-    super(str)
-    identify
-  end
 
   def identify
     condense_usa
     check_compound_state
     super
-    identify_all_by_pattern
-    consolidate_identity_options
-    confirm_identity_options
-    standardize_aliases
-    select_final_options
-    check_requirements
   end
 
   #Convert United States of America to usa
@@ -32,11 +22,6 @@ class USIdentifier < NYIdentifier
   end
 
   ###Pattern Options###
-  def identify_all_by_pattern
-    @sep_map.each_with_index do |part, i|
-      @sep_map[i][:from_pattern] = pattern_options(part)
-    end
-  end
 
   def pattern_options(part)
     opts = super

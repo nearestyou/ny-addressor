@@ -1,18 +1,8 @@
 class CAIdentifier < NYIdentifier
-  def initialize(str = nil)
-    super(str)
-    identify
-  end #init
 
   def identify
     check_compound_prov
     super
-    identify_all_by_pattern
-    consolidate_identity_options
-    confirm_identity_options
-    standardize_aliases
-    select_final_options
-    check_requirements
   end #identify
 
   def check_compound_prov
@@ -21,11 +11,6 @@ class CAIdentifier < NYIdentifier
   end
 
   ###Pattern Options###
-  def identify_all_by_pattern
-    @sep_map.each_with_index do |part, i|
-      @sep_map[i][:from_pattern] = pattern_options(part)
-    end
-  end#Identify all by pattern
 
   def pattern_options(part)
     opts = super
