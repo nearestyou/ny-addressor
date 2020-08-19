@@ -52,9 +52,9 @@ class NYAddressor
 
   def set_region
     regions = []
+    regions << :IR if potential_ir
     regions << :CB if potential_cb
     regions << :CA if potential_ca
-    regions << :IR if potential_ir
     regions << :US if potential_us
     case regions.length
     when 0
@@ -82,7 +82,7 @@ class NYAddressor
   end
 
   def potential_ir #ireland
-    return true if array_value_instring(NYAConstants::IR_POSTAL_CODES, @typified)
+    return true if array_value_instring(NYAConstants::IR_POSTAL_CODES, @typified) and array_value_instring(NYAConstants::IR_COUNTIES)
     false
   end
 
@@ -92,7 +92,7 @@ class NYAddressor
     regions[0] #this is temporary !
   end
 
-  def array_value_instring(array, str=@input)
+  def array_value_instring(array, str=@input.downcase)
     array.each { |value| return true if str.include? value }
     false
   end
