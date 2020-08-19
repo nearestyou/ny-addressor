@@ -3,6 +3,7 @@
   load 'lib/us-identifier.rb'
   load 'lib/ca-identifier.rb'
   load 'lib/cb-identifier.rb'
+  load 'lib/ir-identifier.rb'
   load 'lib/constants.rb'
   load 'lib/extensions.rb'
   load 'lib/addressor_utils.rb'
@@ -10,6 +11,7 @@
 #   require 'us-identifier.rb'
 #   require 'ca-identifier.rb'
 #   require 'cb-identifier.rb'
+#   require 'ir-identifier.rb'
 #   require 'identifier.rb'
 #   require 'constants.rb'
 #   require 'extensions.rb'
@@ -27,6 +29,7 @@ class NYAddressor
     end
     @input = input
     @clean = input&.gsub(',',' ')&.delete("'")&.downcase&.split(' ')
+    @typified = AddressorUtils.typify(@input)
     @region = set_region
     @identity = identify
     @parts = @identity.parts if @identity
@@ -36,10 +39,12 @@ class NYAddressor
     case @region
     when :US
       return USIdentifier.new(@input)
-    when :CA
+    when :CA #Canada + Britain
       return CAIdentifier.new(@input)
     when :CB
       return CBIdentifier.new(@input)
+    when :IR
+      return IRIdentifier.new(@input)
     else
       return nil
     end
@@ -49,6 +54,7 @@ class NYAddressor
     regions = []
     regions << :CB if potential_cb
     regions << :CA if potential_ca
+    regions << :IR if potential_ir
     regions << :US if potential_us
     case regions.length
     when 0
@@ -65,21 +71,30 @@ class NYAddressor
   end
 
   def potential_ca
-    typified = AddressorUtils.typify(@input)
-    typified.include?('=|= |=|') or typified.include?('=|=|=|')
+    #Applies to Canadian and British postal codes...
+    @typified.include?('=|= |=|') or @typified.include?('=|=|=|') #and array_value_instring(NYAConstants::CA_DESCRIPTORS + NYAConstants::CA_COMPOUND_PROVINCES.keys.map(&:downcase))
   end
 
   def potential_cb #caribbean
     NYAConstants::CB_ISLANDS.each { |name| return true if @input.include? name}
-    typified = AddressorUtils.typify(@input)
-    return true if typified.split(' ').last == '==||' #bermuda postal code
+    return true if @typified.split(' ').last == '==||' #bermuda postal code
     return false
+  end
+
+  def potential_ir #ireland
+    return true if array_value_instring(NYAConstants::IR_POSTAL_CODES, @typified)
+    false
   end
 
   def elim_region(regions)
     #put some logic here to determine country possibly???
 
     regions[0] #this is temporary !
+  end
+
+  def array_value_instring(array, str=@input)
+    array.each { |value| return true if str.include? value }
+    false
   end
 
   def construct(opts = {})

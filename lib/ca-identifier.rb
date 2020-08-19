@@ -47,7 +47,7 @@ class CAIdentifier < NYIdentifier
   end
 
   def potential_country(part)
-    part[:text] == 'ca' or part[:text] == 'canada'
+    part[:text] == 'ca' or part[:text] == 'canada' or part[:text] == 'britain' or part[:text] == 'br'
   end
 
   ######Pattern Options######

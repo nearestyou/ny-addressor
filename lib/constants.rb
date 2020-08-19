@@ -160,4 +160,37 @@ class NYAConstants
 
   CB_ISLANDS = ['st maarten', 'sint maarten', 'saint maarten', 'bermuda', 'anguilla', 'bvis', 'virgin islands', 'cayman', 'bahamas', 'trinidad', 'cotto laurel', 'santa isabel', 'devonshire']
 
+  IR_COUNTIES = [
+    'antrim',
+    'carlow',
+    'cork',
+    'derry',
+    'donegal',
+    'down',
+    'dublin',
+    'fermanagh',
+    'kerry',
+    'kilkenny',
+    'leitrim',
+    'limerick',
+    'longford',
+    'louth',
+    'mayo',
+    'meath',
+    'offaly',
+    'sligo',
+    'tipperary',
+    'waterford',
+    'westmeath',
+    'wicklow'
+  ]
+  IR_POSTAL_CODES = [ #typified
+    '==|| |==',
+    '=|| ===|',
+    '=|| =|||',
+    '=|| =|==',
+    '=|| =||=',
+    '=|| ===|',
+    '==|| |=='
+  ]
 end

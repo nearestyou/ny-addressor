@@ -4,6 +4,7 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
     @orig = str
     @str = str.downcase
     @bus = {}
+    identify
   end
 
   def identify
@@ -15,6 +16,12 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
     #update_sep_comma #this may not be nescessary
     create_sep_map
     identify_all_by_location
+    identify_all_by_pattern
+    consolidate_identity_options
+    confirm_identity_options
+    standardize_aliases
+    select_final_options
+    check_requirements
   end
 
   def pre_extra
@@ -121,6 +128,12 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
   ######Location Options######
 
   ###Identify by pattern###
+  def identify_all_by_pattern
+    @sep_map.each_with_index do |part, i|
+      @sep_map[i][:from_pattern] = pattern_options(part)
+    end
+  end
+
   def pattern_options(part)
     opts = []
     opts << :street_number if potential_street_number(part)
@@ -469,5 +482,12 @@ attr_accessor :str, :sep, :sep_map, :bus, :parts
     nil
   end
 
+  def array_value_instring(array, str=@str)
+    array.each { |value| value.split(' ').each { |word| return true if str.include? word } }
+    # array.each do |value|
+    #   value.split(' ').each { |word| return true if str.include? word}
+    # end
+    false
+  end
 
 end #NYIdentifier class
