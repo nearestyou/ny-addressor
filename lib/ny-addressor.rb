@@ -1,4 +1,4 @@
-if ENV['LOCAL_DEPENDENCIES']
+# if ENV['LOCAL_DEPENDENCIES']
   load 'lib/identifier.rb'
   load 'lib/us-identifier.rb'
   load 'lib/ca-identifier.rb'
@@ -7,6 +7,7 @@ if ENV['LOCAL_DEPENDENCIES']
   load 'lib/constants.rb'
   load 'lib/extensions.rb'
   load 'lib/addressor_utils.rb'
+if true
 else
   require 'us-identifier.rb'
   require 'ca-identifier.rb'
@@ -67,7 +68,14 @@ class NYAddressor
   end
 
   def potential_us
-    return (NYAConstants::US_DESCRIPTORS & (@clean&.map(&:downcase) || [])).count > 0
+    return true if (NYAConstants::US_DESCRIPTORS & (@clean&.map(&:downcase) || [])).count > 0
+    @clean.each_with_index do |sep, i| #check for compund state
+      if i+1 < @clean.length
+        return true if NYAConstants::US_COMPOUND_STATES.keys.map(&:downcase).include? (sep + ' ' + @clean[i+1])
+      end
+    end
+    return false
+
   end
 
   def potential_ca

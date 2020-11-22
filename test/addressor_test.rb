@@ -246,4 +246,8 @@ class NYAddressorTest < MiniTest::Test
     assert eq("4933 Yukon Ave N, New Hope, MN, 55428", "4933, Yukon Ave N, New Hope, MN, 55428")
   end
 
+  def test_compund_state
+    assert eq("1405 Main St, Warrington, New York, 55345", "1405 Main St, Warrington, NY, 55345")
+  end
+
 end
