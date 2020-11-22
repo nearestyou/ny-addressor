@@ -1,4 +1,4 @@
-# if ENV['LOCAL_DEPENDENCIES']
+if ENV['LOCAL_DEPENDENCIES']
   load 'lib/identifier.rb'
   load 'lib/us-identifier.rb'
   load 'lib/ca-identifier.rb'
