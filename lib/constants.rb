@@ -152,8 +152,9 @@ class NYAConstants
     'suite' => 'ste',
     'room' => 'room',
     'unit' => '#',
-    'p.o.box' => 'po',
-    'pobox' => 'po'
+    'p.o.box' => 'pobox',
+    'po' => 'po',
+    'box' => 'po',
   }
   UNIT_DESCRIPTORS ||= (UNITS.keys + UNITS.values)
   CB_ISLAND_NAMES = ['saint maarten', 'sint maarten', 'st maarten', 'saint martin', 'st martin', 'bermuda', 'anguilla', 'us virgin islands', 'bahamas', 'puerto rico', 'cayman islands', 'montserrat', 'british virgin islands', 'trinidad', 'tobago', 'saint vincent', 'st vincent', 'grenadines', 'saint lucia', 'st lucia', 'saint kitts', 'st kitts', 'nevis', 'aruba', 'jamaica', 'grenada', 'haiti', 'guadeloupe', 'martinique', 'saint barthelemy', 'st barthelemy', 'barbados', 'antigua']
