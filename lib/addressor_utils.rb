@@ -1,10 +1,6 @@
 class AddressorUtils
 class << self
 
-def typify(str)
-  str.gsub(/[0-9]/,'|').gsub(/[a-zA-Z]/,'=')
-end
-
 def string_inclusion(str1, str2, numeric_failure = false)
   strs = [ str1.downcase.gsub(/[^a-z0-9]/, ''), str2.downcase.gsub(/[^a-z0-9]/, '') ].sort_by{|str| str.length}
   case

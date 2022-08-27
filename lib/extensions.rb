@@ -2,6 +2,10 @@
 
 # Extend string class
 class String
+  def typify
+    self.gsub(/[0-9]/,'|').gsub(/[a-zA-Z]/,'=')
+  end
+
   def numeric?
     self[/[0-9]+/] == self
   end

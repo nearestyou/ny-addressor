@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-load 'lib/addressor_utils.rb'
 load 'lib/constants.rb'
 load 'lib/extensions.rb'
 
@@ -11,7 +10,7 @@ class NYAddressPart
 
   def initialize(word)
     @text = word
-    @typified = AddressorUtils.typify(word)
+    @typified = word.typify
     pattern_options
   end
 
