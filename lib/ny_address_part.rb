@@ -5,13 +5,15 @@ load 'lib/extensions.rb'
 
 # Address Part
 class NYAddressPart
-  attr_reader :from_pattern, :from_position, :from_comma, :from_all, :text, :typified
+  attr_reader :from_pattern, :from_position, :from_comma, :from_all, :text, :typified, :comma_block
   attr_accessor :confirmed
 
   def initialize(word)
     @text = word
     @typified = word.typify
     pattern_options
+
+    @comma_block = nil
   end
 
   def to_s
@@ -34,6 +36,8 @@ class NYAddressPart
   # @param comma - index of the comma group
   # @param comma_count - how many comma groups are there?
   def comma_options(comma, comma_count)
+    @comma_block = comma
+
     @from_comma =
       case comma_count
       when 3
@@ -41,7 +45,7 @@ class NYAddressPart
         when 0
           %i[street_number street_name street_direction street_label unit]
         when 1
-          %i[unit city state]
+          %i[unit city state postal]
         when 3
           %i[city state postal country]
         end
@@ -124,7 +128,7 @@ class NYAddressPart
     @from_pattern << :street_label if NYAConstants::LABEL_DESCRIPTORS.include? @text
     @from_pattern << :street_direction if NYAConstants::DIRECTION_DESCRIPTORS.include? @text
     @from_pattern << :unit if potential_unit
-    @from_pattern << :city if @text.alphabetic?
+    @from_pattern << :city if potential_city
     @from_pattern << :state if NYAConstants::STATE_DESCRIPTORS.include? @text
     @from_pattern << :postal if @text.has_digits?
     @from_pattern << :country if @text.alphabetic?
@@ -150,5 +154,12 @@ class NYAddressPart
     return true if @text.has_digits?
 
     false
+  end
+
+  def potential_city
+    return true if @text.alphabetic?
+    return true if @text == 'st.' #Saint
+
+    return false
   end
 end

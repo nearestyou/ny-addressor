@@ -2,11 +2,11 @@
 
 load 'lib/addressor_utils.rb'
 load 'lib/ny_address_part.rb'
+require 'digest'
 require 'byebug'
 
 # Addressor
 class NYAddressor
-  # attr_accessor :input, :parts
   attr_reader :sep_map, :input, :parts, :confirmed
 
   def initialize(input)
@@ -14,12 +14,83 @@ class NYAddressor
 
     @confirmed = {}
     @input = input
-    @clean = clean(input)
-    @sep = @clean.split
-    @sep_comma = @input.split(',').map { |p| clean(p).strip.split }
+    # @sep_comma = @input.split(',').map { |p| p.clean.strip.split unless p.strip.empty? }.reject(&:nil?)
+    @sep_comma = @input.unrepeat.split(',').map { |p| p.clean.strip.split unless p.strip.empty? }.reject(&:nil?)
+    @sep = @sep_comma.flatten
     create_sep_map
     confirm_options
+    set_parts
   end
+
+  def clean
+    @input.clean
+  end
+
+  def construct(opts = {})
+    return nil unless @parts
+    return nil unless @parts.slice(:street_number, :street_name, :state).keys.length == 3
+
+    opts = { include_unit: true, include_label: true, include_dir: true, include_postal: true }.merge(opts)
+    addr = "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:city]}#{@parts[:state]}"
+    return nil if addr.length < 2
+
+    addr << @parts[:unit].to_s if opts[:include_unit]
+    addr << @parts[:street_label].to_s if opts[:include_label]
+    addr << @parts[:street_direction].to_s if opts[:include_dir]
+    addr << (@parts[:postal] || '99999').to_s[0..4] if opts[:include_postal]
+    addr.standardize.unrepeat
+  end
+
+  def hash
+    k = construct
+    return nil unless k
+
+    Digest::SHA256.hexdigest(k)[0..23]
+  end
+
+  def unitless_hash
+    k = construct({ include_unit: false })
+    return nil unless k
+
+    Digest::SHA256.hexdigest(k)[0..23]
+  end
+
+  # for searching by missing/erroneous ZIP
+  def hash99999
+    return nil unless @parts
+
+    Digest::SHA256.hexdigest(construct[0..-6] << '99999')[0..23]
+  end
+
+  # Street num/name + state
+  def sns
+    return '' unless @parts[:street_number] && @parts[:street_name] && @parts[:state]
+
+    "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}".standardize
+  end
+
+  # Equality functions used for testing
+  def ==(other)
+    eq(other.parts)
+  end
+
+  def eq(parts)
+    return nil unless @parts
+    return false unless @parts[:street_number].to_s.standardize == parts[:street_number].to_s.standardize
+    return false unless @parts[:street_name].to_s.standardize == parts[:street_name].to_s.standardize
+    return false unless @parts[:street_label].to_s.standardize == parts[:street_label].to_s.standardize
+    return false unless @parts[:street_direction].to_s.standardize == parts[:street_direction].to_s.standardize
+    return false unless @parts[:unit].to_s.standardize == parts[:unit].to_s.standardize
+    return false unless @parts[:city].to_s.standardize == parts[:city].to_s.standardize
+    return false unless @parts[:state].to_s.standardize == parts[:state].to_s.standardize
+    return false unless @parts[:postal].to_s.standardize == parts[:postal].to_s.standardize
+    return false unless @parts[:country].to_s.standardize == parts[:country].to_s.standardize
+
+    true
+  end
+
+  ### PRIVATE METHODS ###
+  private
 
   def create_sep_map
     @sep_map = []
@@ -36,9 +107,20 @@ class NYAddressor
     end
   end
 
-  def clean(str)
-    str&.gsub(/\s*\(.+\)$/, '')&.gsub(',', ' ')&.delete("'")&.downcase&.gsub("\u00A0", ' ')
-    # regex: https://stackoverflow.com/questions/8708515/ruby-rails-remove-text-inside-parentheses-from-a-string
+  def set_parts
+    return if @confirmed.keys.length < 3
+
+    @parts = { orig: @input }
+    @confirmed.each do |label, indexes|
+      @parts[label] = indexes.map { |i| NYAConstants::STANDARDIZE_ALL[@sep_map[i].text] || @sep_map[i].text }.join(' ')
+    end
+
+    @parts.each do |label, part|
+      @parts[label] = NYAConstants::STANDARDIZE_ALL[part] || part
+    end
+
+    unfound = (0...@sep_map.length).to_a - confirmed_positions
+    @parts[:bus] = unfound.map { |i| @sep_map[i].text }
   end
 
   # Find potential matches for this symbol
@@ -88,15 +170,18 @@ class NYAddressor
 
   def confirm_postal
     potential = @sep_map.each_index.select { |i| @sep_map[i].from_all.include? :postal }
-    (@confirmed[:postal] ||= []) << potential.last
+    (@confirmed[:postal] ||= []) << potential.last unless potential.empty?
     # TODO: Multipostal logic
+    # typified.include?('=|= |=|') or typified.include?('=|=|=|')
   end
 
   def confirm_state
     potential = @sep_map.each_index.select { |i| @sep_map[i].from_all.include? :state }
     confirm = @confirmed[:postal] ? potential.select { |i| i < @confirmed[:postal].min } : potential
-    (@confirmed[:state] ||= []) << confirm.last unless confirm.empty?
-    # TODO: Multistate logic
+    last_comma_block = confirm.map { |i| @sep_map[i].comma_block || nil }.max
+    confirm = confirm.select { |i| @sep_map[i].comma_block.to_i == last_comma_block } if last_comma_block
+
+    @confirmed[:state] = confirm unless confirm.empty?
   end
 
   def confirm_country
@@ -144,12 +229,12 @@ class NYAddressor
       # Highway is a label, the name comes after
       known_before = confirmed_positions(%i[street_direction]).min
       known_after = confirmed_positions(%i[street_label]).max
-    else
-      known_before ||= confirmed_positions(%i[street_label street_direction]).min
-      known_after ||= confirmed_positions(%i[street_number]).max
     end
+    # else
+    known_before ||= confirmed_positions(%i[street_label street_direction]).min
+    known_after ||= confirmed_positions(%i[street_number]).max
 
-    # debugger
+    # TODO: Select everything within the same comma_block
     confirm = potential(:street_name)
     confirm = confirm.select { |i| i < known_before } if known_before
     confirm = confirm.select { |i| i > known_after } if known_after
@@ -157,6 +242,7 @@ class NYAddressor
   end
 
   def confirm_city
+    # TODO: Select everything within the same comma_block
     known_after = confirmed_positions(%i[street_label street_direction]).max
     known_before = confirmed_positions(%i[postal country state]).min
 
@@ -166,11 +252,11 @@ class NYAddressor
     @confirmed[:city] = confirm if confirm && !confirm.empty?
   end
 
-
   ### Methods for finding specific things about an address
 
   def direction_touching_number?
-    confirmed_positions(%i[street_number street_direction]).length > 1 && @confirmed[:street_direction].min - 1 == @confirmed[:street_number].max
+    confirmed_positions(%i[street_number street_direction]).length > 1 &&
+      @confirmed[:street_direction].min - 1 == @confirmed[:street_number].max
   end
 
   def highway_street?
@@ -178,24 +264,9 @@ class NYAddressor
   end
 end
 
-
-
-#  def potential_ca
-#    typified = AddressorUtils.typify(@input)
-#    typified.include?('=|= |=|') or typified.include?('=|=|=|')
-#  end
-#
-#  ## Manually inheriting methods from region specific addressor
-#  def construct(opts = {}); @addressor.construct(opts); end
-#  def hash; @addressor.hash; end
-#  def hash99999; @addressor.hash99999; end
-#  def unitless_hash; @addressor.unitless_hash; end
-#  def sns; @addressor.sns; end
 #  def comp(nya, comparison_keys = [:street_number, :street_name, :postal_code]); AddressorUtils.comp(@addressor.parts, nya.addressor.parts, comparison_keys); end
 #
 #  def self.string_inclusion(str1, str2, numeric_failure = false); AddressorUtils.string_inclusion(str1, str2, numeric_failure); end
 #  def self.determine_state(state_name, postal_code = nil); AddressorUtils.determine_state(state_name, postal_code); end
 #  #def self.comp(parts1, parts2, comparison_keys = [:street_number, :street_name, :postal_code]); AddressorUtils.comp(parts1, parts2, comparison_keys); end
 #  def self.comp(*args); AddressorUtils.comp(*args); end
-#
-#end

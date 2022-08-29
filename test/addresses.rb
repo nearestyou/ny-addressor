@@ -3,11 +3,6 @@ require 'byebug'
 load 'lib/ny-addressor.rb'
 
 class AddressesTest < MiniTest::Test
-  def test_4933_yukon
-    nya = NYAddress.new('4933 Yukon AVE N, New Hope, MN 55428')
-    assert nya.parts == {street_number: '4933', street_name: 'Yukon', street_label: 'AVE', street_direction: 'N', city: 'New Hope', state: 'MN', postal_code: '55428'}
-  end
-
   def test_white_house
     nya = NYAddress.new('1600 Pennsylvania Ave NE, Washington, DC 20202')
     assert nya.parts == {
