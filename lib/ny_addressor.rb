@@ -99,11 +99,12 @@ class NYAddressor
   def preformat(str)
     result = str.dup
     # Remove corner stores
-    # TODO: This needs to be in reverse? and only for numbers
+    # TODO: Only do this for numbers?
     while result.include?('&')
       location = result.index('&')
-      end_location = result[location + 2..].index(' ')
-      result = result[0..location - 1].strip + result[location + end_location + 2..]
+      pre_location = result[0..location - 1].strip.index(' ') || 0
+      remove_str = result[pre_location..location]
+      result = result.sub(remove_str, '').strip
     end
 
     result
