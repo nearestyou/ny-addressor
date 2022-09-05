@@ -26,6 +26,18 @@ class NYAddressor
     AddressorUtils.determine_state(state_name, postal_code)
   end
 
+  def self.string_inclusion(str1, str2, numeric_failure: false)
+    AddressorUtils.string_inclusion(str1, str2, numeric_failure)
+  end
+
+  def self.comp(*args)
+    AddressorUtils.comp(*args)
+  end
+
+  def comp(nya, comparison_keys = %i[street_number street_name postal])
+    AddressorUtils.comp(@parts, nya.parts, comparison_keys)
+  end
+
   def clean
     @input.clean
   end
@@ -320,9 +332,3 @@ class NYAddressor
     confirmed_map(%i[street_label]).map(&:text).include? 'hwy'
   end
 end
-
-#  def comp(nya, comparison_keys = [:street_number, :street_name, :postal_code]); AddressorUtils.comp(@addressor.parts, nya.addressor.parts, comparison_keys); end
-#
-#  def self.string_inclusion(str1, str2, numeric_failure = false); AddressorUtils.string_inclusion(str1, str2, numeric_failure); end
-#  #def self.comp(parts1, parts2, comparison_keys = [:street_number, :street_name, :postal_code]); AddressorUtils.comp(parts1, parts2, comparison_keys); end
-#  def self.comp(*args); AddressorUtils.comp(*args); end

@@ -82,26 +82,26 @@ class NYAddressorTest < MiniTest::Test
     assert eq('1600 Pennsylvania Ave, Washington 2, DC, 99999', '1600 Pennsylvania Ave, Washington, DC 99999')
   end
 
-#  def test_great_match
-#    assert_equal comp( '1600 Pennsylvania Ave, Washington, DC 20500',  '1600 Pennsylvania Ave, Washington, DC 20500'), 3
-#  end
-#
-#  def test_okay_match
-#    assert_equal comp( '1500 Pennsylvania Ave, Washington, DC 20500',  '1600 Pennsylvania Ave, Washington, DC 20500'), 2
-#  end
-#
-#  def test_bad_match
-#    assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20500',  '1600 Pennsylvania Ave, Washington, DC 20500'), 1
-#  end
-#
-#  def test_non_match
-#    assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20400',  '1600 Pennsylvania Ave, Washington, DC 20500'), 0
-#  end
-#
-#  def test_error_match
-#    assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20400', 'kjhghjkjhghjkjhg'), 0
-#    assert_equal comp( 'kjhghjkjhghjkjhg', '1500 Bennsylvania Ave, Washington, DC 20400'), 0
-#  end
+  def test_great_match
+    assert_equal comp( '1600 Pennsylvania Ave, Washington, DC 20500',  '1600 Pennsylvania Ave, Washington, DC 20500'), 3
+  end
+
+  def test_okay_match
+    assert_equal comp( '1500 Pennsylvania Ave, Washington, DC 20500',  '1600 Pennsylvania Ave, Washington, DC 20500'), 2
+  end
+
+  def test_bad_match
+    assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20500',  '1600 Pennsylvania Ave, Washington, DC 20500'), 1
+  end
+
+  def test_non_match
+    assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20400',  '1600 Pennsylvania Ave, Washington, DC 20500'), 0
+  end
+
+  def test_error_match
+    assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20400', 'kjhghjkjhghjkjhg'), 0
+    assert_equal comp( 'kjhghjkjhghjkjhg', '1500 Bennsylvania Ave, Washington, DC 20400'), 0
+  end
 
   def test_error_parse
     assert_nil NYAddressor.new('ghjkjhghjkjhghjkjhghjkjhghjk').parts
@@ -111,18 +111,18 @@ class NYAddressorTest < MiniTest::Test
     assert_nil NYAddressor.new('ghjkjhghjkjhghjkjhghjkjhghjk').hash
   end
 
-#  def test_perfect_name_inclusion
-#    assert_equal NYAddressor.string_inclusion('THE TAVERN BAR', 'The Tavernbar'), 1
-#    assert_equal NYAddressor.string_inclusion('ASDF', 'The Tavernbar'), 0
-#  end
-#
-#  def test_imperfect_name_inclusion
-#    assert_equal NYAddressor.string_inclusion('THE TAVERN BEAR', 'The Tavernbar', true), 10.0/12
-#    assert_equal NYAddressor.string_inclusion('THE TAVERN BEAR', 'The Tavernbar on 1st Ave', true), 10.0/13
-#    assert_equal NYAddressor.string_inclusion('THE TAVORN BAR', 'The Tavernbar', true), 6.0/12
-#    assert_equal NYAddressor.string_inclusion('Zoo', 'The Tavernbar', true), 0.0/3
-#    assert_equal NYAddressor.string_inclusion('Zoe', 'The Tavernbar', true), 1.0/3
-#  end
+  def test_perfect_name_inclusion
+    assert_equal NYAddressor.string_inclusion('THE TAVERN BAR', 'The Tavernbar'), 1
+    assert_equal NYAddressor.string_inclusion('ASDF', 'The Tavernbar'), 0
+  end
+
+  def test_imperfect_name_inclusion
+    assert_equal NYAddressor.string_inclusion('THE TAVERN BEAR', 'The Tavernbar', numeric_failure: true), 10.0 / 12
+    assert_equal NYAddressor.string_inclusion('THE TAVERN BEAR', 'The Tavernbar on 1st Ave', numeric_failure: true), 10.0 / 13
+    assert_equal NYAddressor.string_inclusion('THE TAVORN BAR', 'The Tavernbar', numeric_failure: true), 6.0 / 12
+    assert_equal NYAddressor.string_inclusion('Zoo', 'The Tavernbar', numeric_failure: true), 0.0 / 3
+    assert_equal NYAddressor.string_inclusion('Zoe', 'The Tavernbar', numeric_failure: true), 1.0 / 3
+  end
 
   def test_canadian_zip
     zip = 'H0H 0H0'
