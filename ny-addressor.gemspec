@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.email = 'peter@puzzlesandwich.com'
   s.homepage = 'http://www.puzzlesandwich.com'
   s.files = [
-    'lib/ny_addressor.rb',
+    'lib/ny-addressor.rb',
     'lib/ny_address_part.rb',
     'lib/addressor_utils.rb',
     'lib/constants.rb',
