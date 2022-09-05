@@ -159,8 +159,8 @@ class NYAddressPart
 
   def potential_city
     return true if @text.alphabetic?
-    return true if @text == 'st.' #Saint
+    return true if @text == 'st.' # Saint
 
-    return false
+    false
   end
 end

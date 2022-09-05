@@ -3,7 +3,6 @@
 load 'lib/addressor_utils.rb'
 load 'lib/ny_address_part.rb'
 require 'digest'
-require 'byebug'
 
 # Addressor
 class NYAddressor
@@ -14,8 +13,7 @@ class NYAddressor
 
     @confirmed = {}
     @input = input
-    # @sep_comma = @input.split(',').map { |p| p.clean.strip.split unless p.strip.empty? }.reject(&:nil?)
-    @sep_comma = preformat(@input).unrepeat.split(',').map { |p| p.clean.strip.split unless p.strip.empty? }.reject(&:nil?)
+    @sep_comma = preformat(@input).unrepeat.split(',').map{ |p| p.clean.strip.split unless p.strip.empty? }.reject(&:nil?)
     @sep = @sep_comma.flatten
     create_sep_map
     confirm_options
