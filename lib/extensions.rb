@@ -63,7 +63,7 @@ class String
       return searched + unsearched unless dupe
 
       location = unsearched.index(dupe[0])
-      searched += unsearched[0..location - 1]
+      searched += unsearched[0..location - 1] if location > 0
       searched += if dupe[0].squeeze.length > 1 && dupe[0].has_letters? # &&
                     # ([' ', ',', '.'].include?(dupe[0][0]) || dupe[1].length > 8)
                     dupe[1]

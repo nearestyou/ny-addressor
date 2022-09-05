@@ -5,7 +5,7 @@ load 'lib/extensions.rb'
 
 # Address Part
 class NYAddressPart
-  attr_reader :from_pattern, :from_position, :from_comma, :from_all, :text, :typified, :comma_block
+  attr_reader :from_pattern, :from_position, :from_comma, :from_all, :text, :typified, :comma_block, :position
   attr_accessor :confirmed
 
   def initialize(word)
@@ -98,6 +98,7 @@ class NYAddressPart
   end
 
   def position_options(pos, num_parts)
+    @position = pos
     @from_position =
       case pos
       when 0
@@ -107,7 +108,7 @@ class NYAddressPart
       when 2
         %i[street_number street_name street_label unit street_direction]
       when 3
-        %i[street_name street_label unit street_direction city]
+        %i[street_name street_label unit street_direction city state]
       when num_parts - 4
         %i[city state street_direction street_label unit]
       when num_parts - 3

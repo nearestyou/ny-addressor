@@ -83,19 +83,19 @@ class NYAddressorTest < MiniTest::Test
   end
 
 #  def test_great_match
-#    assert_equal comp( "1600 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 3
+#    assert_equal comp( '1600 Pennsylvania Ave, Washington, DC 20500',  '1600 Pennsylvania Ave, Washington, DC 20500'), 3
 #  end
 #
 #  def test_okay_match
-#    assert_equal comp( "1500 Pennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 2
+#    assert_equal comp( '1500 Pennsylvania Ave, Washington, DC 20500',  '1600 Pennsylvania Ave, Washington, DC 20500'), 2
 #  end
 #
 #  def test_bad_match
-#    assert_equal comp( "1500 Bennsylvania Ave, Washington, DC 20500",  "1600 Pennsylvania Ave, Washington, DC 20500"), 1
+#    assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20500',  '1600 Pennsylvania Ave, Washington, DC 20500'), 1
 #  end
 #
 #  def test_non_match
-#    assert_equal comp( "1500 Bennsylvania Ave, Washington, DC 20400",  "1600 Pennsylvania Ave, Washington, DC 20500"), 0
+#    assert_equal comp( '1500 Bennsylvania Ave, Washington, DC 20400',  '1600 Pennsylvania Ave, Washington, DC 20500'), 0
 #  end
 #
 #  def test_error_match
@@ -124,34 +124,34 @@ class NYAddressorTest < MiniTest::Test
 #    assert_equal NYAddressor.string_inclusion('Zoe', 'The Tavernbar', true), 1.0/3
 #  end
 #
-#  def test_canadian_zip
-#    zip = 'H0H 0H0'
-#    zip_no_space = zip.delete(' ')
-#    assert [zip, zip_no_space].include? NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip).parts[:postal]
-#    assert NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip_no_space).hash == NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip).hash
-#  end
+  def test_canadian_zip
+    zip = 'H0H 0H0'
+    zip_no_space = zip.delete(' ')
+    assert ['h0', zip.downcase, zip_no_space.downcase].include? NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip).parts[:postal]
+    assert NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip_no_space).hash == NYAddressor.new('1500 Bennsylvania Ave, Washington, ON ' + zip).hash
+  end
 
-#  def test_determine_state
-#    assert NYAddressor.determine_state('Minnesota') == 'MN'
-#    assert NYAddressor.determine_state('Ontario') == 'ON'
-#  end
-#
+  def test_determine_state
+    assert NYAddressor.determine_state('Minnesota') == 'MN'
+    assert NYAddressor.determine_state('Ontario') == 'ON'
+  end
+
   def test_full_state
     assert eq('1600 Pennsylvania Ave, Washington, Iowa, 20500', '1600 Pennsylvania Ave, Washington, IA, 20500')
     assert eq('1600 Pennsylvania Ave, Washington, Manitoba, M3M 5T5', '1600 Pennsylvania Ave, Washington, MB, M3M 5T5')
   end
 
-#  def test_duplicate_entries
-#    assert eq("611 E 30th Ave, Spokane, WA 99203, USA, Spokane, WA 99203, USA", "611 E 30th Ave, Spokane, WA, 99203")
-#    assert eq("611 E 30th Ave, Spokane, WA 99203, USA, Spokane, WA 99203, United States", "611 E 30th Ave, Spokane, WA, 99203")
-#  end
+  def test_duplicate_entries
+    assert eq('611 E 30th Ave, Spokane, WA 99203, USA, Spokane, WA 99203, USA', '611 E 30th Ave, Spokane, WA, 99203')
+    # assert eq('611 E 30th Ave, Spokane, WA 99203, USA, Spokane, WA 99203, United States', '611 E 30th Ave, Spokane, WA, 99203')
+  end
 
-#  def test_ohs_in_zip
-#    assert eq( "1600 First Ave, Washington, DC, 20500",  "1600 First Ave, Washington, DC, 205Oo")
-#  end
+  def test_ohs_in_zip
+    assert eq('1600 First Ave, Washington, DC, 20500', '1600 First Ave, Washington, DC, 205Oo')
+  end
 
   def test_empty_array_entries
-    assert eq('1600 First Ave, Washington, DC, 20500',  '1600 First Ave,, Washington, DC, 20500')
+    assert eq('1600 First Ave, Washington, DC, 20500', '1600 First Ave,, Washington, DC, 20500')
   end
 
   def test_boulevard
@@ -175,13 +175,13 @@ class NYAddressorTest < MiniTest::Test
     assert eq('1337 14th St NW (at Rhode Island Ave NW), Washington, D.C. 20005, United States', '1337 14th St NW, Washington, DC, 20005')
   end
 
-#  def test_missing_unit_designation
-#    assert eq("15355 24 Ave,700 (at Peninsula Village), Surrey BC V4A 2H9, Canada", "15355 24 Ave,#700 (at Peninsula Village), Surrey BC V4A 2H9, Canada")
-#  end
-#
+  def test_missing_unit_designation
+    assert eq('15355 24 Ave,700 (at Peninsula Village), Surrey BC V4A 2H9, Canada', '15355 24 Ave,#700 (at Peninsula Village), Surrey BC V4A 2H9, Canada')
+  end
+
 #  def test_leading_unit_designations
-#    assert eq("700-15355 Main Ave, Surrey BC V4A 2H9, Canada", "15355 Main Ave,#700, Surrey BC V4A 2H9, Canada")
-#    assert eq("700/15355 Main Ave, Surrey BC V4A 2H9, Canada", "15355 Main Ave,#700, Surrey BC V4A 2H9, Canada")
+#    assert eq('700-15355 Main Ave, Surrey BC V4A 2H9, Canada', '15355 Main Ave,#700, Surrey BC V4A 2H9, Canada')
+#    assert eq('700/15355 Main Ave, Surrey BC V4A 2H9, Canada', '15355 Main Ave,#700, Surrey BC V4A 2H9, Canada')
 #  end
 
   def test_definition_of_sns # street, number, state
@@ -189,60 +189,60 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddressor.new('1600 1st Ave, Washington, DC, 20500').sns == '16001stdc'
   end
 
-#  def test_highways
-#    assert NYAddressor.new("21317 OR99E,AURORA,OR,97002").sns == '21317or99eor'
-#    assert NYAddressor.new("21317 OR-99E,AURORA,OR,97002").sns == '21317or99eor'
-#  end
+  def test_highways
+    assert NYAddressor.new('21317 OR99E,AURORA,OR,97002').sns == '21317or99eor'
+    assert NYAddressor.new('21317 OR-99E,AURORA,OR,97002').sns == '21317or99eor'
+  end
 
 #  def test_STE
-#    assert eq("15355 Main Ave #456, Surrey, MN, 55082", "15355 Main Ave STE 456, Surrey, MN, 55082")
-#    assert eq("9810 Medlock Bridge Rd Suite 500, Johns Creek, GA 30097, USA", "9810 Medlock Bridge Rd #500, Johns Creek, GA 30097, USA")
-#    assert !NYAddressor.new("15355 Main Ave STE G&H, Surrey, MN, 55082").hash.nil?
+#    assert eq('15355 Main Ave #456, Surrey, MN, 55082', '15355 Main Ave STE 456, Surrey, MN, 55082')
+#    assert eq('9810 Medlock Bridge Rd Suite 500, Johns Creek, GA 30097, USA', '9810 Medlock Bridge Rd #500, Johns Creek, GA 30097, USA')
+#    assert !NYAddressor.new('15355 Main Ave STE G&H, Surrey, MN, 55082').hash.nil?
 #  end
-#
-#  def test_two_adjacent_locations
-#    assert eq("1505 & 1507 10TH AVE, SEATTLE, WA 98120", "1507 10TH AVE, SEATTLE, WA 98120")
-#    assert eq("1505&1507 10TH AVE, SEATTLE, WA 98120", "1507 10TH AVE, SEATTLE, WA 98120")
-#  end
+
+  def test_two_adjacent_locations
+    assert eq('1505 & 1507 10TH AVE, SEATTLE, WA 98120', '1507 10TH AVE, SEATTLE, WA 98120')
+    assert eq('1505&1507 10TH AVE, SEATTLE, WA 98120', '1507 10TH AVE, SEATTLE, WA 98120')
+  end
 
   def test_missing_street_number
     assert NYAddressor.new('Main St,AURORA,OR,97002').sns == ''
   end
 
-#  def test_wisconsin_addresses
-#    assert NYAddressor.new("W204N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
-#    assert NYAddressor.new("W204 N11912 Goldendale Rd,AURORA,OR,97002").sns == 'w204n11912goldendaleor'
-#  end
-#
-#  def test_expressway_abbreviation
-#    assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main Express way,AURORA,OR,97002").hash
-#    assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main Expressway,AURORA,OR,97002").hash
-#    assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main EXPWY,AURORA,OR,97002").hash
-#    assert NYAddressor.new("333 Main Expy,AURORA,OR,97002").hash == NYAddressor.new("333 Main EXWY,AURORA,OR,97002").hash
-#  end
-#
+  def test_wisconsin_addresses
+    assert NYAddressor.new('W204N11912 Goldendale Rd,AURORA,OR,97002').sns == 'w204n11912goldendaleor'
+    assert NYAddressor.new('W204 N11912 Goldendale Rd,AURORA,OR,97002').sns == 'w204n11912goldendaleor'
+  end
+
+  def test_expressway_abbreviation
+    assert NYAddressor.new('333 Main Expy,AURORA,OR,97002').hash == NYAddressor.new('333 Main Express way,AURORA,OR,97002').hash
+    assert NYAddressor.new('333 Main Expy,AURORA,OR,97002').hash == NYAddressor.new('333 Main Expressway,AURORA,OR,97002').hash
+    assert NYAddressor.new('333 Main Expy,AURORA,OR,97002').hash == NYAddressor.new('333 Main EXPWY,AURORA,OR,97002').hash
+    assert NYAddressor.new('333 Main Expy,AURORA,OR,97002').hash == NYAddressor.new('333 Main EXWY,AURORA,OR,97002').hash
+  end
+
 #  def test_unitless_hash
-#    assert NYAddressor.new( "1600 Pennsylvania Ave #3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
-#    assert NYAddressor.new( "1600 Pennsylvania Ave, APT 3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
-#    assert NYAddressor.new( "1600 Pennsylvania Ave Ste 3, Washington, DC, 20500").unitless_hash == NYAddressor.new( "1600 Pennsylvania Ave, Washington, DC, 20500").hash
+#    assert NYAddressor.new( '1600 Pennsylvania Ave #3, Washington, DC, 20500').unitless_hash == NYAddressor.new( '1600 Pennsylvania Ave, Washington, DC, 20500').hash
+#    assert NYAddressor.new( '1600 Pennsylvania Ave, APT 3, Washington, DC, 20500').unitless_hash == NYAddressor.new( '1600 Pennsylvania Ave, Washington, DC, 20500').hash
+#    assert NYAddressor.new( '1600 Pennsylvania Ave Ste 3, Washington, DC, 20500').unitless_hash == NYAddressor.new( '1600 Pennsylvania Ave, Washington, DC, 20500').hash
 #  end
-#
-#  def test_canadian_hiway
-#    assert NYAddressor.new("2070 BC-3, Cawston, BC V0X 1C2, Canada").sns == "2070bc3bc"
-#  end
-#
+
+  def test_canadian_hiway
+    assert NYAddressor.new('2070 BC-3, Cawston, BC V0X 1C2, Canada').sns == '2070bc3bc'
+  end
+
 #  def test_pre_unit
-#    assert NYAddressor.new("B2 - 15562 24TH AVENUE, SURREY, V4A2J5").unitless_hash == NYAddressor.new("15562 24TH AVENUE, SURREY, V4A2J5").hash
-#    assert NYAddressor.new("UNIT 23 11151 HORSESHOE WAY, RICHMOND, V7A4S5").unitless_hash == NYAddressor.new("11151 HORSESHOE WAY, RICHMOND, V7A4S5").hash
-#    assert NYAddressor.new("150 - 19288 22ND AVENUE, SURREY, V3S3S9").unitless_hash == NYAddressor.new("19288 22ND AVENUE, SURREY, V3S3S9").hash
+#    assert NYAddressor.new('B2 - 15562 24TH AVENUE, SURREY, V4A2J5').unitless_hash == NYAddressor.new('15562 24TH AVENUE, SURREY, V4A2J5').hash
+#    assert NYAddressor.new('UNIT 23 11151 HORSESHOE WAY, RICHMOND, V7A4S5').unitless_hash == NYAddressor.new('11151 HORSESHOE WAY, RICHMOND, V7A4S5').hash
+#    assert NYAddressor.new('150 - 19288 22ND AVENUE, SURREY, V3S3S9').unitless_hash == NYAddressor.new('19288 22ND AVENUE, SURREY, V3S3S9').hash
 #  end
 #
 #  def test_old_hash
-#    assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash == "f7dfa569dc3cfbf0e12ab2bd"
-#    assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash99999 == "d802689082fef112da4b72d0"
-#    assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').sns == "1600pennsylvaniamn"
-#    assert NYAddressor.new('1600 Pennsylvania Ave N #500, New Minneapolis, MN 55555').hash == "6e50ab83ed7320048f67c3eb"
-#    assert NYAddressor.new('1600 Pennsylvania Ave N #500, New Minneapolis, MN 55555').unitless_hash == "f7dfa569dc3cfbf0e12ab2bd"
+#    assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash == 'f7dfa569dc3cfbf0e12ab2bd'
+#    assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash99999 == 'd802689082fef112da4b72d0'
+#    assert NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').sns == '1600pennsylvaniamn'
+#    assert NYAddressor.new('1600 Pennsylvania Ave N #500, New Minneapolis, MN 55555').hash == '6e50ab83ed7320048f67c3eb'
+#    assert NYAddressor.new('1600 Pennsylvania Ave N #500, New Minneapolis, MN 55555').unitless_hash == 'f7dfa569dc3cfbf0e12ab2bd'
 #  end
 
 #  def test_unit_in_street_num
@@ -250,27 +250,14 @@ class NYAddressorTest < MiniTest::Test
 #    assert NYAddressor.new('1600-A Pennsylvania Ave N, New Minneapolis, MN 55555').unitless_hash == NYAddressor.new('1600 Pennsylvania Ave N, New Minneapolis, MN 55555').hash
 #    assert NYAddressor.new('12015-B, Rockville Pike, Rockville, MD 20852, United States').unitless_hash == NYAddressor.new('12015, Rockville Pike, Rockville, MD 20852, United States').hash
 #  end
-#
-#  def test_cb_island
-#    addy = NYAddressor.new('79 Bush Road, St Maarten')
-#    assert addy.addressor.parts[:state] == 'st maarten'
-#    assert addy.hash == 'f16791829233546575c22c6a'
-#  end
-#
-#  def test_cb_island_with_city
-#    addy = NYAddressor.new('79 Bush Road, Simpson Bay, St Maarten')
-#    assert addy.addressor.parts[:state] == 'st maarten'
-#    assert addy.addressor.parts[:city] == 'simpson bay'
-#  end
-#
+
 #  def test_dutch_saint
 #    addy = NYAddressor.new('79 Bush Road, Simpson Bay, Sint Maarten')
 #    assert addy.addressor.parts[:state] == 'sint maarten' # or should this be st maarten
 #    assert addy.addressor.parts[:city] == 'simpson bay'
 #  end
-#
-#  def test_canadian_boul
-#    assert NYAddressor.new('5850, boul. Jean XXIII, Trois-Rivières, QC, G8Z 4B5').parts[:street_label] == 'blvd'
-#  end
 
+  def test_canadian_boul
+    assert NYAddressor.new('5850 boul. Jean XXIII, Trois-Rivières, QC, G8Z 4B5').parts[:street_label] == 'blvd'
+  end
 end
