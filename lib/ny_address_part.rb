@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
-load 'lib/constants.rb'
-load 'lib/extensions.rb'
+if ENV['LOCAL_DEPENDENCIES']
+  load 'lib/constants.rb'
+  load 'lib/extensions.rb'
+else
+  require 'constants.rb'
+  require 'extensions.rb'
+end
 
 # Address Part
 class NYAddressPart
