@@ -37,11 +37,19 @@ class String
   end
 
   def letter_count
-    split('').reject(&:numeric?).length
+    gsub(/[^a-zA-Z]/, '').length
   end
 
   def digit_count
     split('').select(&:numeric?).length
+  end
+
+  def strip_digits
+    gsub(/[0-9]/, '')
+  end
+
+  def strip_letters
+    gsub(/[a-zA-Z]/, '')
   end
 
   # https://stackoverflow.com/questions/7184123/check-if-string-is-repetition-of-an-unknown-substring

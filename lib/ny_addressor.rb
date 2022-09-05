@@ -146,14 +146,27 @@ class NYAddressor
   # Based on what's in the bus
   def assume_parts
     # Check if unit is in street number
-    sn = @parts[:street_number].split(%r{[-/]}) if @parts[:street_number] && @parts[:unit].nil?
-    if sn && sn.length > 1
-      pos = sn[0].length + 1
-      @parts[:unit] = sn[0].strip
-      @parts[:street_number] = @parts[:street_number][pos..].strip
+    # 1) If street number has - or / unit is the smallest length
+    # 2) If street number is all nums except 1 letter, letter is unit
+    search_for_unit_in_street_num if @parts[:unit].nil? && @parts[:street_number]
+  end
+
+  def search_for_unit_in_street_num
+    if @parts[:street_number].letter_count == 1
+      @parts[:unit] = @parts[:street_number].strip_digits
+      @parts[:street_number] = @parts[:street_number].strip_letters
+      return
     end
 
-    @parts
+    sn = @parts[:street_number].split(%r{[-/]}, 2)
+    return unless sn.length == 2
+
+    unit = sn.min { |x, y| x.size <=> y.size }
+    unit_pos = @parts[:street_number].index(unit) - 2
+    @parts[:unit] = unit.strip
+    after = @parts[:street_number][unit_pos + unit.length + 3..]
+    before = unit_pos.negative? ? '' : @parts[:street_number][0..unit_pos]
+    @parts[:street_number] = before + after
   end
 
   def cleanup_parts
@@ -233,6 +246,7 @@ class NYAddressor
     nums = potential(:street_number).select { |i| @sep_map[i].text.numeric? }
     nums = potential(:street_number).select { |i| @sep_map[i].text.has_digits? } if nums.empty?
     @confirmed[:street_number] = [nums.min] unless nums.empty?
+    @confirmed[:street_number] = nums if nums.map { |i| @sep_map[i].typified }.join == '=|||=|||||' # Wisconsin
   end
 
   def confirm_street_label
@@ -290,8 +304,9 @@ class NYAddressor
   ### Methods for finding specific things about an address
 
   def direction_touching_number?
-    confirmed_positions(%i[street_number street_direction]).length > 1 &&
-      @confirmed[:street_direction].min - 1 == @confirmed[:street_number].max
+    return false unless @confirmed[:street_direction] && @confirmed[:street_number]
+
+    @confirmed[:street_direction].min - 1 == @confirmed[:street_number].max
   end
 
   def label_touching_number?
