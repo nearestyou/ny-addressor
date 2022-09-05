@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
-load 'lib/addressor_utils.rb'
-load 'lib/ny_address_part.rb'
 require 'digest'
+if ENV['LOCAL_DEPENDENCIES']
+  load 'lib/addressor_utils.rb'
+  load 'lib/ny_address_part.rb'
+else
+  require 'addressor_utils.rb'
+  require 'ny_address_part.rb'
+end
 
 # Addressor
 class NYAddressor
