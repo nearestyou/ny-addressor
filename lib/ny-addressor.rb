@@ -4,6 +4,7 @@ require 'digest'
 if ENV['LOCAL_DEPENDENCIES']
   load 'lib/addressor_utils.rb'
   load 'lib/ny_address_part.rb'
+  require 'byebug'
 else
   require 'addressor_utils.rb'
   require 'ny_address_part.rb'
@@ -182,7 +183,7 @@ class NYAddressor
     @parts[:unit] = unit.strip
     after = @parts[:street_number][unit_pos + unit.length + 3..]
     before = unit_pos.negative? ? '' : @parts[:street_number][0..unit_pos]
-    @parts[:street_number] = before + after
+    @parts[:street_number] = before.to_s + after.to_s
   end
 
   def cleanup_parts
