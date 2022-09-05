@@ -14,7 +14,8 @@ class String
 
   # Standardize strings for comparison testing
   def standardize
-    clean.delete(' ').delete('-').delete('.')
+    # clean.delete(' ').delete('-').delete('.')
+    clean.gsub(/[-\s.#]/, '')
   end
 
   def numeric?

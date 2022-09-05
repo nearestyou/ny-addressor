@@ -145,6 +145,15 @@ class NYAddressor
 
   # Based on what's in the bus
   def assume_parts
+    # Check if unit is in street number
+    sn = @parts[:street_number].split(%r{[-/]}) if @parts[:street_number] && @parts[:unit].nil?
+    if sn && sn.length > 1
+      pos = sn[0].length + 1
+      @parts[:unit] = sn[0].strip
+      @parts[:street_number] = @parts[:street_number][pos..].strip
+    end
+
+    @parts
   end
 
   def cleanup_parts
@@ -222,7 +231,7 @@ class NYAddressor
 
   def confirm_street_number
     nums = potential(:street_number).select { |i| @sep_map[i].text.numeric? }
-    nums = potential(:street_number).select { |i| @sep_map[i].text.has_digits? } if nums.length == 0
+    nums = potential(:street_number).select { |i| @sep_map[i].text.has_digits? } if nums.empty?
     @confirmed[:street_number] = [nums.min] unless nums.empty?
   end
 
