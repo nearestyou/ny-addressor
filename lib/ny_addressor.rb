@@ -68,6 +68,7 @@ class NYAddressor
 
   # Street num/name + state
   def sns
+    return '' unless @parts
     return '' unless @parts[:street_number] && @parts[:street_name] && @parts[:state]
 
     "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:state]}".standardize
@@ -102,7 +103,7 @@ class NYAddressor
     # TODO: Only do this for numbers?
     while result.include?('&')
       location = result.index('&')
-      pre_location = result[0..location - 1].strip.index(' ') || 0
+      pre_location = location - (result[0..location - 1].strip.reverse.index(' ') || location)
       remove_str = result[pre_location..location]
       result = result.sub(remove_str, '').strip
     end
@@ -171,6 +172,7 @@ class NYAddressor
 
   def cleanup_parts
     @parts[:postal] = @parts[:postal].gsub(/o|O/, '0') if @parts[:postal]
+    NYAConstants::UNIT_DESCRIPTORS.each { |desc| @parts[:unit] = @parts[:unit].gsub(desc, '').strip } if @parts[:unit]
   end
 
   # Find potential matches for this symbol

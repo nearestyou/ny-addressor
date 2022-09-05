@@ -184,7 +184,8 @@ class NYAddressorTest < MiniTest::Test
     assert eq('700/15355 Main Ave, Surrey BC V4A 2H9, Canada', '15355 Main Ave,#700, Surrey BC V4A 2H9, Canada')
   end
 
-  def test_definition_of_sns # street, number, state
+  def test_definition_of_sns
+    # street number, name, state
     assert NYAddressor.new('1600 First Ave, Washington, DC, 20500').sns == '16001stdc'
     assert NYAddressor.new('1600 1st Ave, Washington, DC, 20500').sns == '16001stdc'
   end
@@ -194,11 +195,11 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddressor.new('21317 OR-99E,AURORA,OR,97002').sns == '21317or99eor'
   end
 
-#  def test_STE
-#    assert eq('15355 Main Ave #456, Surrey, MN, 55082', '15355 Main Ave STE 456, Surrey, MN, 55082')
-#    assert eq('9810 Medlock Bridge Rd Suite 500, Johns Creek, GA 30097, USA', '9810 Medlock Bridge Rd #500, Johns Creek, GA 30097, USA')
-#    assert !NYAddressor.new('15355 Main Ave STE G&H, Surrey, MN, 55082').hash.nil?
-#  end
+  def test_ste
+    assert eq('15355 Main Ave #456, Surrey, MN, 55082', '15355 Main Ave STE 456, Surrey, MN, 55082')
+    assert eq('9810 Medlock Bridge Rd Suite 500, Johns Creek, GA 30097, USA', '9810 Medlock Bridge Rd #500, Johns Creek, GA 30097, USA')
+    assert !NYAddressor.new('15355 Main Ave STE G&H, Surrey, MN, 55082').hash.nil?
+  end
 
   def test_two_adjacent_locations
     assert eq('1505 & 1507 10TH AVE, SEATTLE, WA 98120', '1507 10TH AVE, SEATTLE, WA 98120')
@@ -243,11 +244,11 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddressor.new('12015-B, Rockville Pike, Rockville, MD 20852, United States').unitless_hash == NYAddressor.new('12015, Rockville Pike, Rockville, MD 20852, United States').hash
   end
 
-#  def test_dutch_saint
-#    addy = NYAddressor.new('79 Bush Road, Simpson Bay, Sint Maarten')
-#    assert addy.addressor.parts[:state] == 'sint maarten' # or should this be st maarten
-#    assert addy.addressor.parts[:city] == 'simpson bay'
-#  end
+  #  def test_dutch_saint
+  #    addy = NYAddressor.new('79 Bush Road, Simpson Bay, Sint Maarten')
+  #    assert addy.addressor.parts[:state] == 'sint maarten' # or should this be st maarten
+  #    assert addy.addressor.parts[:city] == 'simpson bay'
+  #  end
 
   def test_canadian_boul
     assert NYAddressor.new('5850 boul. Jean XXIII, Trois-Rivières, QC, G8Z 4B5').parts[:street_label] == 'blvd'
