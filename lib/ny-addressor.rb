@@ -79,6 +79,9 @@ class NYAddressor
   def hash99999
     return nil unless @parts
 
+    k = construct
+    return nil unless k
+
     Digest::SHA256.hexdigest(construct[0..-6] << '99999')[0..23]
   end
 
@@ -328,8 +331,9 @@ class NYAddressor
   end
 
   def label_touching_number?
-    confirmed_positions(%i[street_number street_label]).length > 1 &&
-      @confirmed[:street_label].min - 1 == @confirmed[:street_number].max
+    return false unless @confirmed[:street_label] && @confirmed[:street_number]
+
+    @confirmed[:street_label].min - 1 == @confirmed[:street_number].max
   end
 
   def highway_street?

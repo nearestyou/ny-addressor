@@ -119,7 +119,7 @@ class NYAddressPart
       when num_parts - 3
         %i[city state postal]
       when num_parts - 2
-        %i[state postal country]
+        %i[city state postal country]
       when num_parts - 1
         %i[state postal country]
       else

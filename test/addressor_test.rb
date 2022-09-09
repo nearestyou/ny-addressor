@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require 'byebug'
 ENV['LOCAL_DEPENDENCIES'] = 'true'
-load 'lib/ny_addressor.rb'
+load 'lib/ny-addressor.rb'
 
 class NYAddressorTest < MiniTest::Test
   def eq(str1, str2)
@@ -252,5 +252,9 @@ class NYAddressorTest < MiniTest::Test
 
   def test_canadian_boul
     assert NYAddressor.new('5850 boul. Jean XXIII, Trois-Rivières, QC, G8Z 4B5').parts[:street_label] == 'blvd'
+  end
+
+  def test_previous_errors
+    assert NYAddressor.new('Perkins Rd. & Rouzan Ave. 4841 Rouzan Square Ave, Baton Rouge, LA 70808')
   end
 end
