@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# gem build ny-addressor.gemspec
+
 ENV['LOCAL_DEPENDENCIES'] = 'true'
 load 'lib/ny-addressor.rb'
 
