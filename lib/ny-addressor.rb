@@ -21,9 +21,14 @@ class NYAddressor
     @input = input
     @sep_comma = preformat(@input).unrepeat.split(',').map{ |p| p.clean.strip.split unless p.strip.empty? }.reject(&:nil?)
     @sep = @sep_comma.flatten
-    create_sep_map
-    confirm_options
-    set_parts
+
+    begin
+      create_sep_map
+      confirm_options
+      set_parts
+    rescue StandardError => e
+      puts "NYAddressor(#{input}) failed: #{e}"
+    end
   end
 
   def self.determine_state(state_name, postal_code = nil)
