@@ -322,14 +322,16 @@ class NYAddressor
   def confirm_highway_street_name
     return false unless highway_street?
 
-    # if there's a highway and another potential pattern for a street_number -- it's probably a highway
-    highway_num = @sep_map.each_index.select { |i| @sep_map[i].from_all.include? :street_number }.max
-    return false if highway_num.nil?
-    return false if @confirmed[:street_number].include? highway_num
+    # find where it says highway, check if the next one is a number
+    label_position = confirmed_map(%i[street_label]).select { |sep| sep.text.include?('hwy') || sep.text.include?('highway') }.last.position
+    after_label = @sep_map[label_position + 1]
+    return false unless after_label.text.has_digits?
 
-    @confirmed[:street_name] = [highway_num] if highway_num
+    @confirmed[:street_name] = [after_label.position]
     # If it's a number it was probably picked up as a unit
-    @confirmed[:unit].length == 1 ? @confirmed = @confirmed.except(:unit) : @confirmed[:unit].delete(highway_num) if @confirmed[:unit]&.include?(highway_num)
+    if @confirmed[:unit]&.include?(after_label.position)
+      @confirmed[:unit].length == 1 ? @confirmed = @confirmed.except(:unit) : @confirmed[:unit].delete(after_label.position)
+    end
     true
   end
 
