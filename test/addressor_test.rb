@@ -193,6 +193,8 @@ class NYAddressorTest < MiniTest::Test
   def test_highways
     assert NYAddressor.new('21317 OR99E,AURORA,OR,97002').sns == '21317or99eor'
     assert NYAddressor.new('21317 OR-99E,AURORA,OR,97002').sns == '21317or99eor'
+    assert NYAddressor.new('7902 Highway 23, Belle Chasse, LA 70037, United States').sns == '790223la'
+    assert NYAddressor.new('5801 Sunrise Hwy, Holbrook, NY 11741, USA').sns == '5801sunriseny'
   end
 
   def test_ste

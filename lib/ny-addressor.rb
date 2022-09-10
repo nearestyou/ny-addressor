@@ -301,11 +301,14 @@ class NYAddressor
   end
 
   def confirm_street_name
+    # Treat highways differently
+    return if confirm_highway_street_name
+
     known_after = %i[street_number]
     known_before = []
 
     (direction_touching_number? ? known_after : known_before) << :street_direction
-    (label_touching_number? || highway_street? ? known_after : known_before) << :street_label
+    (label_touching_number? ? known_after : known_before) << :street_label
     known_before = confirmed_positions(known_before).min
     known_after = confirmed_positions(known_after).max
 
@@ -314,6 +317,20 @@ class NYAddressor
     confirm = confirm.select { |i| i < known_before } if known_before
     confirm = confirm.select { |i| i > known_after } if known_after
     @confirmed[:street_name] = confirm if confirm && !confirm.empty?
+  end
+
+  def confirm_highway_street_name
+    return false unless highway_street?
+
+    # if there's a highway and another potential pattern for a street_number -- it's probably a highway
+    highway_num = @sep_map.each_index.select { |i| @sep_map[i].from_all.include? :street_number }.max
+    return false if highway_num.nil?
+    return false if @confirmed[:street_number].include? highway_num
+
+    @confirmed[:street_name] = [highway_num] if highway_num
+    # If it's a number it was probably picked up as a unit
+    @confirmed[:unit].length == 1 ? @confirmed = @confirmed.except(:unit) : @confirmed[:unit].delete(highway_num) if @confirmed[:unit]&.include?(highway_num)
+    true
   end
 
   def confirm_city
@@ -342,6 +359,7 @@ class NYAddressor
   end
 
   def highway_street?
-    confirmed_map(%i[street_label]).map(&:text).include? 'hwy'
+    labels = confirmed_map(%i[street_label]).map(&:text)
+    labels.include?('hwy') || labels.include?('highway')
   end
 end

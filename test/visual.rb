@@ -5,7 +5,7 @@
 ENV['LOCAL_DEPENDENCIES'] = 'true'
 load 'lib/ny-addressor.rb'
 
-inp = 'Perkins Rd. & Rouzan Ave. 4841 Rouzan Square Ave, Baton Rouge, LA 70808'
+inp = '5801 Sunrise Hwy, Holbrook, NY 11741, USA'
 
 nya = NYAddressor.new(inp)
 nya.sep_map.each { |sep| puts sep }
