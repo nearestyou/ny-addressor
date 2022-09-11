@@ -392,6 +392,7 @@ class NYAddressor
 
     # Check to see if there's anything on the bus
     potential = @parts[:bus].select { |sep| sep.from_position.include? :street_name }.first
+    return unless potential
     return unless @sep_map[potential.position - 1].text.include? chosen
 
     @parts[:street_name] << " #{potential.text}"
@@ -402,7 +403,7 @@ class NYAddressor
   def search_for_saint_name
     # Saint must come before the street_name
     return unless @parts[:street_label].include? 'st'
-    return unless @parts[:bus]
+    return unless @parts[:bus] && !@parts[:bus].empty?
 
     potential_name = @parts[:bus].first
     sep_st = @confirmed[:street_label].map { |pos| @sep_map[pos] }.select { |sep| sep.text.include? 'st' }.first
