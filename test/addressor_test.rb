@@ -59,6 +59,11 @@ class NYAddressorTest < MiniTest::Test
     assert eq('89 Trinity Dr, Moncton NB E1G 2J7, Canada', '89 Trinity Dr, Moncton, NB E1G 2J7, Canada')
   end
 
+  def test_double_direction
+    assert eq('232 N Main St N, Stillwater, MN 55082, USA', '232 Main St N, Stillwater, MN 55082, USA')
+    assert eq('232 N Main St N, Stillwater, MN 55082, USA', '232 N Main St, Stillwater, MN 55082, USA')
+  end
+
   def test_double_entry
     assert eq('1600 Pennsylvania Ave, Washington, DC 20500', '1600 Pennsylvania Ave, Washington, DC 20500, Washington, DC 20500')
     assert eq('1600 Pennsylvania Ave, Washington, DC 20500', '1600 Pennsylvania Ave, Washington DC, DC 20500')

@@ -5,7 +5,7 @@
 ENV['LOCAL_DEPENDENCIES'] = 'true'
 load 'lib/ny-addressor.rb'
 
-inp = '5728 111 St NW, Edmonton AB T6H 3G1, Canada'
+inp = '232 N Main St N, Stillwater, MN 55082, USA'
 
 nya = NYAddressor.new(inp)
 nya.sep_map.each { |sep| puts sep }

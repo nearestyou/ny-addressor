@@ -389,6 +389,14 @@ class NYAddressor
     chosen = @parts[:street_direction].split.first
     @parts[:street_name] = chosen
     @parts[:street_direction] = @parts[:street_direction].sub(chosen, '').strip
+
+    # Check to see if there's anything on the bus
+    potential = @parts[:bus].select { |sep| sep.from_position.include? :street_name }.first
+    return unless @sep_map[potential.position - 1].text.include? chosen
+
+    @parts[:street_name] << " #{potential.text}"
+    @parts[:bus] = @parts[:bus][1..]
+    # @parts = @parts.except(:bus) if @parts[:bus].empty?
   end
 
   def search_for_saint_name
@@ -415,5 +423,15 @@ class NYAddressor
   def cleanup_parts
     @parts[:postal] = @parts[:postal].gsub(/o|O/, '0') if @parts[:postal]
     NYAConstants::UNIT_DESCRIPTORS.each { |desc| @parts[:unit] = @parts[:unit].gsub(desc, '').strip } if @parts[:unit]
+
+    remove_duplicate_direction if @parts[:street_name] && @parts[:street_direction]
+  end
+
+  # North Main St N -> Main St N
+  def remove_duplicate_direction
+    spl = @parts[:street_name].split
+    return unless @parts[:street_direction].include? spl.first
+
+    @parts[:street_name] = spl[1..].join
   end
 end
