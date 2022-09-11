@@ -64,6 +64,14 @@ class NYAddressorTest < MiniTest::Test
     assert eq('232 N Main St N, Stillwater, MN 55082, USA', '232 N Main St, Stillwater, MN 55082, USA')
   end
 
+  def test_direction_as_street
+    assert !NYAddressor.new('260 North St N, Middlebury, VT 05753, USA').hash.nil?
+  end
+
+  def test_label_as_street
+    assert !NYAddressor.new('260 Court St Unit 6, Middlebury, VT 05753, USA').hash.nil?
+  end
+
   def test_double_entry
     assert eq('1600 Pennsylvania Ave, Washington, DC 20500', '1600 Pennsylvania Ave, Washington, DC 20500, Washington, DC 20500')
     assert eq('1600 Pennsylvania Ave, Washington, DC 20500', '1600 Pennsylvania Ave, Washington DC, DC 20500')

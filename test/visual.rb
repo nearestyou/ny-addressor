@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 # gem build ny-addressor.gemspec
+# bundle info ny-addressor
 
 ENV['LOCAL_DEPENDENCIES'] = 'true'
 load 'lib/ny-addressor.rb'
 
-inp = '232 N Main St N, Stillwater, MN 55082, USA'
+inp = '260 Court St Unit 6, Middlebury, VT 05753, USA'
 
 nya = NYAddressor.new(inp)
 nya.sep_map.each { |sep| puts sep }

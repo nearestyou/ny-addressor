@@ -355,13 +355,22 @@ class NYAddressor
     # 2) If street number is all nums except 1 letter, letter is unit
     search_for_unit_in_street_num if @parts[:unit].nil? && @parts[:street_number]
 
+    # Search for the street_name elsewhere
+    search_for_street_name if @parts[:street_name].nil?
+  end
+
+  def search_for_street_name
     # Check if street name got picked up as direction
-    search_for_name_in_direction if @parts[:street_name].nil? && @parts[:street_direction]
+    if @parts[:street_direction]
+      return if search_for_name_in_direction
+    end
 
-    # Check if street name was saint
-    search_for_saint_name if @parts[:street_name].nil? && @parts[:street_label]
+    if @parts[:street_label]
+      return if search_for_saint_name # Check if street was a st->Saint
+      return if search_for_name_in_label # Check if street name was in street_label
+    end
 
-    guess_name_from_bus if @parts[:street_name].nil? && @parts[:bus]
+    guess_name_from_bus if @parts[:bus]
   end
 
   def search_for_unit_in_street_num
@@ -384,36 +393,47 @@ class NYAddressor
 
   def search_for_name_in_direction
     spl = @parts[:street_direction].split
-    return unless spl.length > 1
+    return false unless spl.length > 1
 
-    chosen = @parts[:street_direction].split.first
+    chosen = spl.first
     @parts[:street_name] = chosen
     @parts[:street_direction] = @parts[:street_direction].sub(chosen, '').strip
 
     # Check to see if there's anything on the bus
     potential = @parts[:bus].select { |sep| sep.from_position.include? :street_name }.first
-    return unless potential
-    return unless @sep_map[potential.position - 1].text.include? chosen
+    return false unless potential
+    return false unless @sep_map[potential.position - 1].text.include? chosen
 
     @parts[:street_name] << " #{potential.text}"
     @parts[:bus] = @parts[:bus][1..]
     # @parts = @parts.except(:bus) if @parts[:bus].empty?
+    true
+  end
+
+  def search_for_name_in_label
+    spl = @parts[:street_label].split
+    return false unless spl.length > 1
+
+    chosen = spl.first
+    @parts[:street_name] = chosen
+    @parts[:street_label] = @parts[:street_label].sub(chosen, '').strip
   end
 
   def search_for_saint_name
     # Saint must come before the street_name
-    return unless @parts[:street_label].include? 'st'
-    return unless @parts[:bus] && !@parts[:bus].empty?
+    return false unless @parts[:street_label].include? 'st'
+    return false unless @parts[:bus] && !@parts[:bus].empty?
 
     potential_name = @parts[:bus].first
     sep_st = @confirmed[:street_label].map { |pos| @sep_map[pos] }.select { |sep| sep.text.include? 'st' }.first
     # Saint must be before the street name
-    return unless sep_st.position + 1 == potential_name.position
+    return false unless sep_st.position + 1 == potential_name.position
 
     # Remove st from label and add to street name
     @parts[:street_label] = @parts[:street_label].sub('st', '').strip
     @parts = @parts.except(:street_label) if @parts[:street_label].empty?
     @parts[:street_name] = "st #{@parts[:bus].first.text}"
+    true
   end
 
   def guess_name_from_bus
