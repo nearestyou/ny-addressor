@@ -31,6 +31,8 @@ class NYAddressor
     end
   end
 
+  # PUBLIC METHODS
+  # ###
   def to_s
     output = "Addressor(#{@input})"
     output << "\nParts: #{@parts.except(:bus)}"
@@ -159,77 +161,6 @@ class NYAddressor
     end
   end
 
-  def set_parts
-    return if @confirmed.keys.length < 3
-
-    @parts = { orig: @input }
-    @confirmed.each do |label, indexes|
-      @parts[label] = indexes.map { |i| NYAConstants::STANDARDIZE_ALL[@sep_map[i].text] || @sep_map[i].text }.join(' ')
-    end
-
-    @parts.each do |label, part|
-      @parts[label] = NYAConstants::STANDARDIZE_ALL[part] || part
-    end
-
-    unfound = (0...@sep_map.length).to_a - confirmed_positions
-    @parts[:bus] = unfound.map { |i| @sep_map[i] }
-    assume_parts
-    cleanup_parts
-  end
-
-  # Based on what's in the bus
-  def assume_parts
-    # Check if unit is in street number
-    # 1) If street number has - or / unit is the smallest length
-    # 2) If street number is all nums except 1 letter, letter is unit
-    search_for_unit_in_street_num if @parts[:unit].nil? && @parts[:street_number]
-
-    # Check if street name got picked up as direction
-    search_for_name_in_direction if @parts[:street_name].nil? && @parts[:street_direction]
-
-    # Check if street name was saint
-    search_for_saint_name if @parts[:street_name].nil? && @parts[:street_label]
-  end
-
-  def search_for_unit_in_street_num
-    if @parts[:street_number].letter_count == 1
-      @parts[:unit] = @parts[:street_number].strip_digits
-      @parts[:street_number] = @parts[:street_number].strip_letters
-      return
-    end
-
-    sn = @parts[:street_number].split(%r{[-/]}, 2)
-    return unless sn.length == 2
-
-    unit = sn.min { |x, y| x.size <=> y.size }
-    unit_pos = @parts[:street_number].index(unit) - 2
-    @parts[:unit] = unit.strip
-    after = @parts[:street_number][unit_pos + unit.length + 3..]
-    before = unit_pos.negative? ? '' : @parts[:street_number][0..unit_pos]
-    @parts[:street_number] = before.to_s + after.to_s
-  end
-
-  def search_for_name_in_direction
-    spl = @parts[:street_direction].split
-    return unless spl.length > 1
-
-    chosen = @parts[:street_direction].split.first
-    @parts[:street_name] = chosen
-    @parts[:street_direction] = @parts[:street_direction].sub(chosen, '').strip
-  end
-
-  def search_for_saint_name
-    return unless @parts[:street_label].include? 'st'
-    return unless @parts[:bus]
-    @parts[:street_label] = @parts[:street_label].sub('st', '').strip
-    @parts[:street_name] = "st #{@parts[:bus].first.text}"
-  end
-
-  def cleanup_parts
-    @parts[:postal] = @parts[:postal].gsub(/o|O/, '0') if @parts[:postal]
-    NYAConstants::UNIT_DESCRIPTORS.each { |desc| @parts[:unit] = @parts[:unit].gsub(desc, '').strip } if @parts[:unit]
-  end
-
   # Find potential matches for this symbol
   def potential(sym)
     @sep_map.each_index.select { |i| @sep_map[i].from_all.include? sym }
@@ -247,10 +178,13 @@ class NYAddressor
     result
   end
 
+  # Returns a list of confirmed indexes for these symbols
   def confirmed_map(syms = nil)
     confirmed_positions(syms).map { |i| @sep_map[i] }
   end
 
+  ### Find things about the address we are 90% sure are true
+  #####################
   def confirm_options
     # Postals are the easiest to find
     # Whatever is after is probably the country!
@@ -394,5 +328,92 @@ class NYAddressor
   def highway_street?
     labels = confirmed_map(%i[street_label]).map(&:text)
     labels.include?('hwy') || labels.include?('highway')
+  end
+
+  def set_parts
+    return if @confirmed.keys.length < 3
+
+    @parts = { orig: @input }
+    @confirmed.each do |label, indexes|
+      @parts[label] = indexes.map { |i| NYAConstants::STANDARDIZE_ALL[@sep_map[i].text] || @sep_map[i].text }.join(' ')
+    end
+
+    @parts.each do |label, part|
+      @parts[label] = NYAConstants::STANDARDIZE_ALL[part] || part
+    end
+
+    unfound = (0...@sep_map.length).to_a - confirmed_positions
+    @parts[:bus] = unfound.map { |i| @sep_map[i] }
+    assume_parts
+    cleanup_parts
+  end
+  ### ASSUME PARTS THAT WERE NOT FOUND
+  # Based on what's in the bus
+  def assume_parts
+    # Check if unit is in street number
+    # 1) If street number has - or / unit is the smallest length
+    # 2) If street number is all nums except 1 letter, letter is unit
+    search_for_unit_in_street_num if @parts[:unit].nil? && @parts[:street_number]
+
+    # Check if street name got picked up as direction
+    search_for_name_in_direction if @parts[:street_name].nil? && @parts[:street_direction]
+
+    # Check if street name was saint
+    search_for_saint_name if @parts[:street_name].nil? && @parts[:street_label]
+
+    guess_name_from_bus if @parts[:street_name].nil? && @parts[:bus]
+  end
+
+  def search_for_unit_in_street_num
+    if @parts[:street_number].letter_count == 1
+      @parts[:unit] = @parts[:street_number].strip_digits
+      @parts[:street_number] = @parts[:street_number].strip_letters
+      return
+    end
+
+    sn = @parts[:street_number].split(%r{[-/]}, 2)
+    return unless sn.length == 2
+
+    unit = sn.min { |x, y| x.size <=> y.size }
+    unit_pos = @parts[:street_number].index(unit) - 2
+    @parts[:unit] = unit.strip
+    after = @parts[:street_number][unit_pos + unit.length + 3..]
+    before = unit_pos.negative? ? '' : @parts[:street_number][0..unit_pos]
+    @parts[:street_number] = before.to_s + after.to_s
+  end
+
+  def search_for_name_in_direction
+    spl = @parts[:street_direction].split
+    return unless spl.length > 1
+
+    chosen = @parts[:street_direction].split.first
+    @parts[:street_name] = chosen
+    @parts[:street_direction] = @parts[:street_direction].sub(chosen, '').strip
+  end
+
+  def search_for_saint_name
+    # Saint must come before the street_name
+    return unless @parts[:street_label].include? 'st'
+    return unless @parts[:bus]
+
+    potential_name = @parts[:bus].first
+    sep_st = @confirmed[:street_label].map { |pos| @sep_map[pos] }.select { |sep| sep.text.include? 'st' }.first
+    # Saint must be before the street name
+    return unless sep_st.position + 1 == potential_name.position
+
+    # Remove st from label and add to street name
+    @parts[:street_label] = @parts[:street_label].sub('st', '').strip
+    @parts = @parts.except(:street_label) if @parts[:street_label].empty?
+    @parts[:street_name] = "st #{@parts[:bus].first.text}"
+  end
+
+  def guess_name_from_bus
+    potential = @parts[:bus].select { |sep| sep.from_position.include? :street_name }
+    @parts[:street_name] = potential.first.text unless potential.empty?
+  end
+
+  def cleanup_parts
+    @parts[:postal] = @parts[:postal].gsub(/o|O/, '0') if @parts[:postal]
+    NYAConstants::UNIT_DESCRIPTORS.each { |desc| @parts[:unit] = @parts[:unit].gsub(desc, '').strip } if @parts[:unit]
   end
 end
