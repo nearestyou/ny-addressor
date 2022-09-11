@@ -31,6 +31,15 @@ class NYAddressor
     end
   end
 
+  def to_s
+    output = "Addressor(#{@input})"
+    output << "\nParts: #{@parts.except(:bus)}"
+    output << "\nBus: #{@parts[:bus].map(&:text)}"
+    output << "\nConstruction: #{construct}  | #{sns}"
+    output << "\nHASHES: unitless: #{unitless_hash}  |  generic zip: #{hash99999}  |  default: #{hash}"
+    output
+  end
+
   def self.determine_state(state_name, postal_code = nil)
     AddressorUtils.determine_state(state_name, postal_code)
   end
@@ -176,16 +185,10 @@ class NYAddressor
     search_for_unit_in_street_num if @parts[:unit].nil? && @parts[:street_number]
 
     # Check if street name got picked up as direction
-    if @parts[:street_name].nil? && @parts[:street_direction]
-      spl = @parts[:street_direction].split
-      if spl.length > 1
-        chosen = @parts[:street_direction].split.first
-        @parts[:street_name] = chosen
-        @parts[:street_direction] = @parts[:street_direction].sub(chosen, '').strip
-      end
-    end
+    search_for_name_in_direction if @parts[:street_name].nil? && @parts[:street_direction]
 
-    true
+    # Check if street name was saint
+    search_for_saint_name if @parts[:street_name].nil? && @parts[:street_label]
   end
 
   def search_for_unit_in_street_num
@@ -204,6 +207,22 @@ class NYAddressor
     after = @parts[:street_number][unit_pos + unit.length + 3..]
     before = unit_pos.negative? ? '' : @parts[:street_number][0..unit_pos]
     @parts[:street_number] = before.to_s + after.to_s
+  end
+
+  def search_for_name_in_direction
+    spl = @parts[:street_direction].split
+    return unless spl.length > 1
+
+    chosen = @parts[:street_direction].split.first
+    @parts[:street_name] = chosen
+    @parts[:street_direction] = @parts[:street_direction].sub(chosen, '').strip
+  end
+
+  def search_for_saint_name
+    return unless @parts[:street_label].include? 'st'
+    return unless @parts[:bus]
+    @parts[:street_label] = @parts[:street_label].sub('st', '').strip
+    @parts[:street_name] = "st #{@parts[:bus].first.text}"
   end
 
   def cleanup_parts
