@@ -82,13 +82,22 @@ class NYAConstants
     'Ireland' => 'IR',
     'Northern Ireland' => 'NIR'
   }.freeze
+  AU_STATES = {
+    'New South Wales' => 'NSW',
+    'Victoria' => 'VIC',
+    'Queensland' => 'QLD',
+    'Western Australia' => 'WA',
+    'South Australia' => 'SA',
+    'Tasmania' => 'TAS'
+  }.freeze
 
   # Words that we can assume by pattern are a state
   other_descriptors = []
   US_DESCRIPTORS = (US_STATES.keys.map(&:split).flatten + US_STATES.values).map(&:downcase).freeze
   CA_DESCRIPTORS = (CA_PROVINCES.keys.map(&:split).flatten + CA_PROVINCES.values).map(&:downcase).freeze
   UK_DESCRIPTORS = (UK_STATES.keys.map(&:split).flatten + UK_STATES.values).map(&:downcase).freeze
-  STATE_DESCRIPTORS = (US_DESCRIPTORS + CA_DESCRIPTORS + UK_DESCRIPTORS + other_descriptors).freeze
+  AU_DESCRIPTORS = (AU_STATES.keys.map(&:split).flatten + AU_STATES.values).map(&:downcase).freeze
+  STATE_DESCRIPTORS = (US_DESCRIPTORS + CA_DESCRIPTORS + UK_DESCRIPTORS + AU_DESCRIPTORS + other_descriptors).freeze
 
   POBOX_ALIAS = [
     'po',
