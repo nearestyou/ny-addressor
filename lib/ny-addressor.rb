@@ -370,7 +370,8 @@ class NYAddressor
       return if search_for_name_in_label # Check if street name was in street_label
     end
 
-    guess_name_from_bus if @parts[:bus]
+    return if guess_name_from_bus
+    overwrite_direction_as_name
   end
 
   def search_for_unit_in_street_num
@@ -437,9 +438,27 @@ class NYAddressor
   end
 
   def guess_name_from_bus
+    return unless @parts[:bus]
+
     potential = @parts[:bus].select { |sep| sep.from_position.include? :street_name }
-    @parts[:street_name] = potential.first.text unless potential.empty?
+    return false if potential.empty?
+
+    @parts[:street_name] = potential.first.text
+    true
   end
+
+  def overwrite_direction_as_name
+    return false unless @parts[:street_direction]
+
+    spl = @parts[:street_direction].split
+    @parts[:street_name] = spl.first
+    @parts[:street_direction] = spl[1..].join
+    @parts = @parts.except(:street_direction) if @parts[:street_direction].empty?
+    true
+  end
+
+  ### PARTS CLEANING
+  # ###
 
   def cleanup_parts
     @parts[:postal] = @parts[:postal].gsub(/o|O/, '0') if @parts[:postal]

@@ -66,6 +66,8 @@ class NYAddressorTest < MiniTest::Test
 
   def test_direction_as_street
     assert !NYAddressor.new('260 North St N, Middlebury, VT 05753, USA').hash.nil?
+    assert !NYAddressor.new('901 Avenue E, Wisner, NE 68791, United States').hash.nil?
+    assert !NYAddressor.new('11030 East Blvd, Cleveland, OH 44106, United States').hash.nil?
   end
 
   def test_label_as_street
