@@ -15,20 +15,7 @@ class NYAddressor
   attr_reader :sep_map, :input, :parts, :confirmed
 
   def initialize(input)
-    return if input.nil? || input.length < 4
-
-    @confirmed = {}
-    @input = input
-    @sep_comma = preformat(@input).unrepeat.split(',').map{ |p| p.clean.strip.split unless p.strip.empty? }.reject(&:nil?)
-    @sep = @sep_comma.flatten
-
-    begin
-      create_sep_map
-      confirm_options
-      set_parts
-    rescue StandardError => e
-      puts "NYAddressor(#{input}) failed: #{e}"
-    end
+    reset(input)
   end
 
   # PUBLIC METHODS
@@ -131,6 +118,29 @@ class NYAddressor
 
   ### PRIVATE METHODS ###
   private
+
+  def reset(input)
+    @confirmed = {}
+    @input = input
+    return if input.nil? || input.length < 4
+
+    @sep_comma = preformat(@input).unrepeat.split(',').map{ |p| p.clean.strip.split unless p.strip.empty? }.reject(&:nil?)
+    @sep = @sep_comma.flatten
+
+    begin
+      create_sep_map
+      confirm_options
+      set_parts
+    rescue StandardError => e
+      puts "NYAddressor(#{input}) failed: #{e}"
+      return
+    end
+
+    return if hash || !@sep_comma || @sep_comma.length < 2
+    return if @sep_comma[0][0].has_digits? || !@sep_comma[1][0].has_digits?
+
+    reset(input.split(',')[1..].join(',').strip) # Recursively remove commas
+  end
 
   def preformat(str)
     result = str.dup
