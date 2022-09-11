@@ -271,6 +271,10 @@ class NYAddressorTest < MiniTest::Test
     assert NYAddressor.new('5850 boul. Jean XXIII, Trois-Rivières, QC, G8Z 4B5').parts[:street_label] == 'blvd'
   end
 
+  def test_united_kingdom
+    assert !NYAddressor.new('234 West George Street (West Campbell Street), Glasgow, Glasgow City, Scotland G2 4QY, United Kingdom').hash.nil?
+  end
+
   def test_previous_errors
     assert NYAddressor.new('Perkins Rd. & Rouzan Ave. 4841 Rouzan Square Ave, Baton Rouge, LA 70808')
   end

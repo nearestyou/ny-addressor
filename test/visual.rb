@@ -6,7 +6,7 @@
 ENV['LOCAL_DEPENDENCIES'] = 'true'
 load 'lib/ny-addressor.rb'
 
-inp = '901 Avenue E, Wisner, NE 68791, United States'
+inp = '234 West George Street (West Campbell Street), Glasgow, Glasgow City, Scotland G2 4QY, United Kingdom'
 
 nya = NYAddressor.new(inp)
 nya.sep_map.each { |sep| puts sep }

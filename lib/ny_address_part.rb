@@ -115,7 +115,7 @@ class NYAddressPart
       when 3
         %i[street_name street_label unit street_direction city state]
       when num_parts - 4
-        %i[city state street_direction street_label unit]
+        %i[city state street_direction street_label unit postal]
       when num_parts - 3
         %i[city state postal]
       when num_parts - 2

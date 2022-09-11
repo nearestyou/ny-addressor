@@ -214,6 +214,7 @@ class NYAddressor
     return if potential.empty?
 
     @confirmed[:postal] = potential if potential.map { |i| @sep_map[i].typified }.join.delete(' ') == '=|=|=|'
+    @confirmed[:postal] = potential if potential.map { |i| @sep_map[i].typified }.join.delete(' ') == '=||==' # G2 4QY
     @confirmed[:postal] ||= [potential.last]
   end
 
