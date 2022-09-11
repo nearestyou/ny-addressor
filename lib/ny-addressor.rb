@@ -174,6 +174,18 @@ class NYAddressor
     # 1) If street number has - or / unit is the smallest length
     # 2) If street number is all nums except 1 letter, letter is unit
     search_for_unit_in_street_num if @parts[:unit].nil? && @parts[:street_number]
+
+    # Check if street name got picked up as direction
+    if @parts[:street_name].nil? && @parts[:street_direction]
+      spl = @parts[:street_direction].split
+      if spl.length > 1
+        chosen = @parts[:street_direction].split.first
+        @parts[:street_name] = chosen
+        @parts[:street_direction] = @parts[:street_direction].sub(chosen, '').strip
+      end
+    end
+
+    true
   end
 
   def search_for_unit_in_street_num
