@@ -109,7 +109,7 @@ class NYAddressPart
       when 0
         %i[street_number street_name unit]
       when 1
-        %i[street_number street_name street_direction street_label]
+        %i[street_number street_name street_direction street_label unit]
       when 2
         %i[street_number street_name street_label unit street_direction]
       when 3

@@ -254,9 +254,9 @@ class NYAddressorTest < MiniTest::Test
   end
 
   def test_pre_unit
-    assert NYAddressor.new('B2 - 15562 24TH AVENUE, SURREY, V4A2J5').unitless_hash == NYAddressor.new('15562 24TH AVENUE, SURREY, V4A2J5').hash
-    assert NYAddressor.new('UNIT 23 11151 HORSESHOE WAY, RICHMOND, V7A4S5').unitless_hash == NYAddressor.new('11151 HORSESHOE WAY, RICHMOND, V7A4S5').hash
-    assert NYAddressor.new('150 - 19288 22ND AVENUE, SURREY, V3S3S9').unitless_hash == NYAddressor.new('19288 22ND AVENUE, SURREY, V3S3S9').hash
+    assert NYAddressor.new('B2 - 15562 24TH AVENUE, SURREY BC, V4A2J5').unitless_hash == NYAddressor.new('15562 24TH AVENUE, SURREY BC, V4A2J5').hash
+    assert NYAddressor.new('UNIT 23 11151 HORSESHOE WAY, RICHMOND BC, V7A4S5').unitless_hash == NYAddressor.new('11151 HORSESHOE WAY, RICHMOND BC, V7A4S5').hash
+    assert NYAddressor.new('150 - 19288 22ND AVENUE, SURREY BC, V3S3S9').unitless_hash == NYAddressor.new('19288 22ND AVENUE, SURREY BC, V3S3S9').hash
   end
 
   def test_unit_in_street_num

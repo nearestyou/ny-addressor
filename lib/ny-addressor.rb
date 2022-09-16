@@ -247,7 +247,9 @@ class NYAddressor
   def confirm_street_number
     nums = potential(:street_number).select { |i| @sep_map[i].text.numeric? }
     nums = potential(:street_number).select { |i| @sep_map[i].text.has_digits? } if nums.empty?
-    @confirmed[:street_number] = [nums.min] unless nums.empty?
+
+    # Take the longest one
+    @confirmed[:street_number] = [@sep_map.select { |sep| sep.text == nums.map{|n| @sep_map[n].text}.max_by(&:length) }.first.position] unless nums.empty?
     @confirmed[:street_number] = nums if nums.map { |i| @sep_map[i].typified }.join == '=|||=|||||' # Wisconsin
   end
 
@@ -292,7 +294,10 @@ class NYAddressor
     confirm = potential(:street_name)
     confirm = confirm.select { |i| i < known_before } if known_before
     confirm = confirm.select { |i| i > known_after } if known_after
-    @confirmed[:street_name] = confirm if confirm && !confirm.empty?
+    return if confirm.nil? || confirm.empty?
+
+    @confirmed[:street_name] = confirm
+    confirm.map { |c| @confirmed[:unit].delete c } if @confirmed[:unit] # Remove it from unit if it's in there
   end
 
   def confirm_highway_street_name
@@ -368,6 +373,11 @@ class NYAddressor
 
     # Search for the street_name elsewhere
     search_for_street_name if @parts[:street_name].nil?
+
+    return if @parts[:bus].nil? || @parts[:bus].empty?
+
+    search_for_label_in_bus if @parts[:street_label].nil?
+    search_for_state_in_bus if @parts[:state].nil?
   end
 
   def search_for_street_name
@@ -449,7 +459,7 @@ class NYAddressor
   end
 
   def guess_name_from_bus
-    return unless @parts[:bus]
+    return false unless @parts[:bus]
 
     potential = @parts[:bus].select { |sep| sep.from_position.include? :street_name }
     return false if potential.empty?
@@ -466,6 +476,23 @@ class NYAddressor
     @parts[:street_direction] = spl[1..].join
     @parts = @parts.except(:street_direction) if @parts[:street_direction].empty?
     true
+  end
+
+  def search_for_label_in_bus
+    potential = @parts[:bus].select { |sep| sep.from_pattern.include?(:street_label) }
+    return if potential.empty?
+
+    @parts[:street_label] = potential.map(&:text).join
+    potential.map { |p| @parts[:bus].delete p }
+  end
+
+  def search_for_state_in_bus
+    # TODO: fix test_pre_unit
+    potential = @parts[:bus].select { |sep| sep.from_position.include?(:state) }
+    return if potential.empty?
+
+    @parts[:state] = potential.map(&:text).join
+    potential.map { |p| @parts[:bus].delete p }
   end
 
   ### PARTS CLEANING

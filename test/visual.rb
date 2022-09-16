@@ -6,7 +6,9 @@
 ENV['LOCAL_DEPENDENCIES'] = 'true'
 load 'lib/ny-addressor.rb'
 
-inp = 'Jacksonville International Airport, 2400 Yankee Clipper Dr, Jacksonville, FL 32218, United States'
+inp = 'UNIT 23 11151 HORSESHOE WAY, RICHMOND BC, V7A4S5'
+inp = 'B2 - 15562 24TH AVENUE, SURREY BC, V4A2J5'
+inp = '150 - 19288 22ND AVENUE, SURREY BC, V3S3S9'
 
 nya = NYAddressor.new(inp)
 nya.sep_map.each { |sep| puts sep }
