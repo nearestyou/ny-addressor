@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'byebug'
 # Extend string class
 class String
   def typify
