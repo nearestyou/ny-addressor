@@ -149,7 +149,7 @@ class NYAddressor
     while result.include?('&')
       location = result.index('&')
       pre_location = location - (result[0..location - 1].strip.reverse.index(' ') || location)
-      remove_str = result[pre_location..location]
+      remove_str = result[[0, pre_location].max..location]
       result = result.sub(remove_str, '').strip
     end
 

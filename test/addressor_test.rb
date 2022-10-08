@@ -279,6 +279,10 @@ class NYAddressorTest < MiniTest::Test
     assert !NYAddressor.new('234 West George Street (West Campbell Street), Glasgow, Glasgow City, Scotland G2 4QY, United Kingdom').hash.nil?
   end
 
+  def test_special_characters
+    assert !NYAddressor.new('&#34;N72 W13400 LUND LN SUITE&#34;,MENOMONEE FALLS,WI,53051').hash.nil?
+  end
+
   def test_previous_errors
     assert NYAddressor.new('Perkins Rd. & Rouzan Ave. 4841 Rouzan Square Ave, Baton Rouge, LA 70808')
   end
