@@ -7,8 +7,8 @@ ENV['LOCAL_DEPENDENCIES'] = 'true'
 load 'lib/ny-addressor.rb'
 
 inp = '&#34;N72 W13400 LUND LN SUITE&#34;,MENOMONEE FALLS,WI,53051'
+inp = '26059 MISSION BLVD.,HAYWARD,CA,94544'
 
-debugger
 nya = NYAddressor.new(inp)
 nya.sep_map.each { |sep| puts sep }
 puts nya.to_s

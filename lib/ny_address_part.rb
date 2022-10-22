@@ -131,8 +131,8 @@ class NYAddressPart
     @from_pattern = []
     @from_pattern << :street_number if potential_street_number
     @from_pattern << :street_name if potential_street_name
-    @from_pattern << :street_label if NYAConstants::LABEL_DESCRIPTORS.include? @text
-    @from_pattern << :street_direction if NYAConstants::DIRECTION_DESCRIPTORS.include? @text
+    @from_pattern << :street_label if NYAConstants::LABEL_DESCRIPTORS.include? @text.standardize
+    @from_pattern << :street_direction if NYAConstants::DIRECTION_DESCRIPTORS.include? @text.standardize
     @from_pattern << :unit if potential_unit
     @from_pattern << :city if potential_city
     @from_pattern << :state if NYAConstants::STATE_DESCRIPTORS.include? @text

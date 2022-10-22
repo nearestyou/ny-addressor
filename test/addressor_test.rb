@@ -30,6 +30,7 @@ class NYAddressorTest < MiniTest::Test
 
   def test_periods
     assert eq('1600 First Ave, St. Washington, D.C., 20500', '1600 First Ave, St Washington, DC, 20500')
+    assert eq('26059 MISSION BLVD.,HAYWARD,CA,94544', '26059 MISSION BLVD,HAYWARD,CA,94544')
   end
 
   def test_prefix_suffix
@@ -72,6 +73,7 @@ class NYAddressorTest < MiniTest::Test
 
   def test_label_as_street
     assert !NYAddressor.new('260 Court St Unit 6, Middlebury, VT 05753, USA').hash.nil?
+    assert eq('150 MAIN ST.,WAYLAND,MA,01778', '150 Main Street, Wayland, MA 01778')
   end
 
   def test_double_entry
