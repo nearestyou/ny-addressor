@@ -287,5 +287,7 @@ class NYAddressorTest < MiniTest::Test
 
   def test_previous_errors
     assert NYAddressor.new('Perkins Rd. & Rouzan Ave. 4841 Rouzan Square Ave, Baton Rouge, LA 70808')
+    assert !NYAddressor.new('14351 104 Ave, Surrey, BC V3T 1Y1, Canada').hash.nil?
+    assert !NYAddressor.new('13526 106 Ave, Surrey, BC V3T 2C5, Canada').hash.nil?
   end
 end

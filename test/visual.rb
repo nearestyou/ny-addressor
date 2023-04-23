@@ -8,6 +8,7 @@ load 'lib/ny-addressor.rb'
 
 inp = '&#34;N72 W13400 LUND LN SUITE&#34;,MENOMONEE FALLS,WI,53051'
 inp = '26059 MISSION BLVD.,HAYWARD,CA,94544'
+inp = '14351 104 Ave, Surrey, BC V3T 1Y1, Canada'
 
 nya = NYAddressor.new(inp)
 nya.sep_map.each { |sep| puts sep }

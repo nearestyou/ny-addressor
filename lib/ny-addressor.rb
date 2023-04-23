@@ -503,6 +503,13 @@ class NYAddressor
     NYAConstants::UNIT_DESCRIPTORS.each { |desc| @parts[:unit] = @parts[:unit].gsub(desc, '').strip } if @parts[:unit]
 
     remove_duplicate_direction if @parts[:street_name] && @parts[:street_direction]
+
+    # If there was a unit but no name, make the name the unit
+    # TODO: make sure unit comes after street number?
+    if @parts[:unit] && @parts[:street_name].nil?
+      @parts[:street_name] = @parts[:unit]
+      @parts[:unit] = nil
+    end
   end
 
   # North Main St N -> Main St N
