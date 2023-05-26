@@ -374,10 +374,14 @@ class NYAddressor
     # Search for the street_name elsewhere
     search_for_street_name if @parts[:street_name].nil?
 
+    # set puerto rico as the state
+    @parts[:state] = @parts[:country] if @parts[:state].nil? && @parts[:country] == 'pr'
+
     return if @parts[:bus].nil? || @parts[:bus].empty?
 
     search_for_label_in_bus if @parts[:street_label].nil?
     search_for_state_in_bus if @parts[:state].nil?
+
   end
 
   def search_for_street_name

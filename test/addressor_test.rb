@@ -290,4 +290,10 @@ class NYAddressorTest < MiniTest::Test
     assert !NYAddressor.new('14351 104 Ave, Surrey, BC V3T 1Y1, Canada').hash.nil?
     assert !NYAddressor.new('13526 106 Ave, Surrey, BC V3T 2C5, Canada').hash.nil?
   end
+
+  def test_puero_rican
+    assert !NYAddressor.new('1310 Ashford Ave San Juan PR 907').hash.nil?
+    assert !NYAddressor.new('Carretera Estatal 115, Km. 26.9 Bo. Tablonal AGUADA PR 00602').hash.nil?
+  end
+
 end

@@ -145,6 +145,7 @@ class NYAConstants
 
   STREET_LABELS = {
     'avenue' => 'ave',
+    'av.' => 'ave',
     'boulevard' => 'blvd',
     'boul' => 'blvd',
     'boul.' => 'blvd',
