@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require_relative 'extensions/string'
 require_relative 'ny-addressor/constants'
 
 module NYAddressor
@@ -9,6 +10,9 @@ module NYAddressor
 
     def initialize(full_address, country = :AUTO)
     end
+
+    private
+
   end
 end
 

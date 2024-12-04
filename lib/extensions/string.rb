@@ -13,7 +13,6 @@ class String
 
   # Standardize strings for comparison testing
   def standardize
-    # clean.delete(' ').delete('-').delete('.')
     clean.gsub(/[-\s.#]/, '')
   end
 
@@ -30,8 +29,6 @@ class String
   end
 
   def has_letters?
-    # alphabet = %w[a b c d e f g h i j k l m n o p q r s t u v w x y z]
-    # split('').each { |char| return true if alphabet.include? char }
     match(/[a-zA-Z]/) ? true : false
   end
 
@@ -53,27 +50,17 @@ class String
 
   # https://stackoverflow.com/questions/7184123/check-if-string-is-repetition-of-an-unknown-substring
   # , Washington, DC 20500, Washington, DC 20500, Washington, DC 20500, Washington, DC 20500 -> , Washington, DC 20500,
-  # def unrepeat
-  #   n = size
-  #   newstr = dup
-  #   n.times do |i|
-  #     newstr = newstr[-1] + newstr[0..-2]
-  #     return self[0..i + 1] if newstr == self
-  #   end
-  # end
   def unrepeat
     searched = ''
     unsearched = dup
     dupe = match(/(.+)\1+/)
-    # Dupe[0] = pattern found, [1] group found
 
     until unsearched.empty?
       return searched + unsearched unless dupe
 
       location = unsearched.index(dupe[0])
       searched += unsearched[0..location - 1] if location > 0
-      searched += if dupe[0].squeeze.length > 1 && dupe[0].has_letters? # &&
-                    # ([' ', ',', '.'].include?(dupe[0][0]) || dupe[1].length > 8)
+      searched += if dupe[0].squeeze.length > 1 && dupe[0].has_letters?
                     dupe[1]
                   else
                     dupe[0]
