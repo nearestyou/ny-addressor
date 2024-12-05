@@ -1,11 +1,13 @@
 require 'minitest/autorun'
 require_relative '../lib/ny-addressor/parsers/generic_parser'
+require_relative '../lib/ny-addressor/address_field'
 require 'byebug'
 
 class TestGenericParser < Minitest::Test
   def setup
     @address = "123 Main St N, Springfield, IL 62704, USA"
     @parser = NYAddressor::Parsers::GenericParser.new(@address, :US)
+    @fields = NYAddressor::AddressField
   end
 
   def test_address_split
@@ -27,31 +29,35 @@ class TestGenericParser < Minitest::Test
   end
 
   def test_street_number_pattern
-    assert @parser.parts[0][0].from_pattern.include?(:street_number)
+    assert @parser.parts[0][0].from_pattern.include?(@fields::STREET_NUMBER)
   end
 
   def test_street_name_pattern
-    assert @parser.parts[0][1].from_pattern.include?(:street_name)
-    assert !@parser.parts[0][0].from_pattern.include?(:street_name)
+    assert @parser.parts[0][1].from_pattern.include?(@fields::STREET_NAME)
+    assert !@parser.parts[0][0].from_pattern.include?(@fields::STREET_NAME)
   end
 
   def test_direction_pattern
-    assert @parser.parts[0][3].from_pattern.include?(:street_direction)
+    assert @parser.parts[0][3].from_pattern.include?(@fields::STREET_DIRECTION)
   end
 
   def test_unit_pattern
-    assert @parser.parts[0][0].from_pattern.include?(:unit)
+    assert @parser.parts[0][0].from_pattern.include?(@fields::UNIT)
   end
 
   def test_state_pattern
-    assert @parser.parts[2][0].from_pattern.include?(:state)
+    assert @parser.parts[2][0].from_pattern.include?(@fields::STATE)
   end
 
   def test_postal_pattern
-    assert @parser.parts[2][1].from_pattern.include?(:postal)
+    assert @parser.parts[2][1].from_pattern.include?(@fields::POSTAL)
   end
 
   def test_country_pattern
-    assert @parser.parts[3][0].from_pattern.include?(:country)
+    assert @parser.parts[3][0].from_pattern.include?(@fields::COUNTRY)
+  end
+
+  def test_postal
+    assert_equal @parser.get_field(@fields::POSTAL).text, "62704"
   end
 end

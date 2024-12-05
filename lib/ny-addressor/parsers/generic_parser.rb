@@ -2,6 +2,7 @@
 require_relative '../address_part'
 require_relative '../../extensions/string'
 require_relative '../constants'
+require_relative '../address_field'
 require 'byebug'
 
 module NYAddressor
@@ -25,98 +26,117 @@ module NYAddressor
         set_options
       end
 
-      # @param sym [Symbol] which field to look for (ex :street_name)
+      # @param field [AddressField] which field to look for (ex :street_name)
       # @return [Array[AddressPart]]
-      def potential(sym)
+      def potential(field)
         @parts.flatten.select do |part|
-          part.confirmed.nil? && part.from_all.include?(sym)
+          part.confirmed.nil? && part.from_all.include?(field)
         end
       end
 
-      # @param sym [Symbol] which field to get
+      # @param field [AddressField] which field to get
       # @return [AddressPart, nil]
-      def get_field(sym)
-        @parts.flatten.find { |part| part.confirmed == sym }
+      def get_field(field)
+        @parts.flatten.find { |part| part.confirmed == field }
       end
 
       private
 
       def set_options
+        # Determine what a part likely is based off it's position
         @parts.flatten.each {|part| part.determine_position(method(:position_options)) }
+
+        # Determine what a part likely is based off it's comma group
         @parts.flatten.each {|part| part.determine_comma_position(method(:comma_position_options)) }
+
+        # Determine what a part likely is based off its content
         set_pattern_options
+
+        # Combine options from different methods
         @parts.flatten.each {|part| part.consolidate_options }
       end
 
       def position_options part
+        f = AddressField
         num_parts = @parts.flatten.size
         case part.position
         when 0
-          %i[street_number street_name unit]
+          [f::STREET_NUMBER, f::STREET_NAME, f::UNIT]
         when 1
-          %i[street_number street_name street_direction street_label unit]
+          [f::STREET_NUMBER, f::STREET_NAME, f::STREET_DIRECTION, f::STREET_LABEL, f::UNIT]
         when 2
-          %i[street_number street_name street_label unit street_direction]
+          [f::STREET_NUMBER, f::STREET_NAME, f::STREET_LABEL, f::UNIT, f::STREET_DIRECTION]
         when 3
-          %i[street_name street_label unit street_direction city state]
+          [f::STREET_NAME, f::STREET_LABEL, f::UNIT, f::STREET_DIRECTION, f::CITY, f::STATE]
         when num_parts - 4
-          %i[city state street_direction street_label unit postal]
+          [f::CITY, f::STATE, f::STREET_DIRECTION, f::STREET_LABEL, f::UNIT, f::POSTAL]
         when num_parts - 3
-          %i[city state postal]
+          [f::CITY, f::STATE, f::POSTAL]
         when num_parts - 2
-          %i[city state postal country]
+          [f::CITY, f::STATE, f::POSTAL, f::COUNTRY]
         when num_parts - 1
-          %i[state postal country]
+          [f::STATE, f::POSTAL, f::COUNTRY]
         else
-          %i[default street_number street_name street_label street_direction unit city state postal country]
+          [f::STREET_NUMBER, f::STREET_NAME, f::STREET_LABEL, f::STREET_DIRECTION, f::UNIT, f::CITY, f::STATE, f::POSTAL, f::COUNTRY]
         end
       end
 
       # Hypothesize what this part could mean based off which comma group it's in
       def comma_position_options part
-        first = %i[street_number street_name street_direction street_label unit]
+        f = AddressField
+        first = [f::STREET_NUMBER, f::STREET_NAME, f::STREET_DIRECTION, f::STREET_LABEL, f::UNIT]
         group_sizes = {
           3 => [
             first,
-            %i[unit city state postal],
-            %i[city state postal country]
+            [f::UNIT, f::CITY, f::STATE, f::POSTAL],
+            [f::CITY, f::STATE, f::POSTAL, f::COUNTRY]
           ],
           4 => [
             first,
-            %i[unit city state],
-            %i[city state postal],
-            %i[state postal country]
+            [f::UNIT, f::CITY, f::STATE],
+            [f::CITY, f::STATE, f::POSTAL],
+            [f::STATE, f::POSTAL, f::COUNTRY]
           ],
           5 => [
             first,
-            %i[unit city],
-            %i[city state],
-            %i[state postal],
-            %i[postal country]
+            [f::UNIT, f::CITY],
+            [f::CITY, f::STATE],
+            [f::STATE, f::POSTAL],
+            [f::POSTAL, f::COUNTRY]
           ],
           6 => [
             first,
-            %i[unit],
-            %i[city],
-            %i[state],
-            %i[postal],
-            %i[country],
+            [f::UNIT],
+            [f::CITY],
+            [f::STATE],
+            [f::POSTAL],
+            [f::COUNTRY],
           ]
         }
-        group_sizes[@parts.size] ? group_sizes[@parts.size][part.group] : %i[street_number street_name street_direction street_label unit city state postal country default]
+        group_sizes[@parts.size] ? group_sizes[@parts.size][part.group] : [
+          f::STREET_NUMBER,
+          f::STREET_NAME,
+          f::STREET_DIRECTION,
+          f::STREET_LABEL,
+          f::UNIT,
+          f::CITY,
+          f::STATE,
+          f::POSTAL,
+          f::COUNTRY
+        ]
       end
 
       def set_pattern_options
         @parts.flatten.each do |part|
-          part.determine_pattern(:street_number, method(:street_number_pattern?))
-          part.determine_pattern(:street_name, method(:street_name_pattern?))
-          part.determine_pattern(:street_label, method(:street_label_pattern?))
-          part.determine_pattern(:street_direction, method(:street_direction_pattern?))
-          part.determine_pattern(:unit, method(:unit_pattern?))
-          part.determine_pattern(:city, method(:city_pattern?))
-          part.determine_pattern(:state, method(:state_pattern?))
-          part.determine_pattern(:postal, method(:postal_pattern?))
-          part.determine_pattern(:country, method(:country_pattern?))
+          part.determine_pattern(AddressField::STREET_NUMBER, method(:street_number_pattern?))
+          part.determine_pattern(AddressField::STREET_NAME, method(:street_name_pattern?))
+          part.determine_pattern(AddressField::STREET_LABEL, method(:street_label_pattern?))
+          part.determine_pattern(AddressField::STREET_DIRECTION, method(:street_direction_pattern?))
+          part.determine_pattern(AddressField::UNIT, method(:unit_pattern?))
+          part.determine_pattern(AddressField::CITY, method(:city_pattern?))
+          part.determine_pattern(AddressField::STATE, method(:state_pattern?))
+          part.determine_pattern(AddressField::POSTAL, method(:postal_pattern?))
+          part.determine_pattern(AddressField::COUNTRY, method(:country_pattern?))
         end
       end
 
