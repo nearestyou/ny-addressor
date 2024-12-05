@@ -9,6 +9,7 @@ module NYAddressor
     end
 
     def initialize(full_address, country = :AUTO)
+      raise "No input" if full_address.nil? || full_address.length < 4
     end
 
     private
