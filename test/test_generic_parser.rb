@@ -64,6 +64,7 @@ class TestGenericParser < Minitest::Test
     assert_equal "123", @parser.get_field(@fields::STREET_NUMBER)&.text
     assert_equal "st", @parser.get_field(@fields::STREET_LABEL)&.text
     assert_equal "n", @parser.get_field(@fields::STREET_DIRECTION)&.text
+    assert_equal "main", @parser.get_field(@fields::STREET_NAME)&.text
+    assert_equal "springfield", @parser.get_field(@fields::CITY)&.text
   end
 end
-    # @address = "123 Main St N, Springfield, IL 62704, USA"

@@ -233,6 +233,9 @@ module NYAddressor
         # If we know the number and a label or direction
         # the street name will be whatever remains
         confirm_street_name
+
+        # If we know the street and state, city is what remains
+        confirm_city
       end
 
       def confirm_postal
@@ -314,6 +317,13 @@ module NYAddressor
         return false if lbl.nil? || num.nil?
 
         lbl.position - 1 == num.position
+      end
+
+      def confirm_city
+        known_after = [AddressField::STREET_NAME, AddressField::STREET_LABEL, AddressField::STREET_DIRECTION]
+        known_before = [AddressField::STATE, AddressField::POSTAL, AddressField::COUNTRY]
+        parts = potential_between(AddressField::CITY, known_after, known_before)
+        parts&.first&.confirm(AddressField::CITY)
       end
     end
   end
