@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'set'
+require 'byebug'
 
 module NYAddressor
   def self.descriptors(map)
@@ -195,6 +196,7 @@ module NYAddressor
         'tasmania' => 'tas'
       }
     }.freeze
+    STATE_DESCRIPTORS = STATES.transform_values { |map| NYAddressor::descriptors(map) }.freeze
 
     POSTAL_FORMATS = {
       US: /\d{5}(-\d{4})?/i,                       # 12345 or 12345-6789
@@ -202,5 +204,18 @@ module NYAddressor
       UK: /[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}/i,      # SW1A 1AA
       AU: /\d{4}/i                                 # 2000
     }.freeze
+  end
+
+  # Fetches constatns for specific region and  type
+  # @param region [Symbol] :US, :UK, etc
+  # @param type [Symbol] :STREET_LABELS, :UNIT_DESCRIPTORS, etc
+  # @return [Hash|List]
+  def self.constants(region, type)
+    begin
+      region_map = Constants.const_get(type)[region] || {}
+      return region_map if region_map
+    rescue
+    end
+    Constants::Generics.const_get(type)
   end
 end

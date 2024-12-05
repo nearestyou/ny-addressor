@@ -41,27 +41,27 @@ module NYAddressor
       # @param part [AddressPart] to evaluate
       # @return [Boolean] does the part follow a street number pattern?
       def street_number_pattern? part
-        return false if Constants::Generics::UNIT_DESCRIPTORS.include? part.text
+        return false if NYAddressor::constants(:region, :UNIT_DESCRIPTORS).include? part.text
         return true if part.text.has_digits?
         false
       end
 
       def street_name_pattern? part
-        return false if Constants::Generics::UNIT_DESCRIPTORS.include? part.text
+        return false if NYAddressor::constants(:region, :UNIT_DESCRIPTORS).include? part.text
         return false if part.text.numeric?
         true
       end
 
       def street_label_pattern? part
-        Constants::Generics::LABEL_DESCRIPTORS.include? part.text.standardize
+        NYAddressor::constants(:region, :LABEL_DESCRIPTORS).include? part.text.standardize
       end
 
       def street_direction_pattern? part
-        Constants::Generics::DIRECTION_DESCRIPTORS.include? part.text.standardize
+        NYAddressor::constants(:region, :DIRECTION_DESCRIPTORS).include? part.text.standardize
       end
 
       def unit_pattern? part
-        return true if Constants::Generics::UNIT_DESCRIPTORS.include? part.text
+        return true if NYAddressor::constants(:region, :UNIT_DESCRIPTORS).include? part.text
         return true if part.text.has_digits?
         false
       end
