@@ -229,6 +229,10 @@ module NYAddressor
         # A unit will be in it's own comma group
         # or after the street label
         confirm_unit
+
+        # If we know the number and a label or direction
+        # the street name will be whatever remains
+        confirm_street_name
       end
 
       def confirm_postal
@@ -284,6 +288,33 @@ module NYAddressor
         potential(AddressField::UNIT)&.first&.confirm(AddressField::UNIT)
       end
 
+      def confirm_street_name
+        after_fields = [AddressField::STREET_NUMBER]
+        before_fields = []
+        (direction_touching_number? ? after_fields : before_fields) << AddressField::STREET_DIRECTION
+        (label_touching_number? ? after_fields : before_fields) << AddressField::STREET_LABEL
+
+        parts = potential_between(AddressField::STREET_NAME, after_fields, before_fields)
+        parts&.first&.confirm(AddressField::STREET_NAME)
+      end
+
+      # Address is of the form 123 North Main St
+      def direction_touching_number?
+        dir = get_field(AddressField::STREET_DIRECTION)
+        num = get_field(AddressField::STREET_NUMBER)
+        return false if dir.nil? || num.nil?
+
+        dir.position - 1 == num.position
+      end
+
+      # Address is of the form ???
+      def label_touching_number?
+        lbl = get_field(AddressField::STREET_LABEL)
+        num = get_field(AddressField::STREET_NUMBER)
+        return false if lbl.nil? || num.nil?
+
+        lbl.position - 1 == num.position
+      end
     end
   end
 end
