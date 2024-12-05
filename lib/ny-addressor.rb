@@ -22,16 +22,19 @@ module NYAddressor
     end
 
     def construct(opts = {})
-      fields = AddressField
-      required_fields = [fields::STREET_NUMBER, fields::STREET_NAME, fields::STATE]
+      required_fields = [AddressField::STREET_NUMBER, AddressField::STREET_NAME, AddressField::STATE]
       return nil if required_fields.any? { |field| @parser.get_field(field).nil? }
 
-      opts = { include_unit: true, include_label: true, include_dir: true, include_postal: true }.merge(opts)
-      addr_str = "#{@parser.get_field(fields::STREET_NUMBER)}#{@parser.get_field(fields::STREET_NAME)}#{@parser.get_field(fields::CITY)}#{@parser.get_field(fields::STATE)}"
-      addr_str << @parser.get_field(fields::UNIT).to_s if opts[:include_unit]
-      addr_str << @parser.get_field(fields::STREET_LABEL).to_s if opts[:include_label]
-      addr_str << @parser.get_field(fields::STREET_DIRECTION).to_s if opts[:include_dir]
-      addr_str << (@parser.get_field(fields::POSTAL).to_s || '99999')[0..4] if opts[:include_postal]
+      opts = { include_unit: true, include_label: true, include_dir: true, include_postal: true, include_country: false }.merge(opts)
+
+      fields = required_fields + [AddressField::CITY]
+      fields << AddressField::UNIT if opts[:include_unit]
+      fields << AddressField::STREET_LABEL if opts[:include_label]
+      fields << AddressField::STREET_DIRECTION if opts[:include_dir]
+      fields << AddressField::COUNTRY if opts[:include_country]
+
+      addr_str = fields.map {|field| @parser.get_field(field)}.compact.map(&:to_s).join
+      addr_str << (@parser.get_field(AddressField::POSTAL)&.to_s || '99999') if opts[:include_postal]
 
       addr_str.standardize.unrepeat
     end
