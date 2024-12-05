@@ -5,7 +5,7 @@ require 'byebug'
 class TestGenericParser < Minitest::Test
   def setup
     @address = "123 Main St N, Springfield, IL 62704, USA"
-    @parser = NYAddressor::Parsers::GenericParser.new(@address)
+    @parser = NYAddressor::Parsers::GenericParser.new(@address, :US)
   end
 
   def test_address_split
