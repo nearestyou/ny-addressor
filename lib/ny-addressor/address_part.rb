@@ -16,13 +16,35 @@ module NYAddressor
 
       @from_pattern = []
       @from_position = []
+      @from_comma = []
       @from_all = []
+    end
+
+    def debug
+      output = "Address Part: (\nText: #{@text}\n"
+      output += "\nAll: #{@from_all}" if @from_all
+      output += "\n\tPositional: #{@from_position}" if @from_position
+      output += "\n\tPaternal: #{@from_pattern}" if @from_pattern
+      output += "\n\tComma: #{@from_comma}" if @from_comma
+      output += "\n)\n"
+      output
     end
 
     def consolidate_options
       @from_all = @from_pattern
       @from_all &= @from_position if @from_position
       @from_all &= @from_comma if @from_comma
+    end
+
+    # Hypothesizes what the part could mean based on it's position
+    # @param checker [Proc] A callable object that returns a list 
+    # of symbols to describe the parts position
+    def determine_position(checker)
+      @from_position = checker.call(self)
+    end
+
+    def determine_comma_position(checker)
+      @from_comma = checker.call(self)
     end
 
     # Determines if the part matches a specific pattern
