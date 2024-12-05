@@ -54,6 +54,9 @@ module NYAddressor
 
         # Combine options from different methods
         @parts.flatten.each {|part| part.consolidate_options }
+
+        # Select parts to use
+        confirm_options
       end
 
       def position_options part
@@ -187,6 +190,21 @@ module NYAddressor
       def country_pattern? part
         NYAddressor::constants(@region, :COUNTRY_DESCRIPTORS).include? part.text
       end
+
+      def confirm_options
+        # Postals are easiest to find
+        # Whatever is after is probably the country
+        # Whatever is before is probably city/state
+        confirm_postal
+
+      end
+
+      def confirm_postal
+        parts = potential(:postal)
+        return if parts.empty?
+        parts.last.confirm(:postal)
+      end
+
     end
   end
 end
