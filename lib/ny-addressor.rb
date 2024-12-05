@@ -12,13 +12,29 @@ module NYAddressor
     end
 
     def initialize(full_address, country = :AUTO)
+      @input = full_address
+      @region = country
       raise "No input" if full_address.nil? || full_address.length < 4
-      @parser = NYAddressor::Parsers::GenericParser.new(full_address, country)
+      @parser = NYAddressor::Parsers::GenericParser.new(@input, @region)
     end
 
     def ==(other)
       return false unless other.is_a?(Addressor)
       self.hash == other.hash
+    end
+
+    def to_s
+      construct
+    end
+
+    def inspect
+      "#<NYAddressor::Addressor(#{@input}, #{@region}): #{to_s}"
+    end
+
+    def debug
+      output = inspect
+      @parser.parts.flatten.each {|part| output << "\n#{part.debug}" }
+      output
     end
 
     def construct(opts = {})

@@ -31,12 +31,12 @@ module NYAddressor
     end
 
     def debug
-      output = "Address Part: (\nText: #{@text}\n"
-      output += "\nAll: #{@from_all}" if @from_all
+      output = "Address Part(#{@text}):"
+      output += "\n\tConfirmed: #{@confirmed}"
+      output += "\n\tAll: #{@from_all}" if @from_all
       output += "\n\tPositional: #{@from_position}" if @from_position
       output += "\n\tPaternal: #{@from_pattern}" if @from_pattern
       output += "\n\tComma: #{@from_comma}" if @from_comma
-      output += "\n)\n"
       output
     end
 
