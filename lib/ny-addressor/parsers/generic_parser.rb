@@ -25,6 +25,20 @@ module NYAddressor
         set_options
       end
 
+      # @param sym [Symbol] which field to look for (ex :street_name)
+      # @return [Array[AddressPart]]
+      def potential(sym)
+        @parts.flatten.select do |part|
+          part.confirmed.nil? && part.from_all.include?(sym)
+        end
+      end
+
+      # @param sym [Symbol] which field to get
+      # @return [AddressPart, nil]
+      def get_field(sym)
+        @parts.flatten.find { |part| part.confirmed == sym }
+      end
+
       private
 
       def set_options
