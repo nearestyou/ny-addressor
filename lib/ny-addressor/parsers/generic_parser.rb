@@ -197,12 +197,31 @@ module NYAddressor
         # Whatever is before is probably city/state
         confirm_postal
 
+        # If there is no postal, state is next easiest to find
+        confirm_state
+        confirm_country
       end
 
       def confirm_postal
-        parts = potential(:postal)
-        return if parts.empty?
-        parts.last.confirm(:postal)
+        parts = potential(AddressField::POSTAL)
+        parts&.last&.confirm(AddressField::POSTAL)
+      end
+
+      def confirm_state
+        postal = get_field(AddressField::POSTAL)
+        parts = potential(AddressField::STATE)
+
+        # State must come before postal code
+        parts.select! {|part| part.position < postal.position} if postal
+
+        parts&.last&.confirm(AddressField::STATE)
+      end
+
+      def confirm_country
+        # we know the country comes after state/postal
+        known_after = [0, get_field(AddressField::POSTAL)&.position, get_field(AddressField::STATE)&.position].compact.max
+        parts = potential(AddressField::COUNTRY).select {|part| part.position > known_after}
+        parts&.last&.confirm(AddressField::COUNTRY)
       end
 
     end

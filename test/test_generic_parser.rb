@@ -58,6 +58,14 @@ class TestGenericParser < Minitest::Test
   end
 
   def test_postal
-    assert_equal @parser.get_field(@fields::POSTAL).text, "62704"
+    assert_equal @parser.get_field(@fields::POSTAL)&.text, "62704"
+  end
+
+  def test_state
+    assert_equal @parser.get_field(@fields::STATE)&.text, "il"
+  end
+
+  def test_country
+    assert_equal @parser.get_field(@fields::COUNTRY)&.text, "usa"
   end
 end
