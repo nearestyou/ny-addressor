@@ -35,6 +35,9 @@ module NYAddressor
           part.determine_pattern(:street_direction, method(:street_direction_pattern?))
           part.determine_pattern(:unit, method(:unit_pattern?))
           part.determine_pattern(:city, method(:city_pattern?))
+          part.determine_pattern(:state, method(:state_pattern?))
+          part.determine_pattern(:postal, method(:postal_pattern?))
+          part.determine_pattern(:country, method(:country_pattern?))
         end
       end
 
@@ -71,6 +74,19 @@ module NYAddressor
         return true if part.text.alphabetic?
         return true if part.text == 'st.' # saint
         false
+      end
+
+      def state_pattern? part
+        NYAddressor::constants(@region, :STATE_DESCRIPTORS).include? part.text
+      end
+
+      def postal_pattern? part
+        format = NYAddressor::constants(@region, :POSTAL_FORMATS)
+        !!(part.text =~ format)
+      end
+
+      def country_pattern? part
+        NYAddressor::constants(@region, :COUNTRY_DESCRIPTORS).include? part.text
       end
     end
   end

@@ -204,6 +204,13 @@ module NYAddressor
       UK: /[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}/i,      # SW1A 1AA
       AU: /\d{4}/i                                 # 2000
     }.freeze
+
+    COUNTRY_DESCRIPTORS = {
+      US: %w[us usa united states of america],
+      CA: %w[ca canada],
+      UK: %w[uk united kingdom],
+      AU: %w[au australia]
+    }.freeze
   end
 
   # Fetches constatns for specific region and  type

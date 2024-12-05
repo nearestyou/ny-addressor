@@ -42,4 +42,16 @@ class TestGenericParser < Minitest::Test
   def test_unit_pattern
     assert @parser.parts[0][0].from_pattern.include?(:unit)
   end
+
+  def test_state_pattern
+    assert @parser.parts[2][0].from_pattern.include?(:state)
+  end
+
+  def test_postal_pattern
+    assert @parser.parts[2][1].from_pattern.include?(:postal)
+  end
+
+  def test_country_pattern
+    assert @parser.parts[3][0].from_pattern.include?(:country)
+  end
 end
