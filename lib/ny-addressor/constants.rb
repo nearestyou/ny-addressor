@@ -13,18 +13,18 @@ module NYAddressor
   module Constants
     module Generics
       STREET_NUMBERS = {
-        'first' => '1st',
-        'second' => '2nd',
-        'third' => '3rd',
-        'fourth' => '4th',
-        'fifth' => '5th',
-        'sixth' => '6th',
-        'seventh' => '7th',
-        'eighth' => '8th',
-        'ninth' => '9th',
-        'tenth' => '10th',
-        'eleventh' => '11th',
-        'twelfth' => '12th'
+        '1st' => 'first',
+        '2nd' => 'second',
+        '3rd' => 'third',
+        '4th' => 'fourth',
+        '5th' => 'fifth',
+        '6th' => 'sixth',
+        '7th' => 'seventh',
+        '8th' => 'eighth',
+        '9th' => 'ninth',
+        '10th' => 'tenth',
+        '11th' => 'eleventh',
+        '12th' => 'twelfth'
       }.freeze
       NUMBER_DESCRIPTORS = NYAddressor::descriptors(STREET_NUMBERS)
 

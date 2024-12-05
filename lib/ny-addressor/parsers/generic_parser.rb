@@ -23,6 +23,7 @@ module NYAddressor
             AddressPart.new(word, full_position, group_index, group_position)
           end
         end
+        preformat
         set_options
       end
 
@@ -62,6 +63,15 @@ module NYAddressor
       end
 
       private
+
+      # Formatting that must be done before option selection
+      def preformat
+        # convert 1st -> first
+        @parts.flatten.each do |part|
+          normalized = Constants::Generics::STREET_NUMBERS[part.text] || part.text
+          part.set_text(normalized)
+        end
+      end
 
       def set_options
         # Determine what a part likely is based off it's position
@@ -226,13 +236,13 @@ module NYAddressor
         confirm_street_label
         confirm_street_direction
 
-        # A unit will be in it's own comma group
-        # or after the street label
-        confirm_unit
-
         # If we know the number and a label or direction
         # the street name will be whatever remains
         confirm_street_name
+
+        # A unit will be in it's own comma group
+        # or after the street label
+        confirm_unit
 
         # If we know the street and state, city is what remains
         confirm_city

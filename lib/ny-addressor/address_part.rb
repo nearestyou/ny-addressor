@@ -10,6 +10,7 @@ module NYAddressor
     # @param group [Integer] The index of the comma-separated group this substring resides in
     # @param group_position [Integer] Which comma separated block the substring resides in
     def initialize(text, position, group, group_position)
+      @original = text
       @text = text
       @group = group
       @group_position = group_position
@@ -20,6 +21,10 @@ module NYAddressor
       @from_comma = []
       @from_all = []
       @confirmed = nil
+    end
+
+    def set_text str
+      @text = str
     end
 
     def to_s
