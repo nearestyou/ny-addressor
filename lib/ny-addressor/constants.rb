@@ -5,8 +5,8 @@ require 'byebug'
 module NYAddressor
   def self.descriptors(map)
     map.each_with_object(Set.new) do |(key, value), set|
-      set.add(key)
-      set.add(value)
+      key.split.each { |k| set.add(k) }
+      value.split.each { |v| set.add(v) }
     end.freeze
   end
 
