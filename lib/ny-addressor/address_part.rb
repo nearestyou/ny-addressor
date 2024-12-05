@@ -2,6 +2,7 @@ module NYAddressor
   class AddressPart
     attr_reader :from_pattern, :from_position, :from_comma, :from_all
     attr_reader :text, :position, :group, :group_position
+    attr_reader :confirmed
 
     # Initializes a new address part
     # @param text [String] substring of the address
@@ -18,6 +19,11 @@ module NYAddressor
       @from_position = []
       @from_comma = []
       @from_all = []
+      @confirmed = nil
+    end
+
+    def confirm(sym)
+      @confirmed = sym
     end
 
     def debug
