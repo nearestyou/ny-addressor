@@ -225,6 +225,10 @@ module NYAddressor
         confirm_street_number
         confirm_street_label
         confirm_street_direction
+
+        # A unit will be in it's own comma group
+        # or after the street label
+        confirm_unit
       end
 
       def confirm_postal
@@ -274,6 +278,10 @@ module NYAddressor
 
         parts = potential_between(AddressField::STREET_DIRECTION, known_after, known_before)
         parts.first.confirm(AddressField::STREET_DIRECTION)
+      end
+
+      def confirm_unit
+        potential(AddressField::UNIT)&.first&.confirm(AddressField::UNIT)
       end
 
     end
