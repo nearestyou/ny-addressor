@@ -57,19 +57,12 @@ class TestGenericParser < Minitest::Test
     assert @parser.parts[3][0].from_pattern.include?(@fields::COUNTRY)
   end
 
-  def test_postal
+  def test_confirmation_options
     assert_equal "62704", @parser.get_field(@fields::POSTAL)&.text
-  end
-
-  def test_state
     assert_equal "il", @parser.get_field(@fields::STATE)&.text
-  end
-
-  def test_country
     assert_equal "usa", @parser.get_field(@fields::COUNTRY)&.text
-  end
-
-  def test_street_number
     assert_equal "123", @parser.get_field(@fields::STREET_NUMBER)&.text
+    assert_equal "st", @parser.get_field(@fields::STREET_LABEL)&.text
   end
 end
+    # @address = "123 Main St N, Springfield, IL 62704, USA"

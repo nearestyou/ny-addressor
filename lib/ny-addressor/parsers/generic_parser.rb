@@ -202,6 +202,7 @@ module NYAddressor
         confirm_country
 
         confirm_street_number
+        confirm_street_label
       end
 
       def confirm_postal
@@ -237,6 +238,18 @@ module NYAddressor
         longest_part.confirm(AddressField::STREET_NUMBER)
       end
 
+      def confirm_street_label
+        known_after = [-1, get_field(AddressField::STREET_NUMBER).position].compact.max
+        known_before = [
+          Float::INFINITY,
+          get_field(AddressField::COUNTRY).position,
+          get_field(AddressField::POSTAL).position,
+          get_field(AddressField::STATE).position
+        ].compact.min
+
+        parts = potential(AddressField::STREET_LABEL).select {|part| part.position > known_after && part.position < known_before}
+        parts.first.confirm(AddressField::STREET_LABEL)
+      end
     end
   end
 end
