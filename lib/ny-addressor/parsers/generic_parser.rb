@@ -200,6 +200,8 @@ module NYAddressor
         # If there is no postal, state is next easiest to find
         confirm_state
         confirm_country
+
+        confirm_street_number
       end
 
       def confirm_postal
@@ -222,6 +224,17 @@ module NYAddressor
         known_after = [0, get_field(AddressField::POSTAL)&.position, get_field(AddressField::STATE)&.position].compact.max
         parts = potential(AddressField::COUNTRY).select {|part| part.position > known_after}
         parts&.last&.confirm(AddressField::COUNTRY)
+      end
+
+      def confirm_street_number
+        parts = potential(AddressField::STREET_NUMBER).select {|part| part.text.numeric? }
+        parts = potential(AddressField::STREET_NUMBER).select {|part| part.text.has_digits? } if parts.empty?
+        return if parts.empty?
+
+        # Take the longest number if multiple candidates
+        longest_part = parts.max_by {|part| part.text.length }
+
+        longest_part.confirm(AddressField::STREET_NUMBER)
       end
 
     end
