@@ -34,10 +34,21 @@ module NYAddressor
         end
       end
 
-      # @param field [AddressField] which field to get
+      # @param field [AddressField] which `confirmed` field to get
       # @return [AddressPart, nil]
       def get_field(field)
         @parts.flatten.find { |part| part.confirmed == field }
+      end
+
+      # @param fields [Array<AddressField>] List of address fields
+      # @return [Integer] The position of the first field that matches the criteria
+      def first_instance_of(fields)
+        positions = fields.map { |field| get_field(field)&.position }
+        [Float::INFINITY, *positions].compact.min
+      end
+      def last_instance_of(fields)
+        positions = fields.map { |field| get_field(field)&.position }
+        [-1, *positions].compact.max
       end
 
       private
@@ -203,6 +214,7 @@ module NYAddressor
 
         confirm_street_number
         confirm_street_label
+        confirm_street_direction
       end
 
       def confirm_postal
@@ -222,7 +234,7 @@ module NYAddressor
 
       def confirm_country
         # we know the country comes after state/postal
-        known_after = [0, get_field(AddressField::POSTAL)&.position, get_field(AddressField::STATE)&.position].compact.max
+        known_after = last_instance_of([AddressField::POSTAL, AddressField::STATE])
         parts = potential(AddressField::COUNTRY).select {|part| part.position > known_after}
         parts&.last&.confirm(AddressField::COUNTRY)
       end
@@ -239,17 +251,20 @@ module NYAddressor
       end
 
       def confirm_street_label
-        known_after = [-1, get_field(AddressField::STREET_NUMBER).position].compact.max
-        known_before = [
-          Float::INFINITY,
-          get_field(AddressField::COUNTRY).position,
-          get_field(AddressField::POSTAL).position,
-          get_field(AddressField::STATE).position
-        ].compact.min
+        known_after = last_instance_of([AddressField::STREET_NUMBER])
+        known_before = first_instance_of([AddressField::COUNTRY, AddressField::POSTAL, AddressField::STATE])
 
         parts = potential(AddressField::STREET_LABEL).select {|part| part.position > known_after && part.position < known_before}
         parts.first.confirm(AddressField::STREET_LABEL)
       end
+
+      def confirm_street_direction
+        known_after = last_instance_of([AddressField::STREET_NUMBER])
+        known_before = first_instance_of([AddressField::COUNTRY, AddressField::POSTAL, AddressField::STATE])
+        parts = potential(AddressField::STREET_DIRECTION).select {|part| part.position > known_after && part.position < known_before}
+        parts.first.confirm(AddressField::STREET_DIRECTION)
+      end
+
     end
   end
 end
