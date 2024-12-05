@@ -95,7 +95,8 @@ module NYAddressor
       :US => "United States",
       :CA => "Canada",
       :UK => "United Kingdom",
-      :AU => "Australia"
+      :AU => "Australia",
+      :CB => "Carribean Islands"
     }.freeze
 
     STREET_NUMBERS = { }.freeze
@@ -194,6 +195,33 @@ module NYAddressor
         'western australia' => 'wa',
         'south australia' => 'sa',
         'tasmania' => 'tas'
+      },
+      :CB => {
+        'saint maarten' => 'st maarten',
+        'bermuda' => 'bermuda',
+        'anguilla' => 'anguilla',
+        'us virgin islands' => 'us virgin islands',
+        'bahamas' => 'bahamas',
+        'puerto rico' => 'pr',
+        'caymand islands' => 'cayman islands',
+        'montserrat' => 'montserrat',
+        'british virgin islands' => 'british virgin islands',
+        'trinidad' => 'trinidad',
+        'tobago' => 'tobago',
+        'saint vincent' => 'st vincent',
+        'grenadines' => 'grenadines',
+        'saint lucia' => 'st lucia',
+        'saint kitts' => 'st kitts',
+        'nevis' => 'nevis',
+        'aruba' => 'aruba',
+        'jamaica' => 'jamaica',
+        'grenada' => 'grenada',
+        'haiti' => 'haiti',
+        'guadeloupe' => 'guadeloupe',
+        'martinique' => 'martinique',
+        'saint barthelemy' => 'st barthelemy',
+        'barbados' => 'barbados',
+        'antigua' => 'antigua'
       }
     }.freeze
     STATE_DESCRIPTORS = STATES.transform_values { |map| NYAddressor::descriptors(map) }.freeze
