@@ -24,13 +24,18 @@ module NYAddressor
         set_pattern_options
       end
 
+      private
+
       def set_pattern_options
         @parts.flatten.each do |part|
           part.determine_pattern(:street_number, method(:street_number_pattern?))
+          part.determine_pattern(:street_name, method(:street_name_pattern?))
+          part.determine_pattern(:street_label, method(:street_label_pattern?))
+          part.determine_pattern(:street_direction, method(:street_direction_pattern?))
+          part.determine_pattern(:unit, method(:unit_pattern?))
+          part.determine_pattern(:city, method(:city_pattern?))
         end
       end
-
-      private
 
       # Checks if an address part matches the pattern for a street number
       # @param part [AddressPart] to evaluate
@@ -38,6 +43,32 @@ module NYAddressor
       def street_number_pattern? part
         return false if Constants::Generics::UNIT_DESCRIPTORS.include? part.text
         return true if part.text.has_digits?
+        false
+      end
+
+      def street_name_pattern? part
+        return false if Constants::Generics::UNIT_DESCRIPTORS.include? part.text
+        return false if part.text.numeric?
+        true
+      end
+
+      def street_label_pattern? part
+        Constants::Generics::LABEL_DESCRIPTORS.include? part.text.standardize
+      end
+
+      def street_direction_pattern? part
+        Constants::Generics::DIRECTION_DESCRIPTORS.include? part.text.standardize
+      end
+
+      def unit_pattern? part
+        return true if Constants::Generics::UNIT_DESCRIPTORS.include? part.text
+        return true if part.text.has_digits?
+        false
+      end
+
+      def city_pattern? part
+        return true if part.text.alphabetic?
+        return true if part.text == 'st.' # saint
         false
       end
     end

@@ -25,6 +25,7 @@ module NYAddressor
         'eleventh' => '11th',
         'twelfth' => '12th'
       }.freeze
+      NUMBER_DESCRIPTORS = NYAddressor::descriptors(STREET_NUMBERS)
 
       STREET_DIRECTIONS = {
         'no' => 'n',
@@ -38,6 +39,7 @@ module NYAddressor
         'southeast' => 'se',
         'southwest' => 'sw'
       }.freeze
+      DIRECTION_DESCRIPTORS = NYAddressor::descriptors(STREET_DIRECTIONS)
 
       STREET_LABELS = {
         'avenue' => 'ave',
@@ -66,6 +68,7 @@ module NYAddressor
         'trail' => 'trl',
         'way' => 'wy'
       }.freeze
+      LABEL_DESCRIPTORS = NYAddressor::descriptors(STREET_LABELS)
 
       UNIT_TYPES = {
         'no' => '#',

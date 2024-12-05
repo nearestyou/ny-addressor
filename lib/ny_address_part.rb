@@ -129,43 +129,9 @@ class NYAddressPart
 
   def pattern_options
     @from_pattern = []
-    @from_pattern << :street_number if potential_street_number
-    @from_pattern << :street_name if potential_street_name
-    @from_pattern << :street_label if NYAConstants::LABEL_DESCRIPTORS.include? @text.standardize
-    @from_pattern << :street_direction if NYAConstants::DIRECTION_DESCRIPTORS.include? @text.standardize
-    @from_pattern << :unit if potential_unit
-    @from_pattern << :city if potential_city
     @from_pattern << :state if NYAConstants::STATE_DESCRIPTORS.include? @text
     @from_pattern << :postal if @text.has_digits?
     @from_pattern << :country if @text.alphabetic?
     @from_pattern
-  end
-
-  def potential_street_number
-    return false if NYAConstants::UNIT_DESCRIPTORS.include? @text
-    return true if @text.has_digits?
-
-    false
-  end
-
-  def potential_street_name
-    return false if NYAConstants::UNIT_DESCRIPTORS.include? @text
-    return false if @text.numeric?
-
-    true
-  end
-
-  def potential_unit
-    return true if NYAConstants::UNIT_DESCRIPTORS.include? @text
-    return true if @text.has_digits?
-
-    false
-  end
-
-  def potential_city
-    return true if @text.alphabetic?
-    return true if @text == 'st.' # Saint
-
-    false
   end
 end
