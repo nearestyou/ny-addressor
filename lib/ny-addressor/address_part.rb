@@ -13,12 +13,23 @@ module NYAddressor
       @group = group
       @group_position = group_position
       @position = position
+
+      @from_pattern = []
+      @from_position = []
+      @from_all = []
     end
 
     def consolidate_options
       @from_all = @from_pattern
       @from_all &= @from_position if @from_position
       @from_all &= @from_comma if @from_comma
+    end
+
+    # Determines if the part matches a specific pattern
+    # @param pattern [Symbol] The type of pattern to check
+    # @param checker [Proc] A callable object to perform the check
+    def determine_pattern(pattern, checker)
+      @from_pattern << pattern if checker.call(self)
     end
   end
 end

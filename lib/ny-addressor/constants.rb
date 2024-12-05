@@ -1,6 +1,14 @@
 # frozen_string_literal: true
+require 'set'
 
 module NYAddressor
+  def self.descriptors(map)
+    map.each_with_object(Set.new) do |(key, value), set|
+      set.add(key)
+      set.add(value)
+    end.freeze
+  end
+
   module Constants
     module Generics
       STREET_NUMBERS = {
@@ -71,6 +79,7 @@ module NYAddressor
         'rr' => 'po',
         'r.r.' => 'po'
       }.freeze
+      UNIT_DESCRIPTORS = NYAddressor::descriptors(UNIT_TYPES)
     end # end generics
   end
 end
