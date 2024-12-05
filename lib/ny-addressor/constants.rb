@@ -247,7 +247,7 @@ module NYAddressor
   # @return [Hash|List]
   def self.constants(region, type)
     begin
-      region_map = Constants.const_get(type)[region] || {}
+      region_map = Constants.const_get(type)[region]
       return region_map if region_map
     rescue
     end

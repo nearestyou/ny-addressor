@@ -22,6 +22,10 @@ module NYAddressor
       @confirmed = nil
     end
 
+    def to_s
+      @text
+    end
+
     def confirm(sym)
       @confirmed = sym
     end

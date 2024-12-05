@@ -1,6 +1,9 @@
 # frozen_string_literal: true
+require 'digest'
 require_relative 'extensions/string'
 require_relative 'ny-addressor/constants'
+require_relative 'ny-addressor/address_field'
+require_relative 'ny-addressor/parsers/generic_parser'
 
 module NYAddressor
   class Addressor
@@ -10,6 +13,33 @@ module NYAddressor
 
     def initialize(full_address, country = :AUTO)
       raise "No input" if full_address.nil? || full_address.length < 4
+      @parser = NYAddressor::Parsers::GenericParser.new(full_address, country)
+    end
+
+    def ==(other)
+      return false unless other.is_a?(Addressor)
+      self.hash == other.hash
+    end
+
+    def construct(opts = {})
+      fields = AddressField
+      required_fields = [fields::STREET_NUMBER, fields::STREET_NAME, fields::STATE]
+      return nil if required_fields.any? { |field| @parser.get_field(field).nil? }
+
+      opts = { include_unit: true, include_label: true, include_dir: true, include_postal: true }.merge(opts)
+      addr_str = "#{@parser.get_field(fields::STREET_NUMBER)}#{@parser.get_field(fields::STREET_NAME)}#{@parser.get_field(fields::CITY)}#{@parser.get_field(fields::STATE)}"
+      addr_str << @parser.get_field(fields::UNIT).to_s if opts[:include_unit]
+      addr_str << @parser.get_field(fields::STREET_LABEL).to_s if opts[:include_label]
+      addr_str << @parser.get_field(fields::STREET_DIRECTION).to_s if opts[:include_dir]
+      addr_str << (@parser.get_field(fields::POSTAL).to_s || '99999')[0..4] if opts[:include_postal]
+
+      addr_str.standardize.unrepeat
+    end
+
+    def hash
+      address = construct
+      return unless address
+      Digest::SHA256.hexdigest(address)[0..23]
     end
 
     private
