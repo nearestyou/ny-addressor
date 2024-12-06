@@ -12,14 +12,14 @@ module NYAddressor
       def initialize(address, region)
         @raw_input = address.downcase
         @region = region
-        @normalized = NYAddressor::normalize(@raw_input, @region)
+        @normalized = NYAddressor::normalize(@raw_input, @region).clean.unrepeat
 
         full_position = -1
         # Splits the address into comma-separated groups
         # @return [Array<Array<AddressPart>>] An array of address part arrays,
         # separated by comma groups
         @parts = @normalized.split(',').map.with_index do |group, group_index|
-          group.clean.unrepeat.split(' ').map.with_index do |word, group_position|
+          group.split(' ').map.with_index do |word, group_position|
             full_position += 1
             AddressPart.new(word, full_position, group_index, group_position)
           end

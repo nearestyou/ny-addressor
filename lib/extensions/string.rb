@@ -66,20 +66,31 @@ class String
   def unrepeat
     searched = ''
     unsearched = dup
-    dupe = match(/(.+)\1+/)
+    # regex = /(.+)\1+/ # basic matching
+    regex = /
+      (^|\b|, )       # word boundary or comma + space
+      (.+?)           # Repeating string
+      (,\s*|\s+)\2    # Check for repeating string after a delimiter
+      ($|\b|,)        # Match to the end of a word boundary
+    /x
+    dupe = match(regex)
 
     until unsearched.empty?
       return searched + unsearched unless dupe
 
       location = unsearched.index(dupe[0])
       searched += unsearched[0..location - 1] if location > 0
-      searched += if dupe[0].squeeze.length > 1 && dupe[0].has_letters?
-                    dupe[1]
+
+      # Do not collapse 'unit A1010'
+      safe_to_collapse = dupe[0].squeeze.length > 1 && (dupe[0].mostly_letters? || dupe[0].split(' ').length > 2)
+
+      searched += if safe_to_collapse
+                    dupe[1] + dupe[2] # delimiter + repeating string
                   else
                     dupe[0]
                   end
       unsearched = unsearched[location + dupe[0].length..]
-      dupe = unsearched.match(/(.+)\1+/)
+      dupe = unsearched.match(regex)
     end
     searched
   end

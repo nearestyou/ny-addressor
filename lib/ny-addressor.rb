@@ -77,7 +77,7 @@ module NYAddressor
       addr_str = fields.map {|field| @parser.get_field(field)}.compact.map(&:to_s).join
       addr_str << (@parser.get_field(AddressField::POSTAL)&.to_s || '99999')[0..4] if opts[:include_postal]
 
-      addr_str.standardize.unrepeat
+      addr_str.standardize
     end
 
     def hash
