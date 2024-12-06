@@ -169,27 +169,27 @@ module NYAddressor
       # @param part [AddressPart] to evaluate
       # @return [Boolean] does the part follow a street number pattern?
       def street_number_pattern? part
-        return false if NYAddressor::constants(@region, :UNIT_DESCRIPTORS).include? part.text
+        return false if NYAddressor::constants(@region, :UNIT_TYPES).values.include? part.text
         return true if part.text.has_digits?
         false
       end
 
       def street_name_pattern? part
-        return false if NYAddressor::constants(@region, :UNIT_DESCRIPTORS).include? part.text
+        return false if NYAddressor::constants(@region, :UNIT_TYPES).values.include? part.text
         return false if part.text.numeric?
         true
       end
 
       def street_label_pattern? part
-        NYAddressor::constants(@region, :LABEL_DESCRIPTORS).include? part.text.standardize
+        NYAddressor::constants(@region, :STREET_LABELS).values.include? part.text.standardize
       end
 
       def street_direction_pattern? part
-        NYAddressor::constants(@region, :DIRECTION_DESCRIPTORS).include? part.text.standardize
+        NYAddressor::constants(@region, :STREET_DIRECTIONS).values.include? part.text.standardize
       end
 
       def unit_pattern? part
-        return true if NYAddressor::constants(@region, :UNIT_DESCRIPTORS).include? part.text
+        return true if NYAddressor::constants(@region, :UNIT_TYPES).values.include? part.text
         return true if part.text.has_digits?
         false
       end
@@ -210,7 +210,7 @@ module NYAddressor
       end
 
       def country_pattern? part
-        NYAddressor::constants(@region, :COUNTRY_DESCRIPTORS).include? part.text
+        NYAddressor::constants(@region, :COUNTRY_IDENTIFIERS).values.include? part.text
       end
 
       def confirm_options

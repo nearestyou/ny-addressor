@@ -3,13 +3,6 @@ require 'set'
 require 'byebug'
 
 module NYAddressor
-  def self.descriptors(map)
-    map.each_with_object(Set.new) do |(key, value), set|
-      key.split.each { |k| set.add(k) }
-      value.split.each { |v| set.add(v) }
-    end.freeze
-  end
-
   module Constants
     module Generics
       STREET_NUMBERS = {
@@ -26,7 +19,6 @@ module NYAddressor
         '11th' => 'eleventh',
         '12th' => 'twelfth'
       }.freeze
-      NUMBER_DESCRIPTORS = NYAddressor::descriptors(STREET_NUMBERS)
 
       STREET_DIRECTIONS = {
         'no' => 'n',
@@ -40,7 +32,6 @@ module NYAddressor
         'southeast' => 'se',
         'southwest' => 'sw'
       }.freeze
-      DIRECTION_DESCRIPTORS = NYAddressor::descriptors(STREET_DIRECTIONS)
 
       STREET_LABELS = {
         'avenue' => 'ave',
@@ -69,7 +60,6 @@ module NYAddressor
         'trail' => 'trl',
         'way' => 'wy'
       }.freeze
-      LABEL_DESCRIPTORS = NYAddressor::descriptors(STREET_LABELS)
 
       UNIT_TYPES = {
         'no' => '#',
@@ -83,7 +73,6 @@ module NYAddressor
         'rr' => 'po',
         'r.r.' => 'po'
       }.freeze
-      UNIT_DESCRIPTORS = NYAddressor::descriptors(UNIT_TYPES)
     end # end generics
   end
 end
@@ -224,7 +213,6 @@ module NYAddressor
         'antigua' => 'antigua'
       }
     }.freeze
-    STATE_DESCRIPTORS = STATES.transform_values { |map| NYAddressor::descriptors(map) }.freeze
 
     POSTAL_FORMATS = {
       US: /\d{5}(-\d{4})?/i,                       # 12345 or 12345-6789
