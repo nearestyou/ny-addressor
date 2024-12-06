@@ -22,7 +22,7 @@ module NYAddressor
   # Normalize a string for a given region
   def self.normalize(input, region)
     result = input.dup
-    types_to_process = %w[COUNTRIES STATES STREET_NUMBERS STREET_DIRECTIONS STREET_LABELS UNIT_TYPES]
+    types_to_process = %i[COUNTRY_IDENTIFIERS STATES STREET_NUMBERS STREET_DIRECTIONS STREET_LABELS UNIT_TYPES]
     types_to_process.each do |type|
       constants(region, type).each do |full_string, abbreviation|
         result.gsub!(/\b#{full_string}\b/i, abbreviation)

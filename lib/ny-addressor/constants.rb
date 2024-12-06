@@ -233,14 +233,7 @@ module NYAddressor
       AU: /\d{4}/i                                 # 2000
     }.freeze
 
-    COUNTRY_DESCRIPTORS = {
-      US: %w[us usa united states of america],
-      CA: %w[ca canada],
-      UK: %w[uk united kingdom],
-      AU: %w[au australia]
-    }.freeze
-
-    COUNTRIES = {
+    COUNTRY_IDENTIFIERS = {
       US: {
         "us" => "usa",
         "united states" => "usa",
@@ -249,6 +242,6 @@ module NYAddressor
       CA: { "canada" => "ca" },
       UK: { "united kingdom" => "uk" },
       AU: { "australia" => "au" }
-    }
+    }.freeze
   end
 end
