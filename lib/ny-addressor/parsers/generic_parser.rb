@@ -80,6 +80,9 @@ module NYAddressor
 
         # Select parts to use
         confirm_options
+
+        # fix invalid parsing
+        fixup!
       end
 
       def position_options part
@@ -326,6 +329,15 @@ module NYAddressor
         known_before = [AddressField::STATE, AddressField::POSTAL, AddressField::COUNTRY]
         parts = potential_between(AddressField::CITY, known_after, known_before)
         parts&.first&.confirm(AddressField::CITY)
+      end
+
+      def fixup!
+        no_street_name = get_field(AddressField::STREET_NAME).nil?
+        return unless no_street_name
+
+        # Direction is street name
+        direction = get_field(AddressField::STREET_DIRECTION)
+        direction.confirm(AddressField::STREET_NAME) if no_street_name && direction && direction.from_all.include?(AddressField::STREET_NAME)
       end
     end
   end
