@@ -34,4 +34,18 @@ class TestFormatEquality < Minitest::Test
       NYAddressor::Addressor.new('1600 Penn St, Washington, DC, 20500', :US),
     )
   end
+
+  def test_prefix_suffix
+    assert_equal(
+      NYAddressor::Addressor.new('1600 North Penn Ave, Washington, DC, 20500', :US),
+      NYAddressor::Addressor.new('1600 Penn Ave North, Washington, DC, 20500', :US),
+    )
+  end
+
+  def test_state_abrev
+    assert_equal(
+      NYAddressor::Addressor.new('1600 North Penn Ave, Washington, DC, 20500', :US),
+      NYAddressor::Addressor.new('1600 Penn Ave North, Washington, District of Columbia, 20500', :US),
+    )
+  end
 end
