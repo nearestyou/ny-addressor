@@ -118,12 +118,12 @@ class TestFormatEquality < Minitest::Test
 
     assert_equal(
       NYAddressor::Addressor.new('1505 & 1507 10TH AVE, SEATTLE, WA 98120', :US),
-      NYAddressor::Addressor.new('1507 10TH AVE, SEATTLE, WA 98120', :US),
+      NYAddressor::Addressor.new('1505 10TH AVE, SEATTLE, WA 98120', :US),
     )
 
     assert_equal(
       NYAddressor::Addressor.new('1505&1507 10TH AVE, SEATTLE, WA 98120', :US),
-      NYAddressor::Addressor.new('1507 10TH AVE, SEATTLE, WA 98120', :US),
+      NYAddressor::Addressor.new('1505 10TH AVE, SEATTLE, WA 98120', :US),
     )
   end
 
@@ -152,14 +152,14 @@ class TestFormatEquality < Minitest::Test
   end
 
   def test_unit_in_street_num
-    original = NYAddressor::Addressor.new('1600 Pennsylvania Ave N, Minneapolis, MN 55555')
+    original = NYAddressor::Addressor.new('1600 Pennsylvania Ave N, Minneapolis, MN 55555', :US)
     assert_equal(
       original.hash,
-      NYAddressor::Addressor.new('1600-A Pennsylvania Ave N, Minneapolis, MN 55555').unitless_hash
+      NYAddressor::Addressor.new('1600-A Pennsylvania Ave N, Minneapolis, MN 55555', :US).unitless_hash
     )
     assert_equal(
       original.hash,
-      NYAddressor::Addressor.new('1600A Pennsylvania Ave N, Minneapolis, MN 55555').unitless_hash
+      NYAddressor::Addressor.new('1600A Pennsylvania Ave N, Minneapolis, MN 55555', :US).unitless_hash
     )
   end
 
