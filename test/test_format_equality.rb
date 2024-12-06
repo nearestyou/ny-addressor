@@ -134,8 +134,8 @@ class TestFormatEquality < Minitest::Test
 
   def test_zip_extension
     assert_equal(
-      NYAddressor::Addressor.new('13322 West Airport Boulevard, Sugar Land, TX 77478-9898', :US),
-      NYAddressor::Addressor.new('13322 Airport Blvd W, Sugar Land, TX 77478', :US)
+      NYAddressor::Addressor.new('13322 Airport Blvd, Sugar, TX 77478-9898', :US),
+      NYAddressor::Addressor.new('13322 Airport Blvd, Sugar, TX 77478', :US)
     )
   end
 
