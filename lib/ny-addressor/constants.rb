@@ -35,10 +35,9 @@ module NYAddressor
 
       STREET_LABELS = {
         'avenue' => 'ave',
-        'av.' => 'ave',
+        'av' => 'ave',
         'boulevard' => 'blvd',
         'boul' => 'blvd',
-        'boul.' => 'blvd',
         'circle' => 'cir',
         'court' => 'ct',
         'drive' => 'dr',
@@ -63,15 +62,13 @@ module NYAddressor
 
       UNIT_TYPES = {
         'no' => '#',
+        'unit' => '#',
         'apartment' => 'apt',
         'suite' => 'ste',
         'room' => 'room',
-        'unit' => '#',
-        'p.o.box' => 'po',
         'pobox' => 'po',
         'box' => 'po',
         'rr' => 'po',
-        'r.r.' => 'po'
       }.freeze
     end # end generics
   end
@@ -107,7 +104,6 @@ module NYAddressor
         'connecticut' => 'ct',
         'delaware' => 'de',
         'district of columbia' => 'dc',
-        'd.c.' => 'dc',
         'florida' => 'fl',
         'georgia' => 'ga',
         'hawaii' => 'hi',

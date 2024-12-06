@@ -10,6 +10,7 @@ class String
     self
       &.gsub(/\s*\(.+\)/, '') # https://stackoverflow.com/questions/8708515/ruby-rails-remove-text-inside-parentheses-from-a-string
       &.delete("'")
+      &.delete(".")
       &.downcase
       &.gsub("\u00A0", ' ')
       &.gsub(/\s+/, ' ') # remove multiple spaces in a row
