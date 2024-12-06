@@ -7,8 +7,13 @@ class String
   end
 
   def clean
-    self&.gsub(/\s*\(.+\)/, '')&.gsub(',', ' ')&.delete("'")&.downcase&.gsub("\u00A0", ' ')
-    # regex: https://stackoverflow.com/questions/8708515/ruby-rails-remove-text-inside-parentheses-from-a-string
+    self
+      &.gsub(/\s*\(.+\)/, '') # https://stackoverflow.com/questions/8708515/ruby-rails-remove-text-inside-parentheses-from-a-string
+      &.delete("'")
+      &.downcase
+      &.gsub("\u00A0", ' ')
+      &.gsub(/\s+/, ' ') # remove multiple spaces in a row
+      &.strip
   end
 
   # Standardize strings for comparison testing
@@ -38,6 +43,14 @@ class String
 
   def digit_count
     split('').select(&:numeric?).length
+  end
+
+  def mostly_numeric?
+    digit_count > letter_count
+  end
+
+  def mostly_letters?
+    !mostly_numeric?
   end
 
   def strip_digits
