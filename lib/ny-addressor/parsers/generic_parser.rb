@@ -8,22 +8,22 @@ require 'byebug'
 module NYAddressor
   module Parsers
     class GenericParser
-      attr_accessor :parts
+      attr_reader :parts
       def initialize(address, region)
-        @original = address.downcase
+        @raw_input = address.downcase
         @region = region
+        @normalized = NYAddressor::normalize(@raw_input, @region)
 
         full_position = -1
         # Splits the address into comma-separated groups
         # @return [Array<Array<AddressPart>>] An array of address part arrays,
         # separated by comma groups
-        @parts = @original.split(',').map.with_index do |group, group_index|
+        @parts = @normalized.split(',').map.with_index do |group, group_index|
           group.clean.unrepeat.split(' ').map.with_index do |word, group_position|
             full_position += 1
             AddressPart.new(word, full_position, group_index, group_position)
           end
         end
-        preformat
         set_options
       end
 
@@ -63,47 +63,6 @@ module NYAddressor
       end
 
       private
-
-      # Formatting that must be done before option selection
-      def preformat
-        # convert 1st -> first
-        @parts.flatten.each do |part|
-          normalized = Constants::Generics::STREET_NUMBERS[part.text] || part.text
-          part.set_text(normalized)
-        end
-
-        abbreviate_state
-      end
-
-      # Convert District of Columbia -> dc
-      def abbreviate_state
-        state_map = NYAddressor::constants(@region, :STATES)
-        state_descriptors = NYAddressor::constants(@region, :STATE_DESCRIPTORS)
-        # parts that could be states
-        parts = @parts.flatten.select { |part| state_descriptors.include? part.text }.sort_by { |part| part.position }
-
-        previous_position = 0
-        compound_part = [] # parts that go together to make one state
-        # example: [district, of, columbia] -> [dc]
-
-        parts.each do |part|
-          # reset if the next part isn't adjacent
-          compound_part = [] if previous_position + 1 != part.group_position
-          previous_position = part.group_position
-          compound_part << part
-
-          key = compound_part.map(&:text).join(' ')
-          next unless state_map.key? key
-
-          # Update the first part, and delete the rest
-          compound_part.first.set_text(state_map[key])
-          compound_part[1..].each do |redundant_part|
-            @parts.each do |group|
-              group.delete(redundant_part) if group.include?(redundant_part)
-            end
-          end
-        end
-      end
 
       def set_options
         # Determine what a part likely is based off it's position

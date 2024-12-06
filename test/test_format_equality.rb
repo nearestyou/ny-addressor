@@ -65,8 +65,8 @@ class TestFormatEquality < Minitest::Test
 
   def test_label_abrev
     assert_equal(
-      NYAddressor::Addressor.new('13322 West Airport Boulevard, Sugar Land, TX 77478', :US),
-      NYAddressor::Addressor.new('13322 Airport Blvd W, Sugar Land, TX 77478', :US)
+      NYAddressor::Addressor.new('13322 Airport Boulevard, Sugar, TX 77478', :US),
+      NYAddressor::Addressor.new('13322 Airport Blvd, Sugar, TX 77478', :US)
     )
   end
 

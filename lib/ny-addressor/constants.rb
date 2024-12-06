@@ -239,18 +239,16 @@ module NYAddressor
       UK: %w[uk united kingdom],
       AU: %w[au australia]
     }.freeze
-  end
 
-  # Fetches constatns for specific region and  type
-  # @param region [Symbol] :US, :UK, etc
-  # @param type [Symbol] :STREET_LABELS, :UNIT_DESCRIPTORS, etc
-  # @return [Hash|List]
-  def self.constants(region, type)
-    begin
-      region_map = Constants.const_get(type)[region]
-      return region_map if region_map
-    rescue
-    end
-    Constants::Generics.const_get(type)
+    COUNTRIES = {
+      US: {
+        "us" => "usa",
+        "united states" => "usa",
+        "united states of america" => "usa"
+      },
+      CA: { "canada" => "ca" },
+      UK: { "united kingdom" => "uk" },
+      AU: { "australia" => "au" }
+    }
   end
 end
