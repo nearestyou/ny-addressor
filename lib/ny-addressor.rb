@@ -14,9 +14,11 @@ module NYAddressor
 
     def initialize(full_address, country = :AUTO)
       @input = full_address
-      @region = country
-      raise "No input" if full_address.nil? || full_address.length < 4
+      # @region = country
+      @region = :US
+      return if full_address.nil? || full_address.length < 4
       @parser = NYAddressor::Parsers::GenericParser.new(@input, @region)
+      # puts debug
     end
 
     def ==(other)
@@ -40,7 +42,7 @@ module NYAddressor
 
     def construct(opts = {})
       required_fields = [AddressField::STREET_NUMBER, AddressField::STREET_NAME, AddressField::STATE]
-      return nil if required_fields.any? { |field| @parser.get_field(field).nil? }
+      return nil if required_fields.any? { |field| @parser&.get_field(field).nil? }
 
       opts = { include_unit: true, include_label: true, include_dir: true, include_postal: true, include_country: false }.merge(opts)
 

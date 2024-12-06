@@ -278,7 +278,7 @@ module NYAddressor
         known_before = [AddressField::COUNTRY, AddressField::POSTAL, AddressField::STATE]
 
         parts = potential_between(AddressField::STREET_LABEL, known_after, known_before)
-        parts.first.confirm(AddressField::STREET_LABEL)
+        parts&.first&.confirm(AddressField::STREET_LABEL)
       end
 
       def confirm_street_direction
