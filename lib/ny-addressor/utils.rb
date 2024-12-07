@@ -14,18 +14,31 @@ module NYAddressor
 
   # Normalize a string for a given region
   def self.normalize(input, region)
-    result = input.dup
-    types_to_process = %i[COUNTRY_IDENTIFIERS STATES STREET_NUMBERS STREET_DIRECTIONS STREET_LABELS UNIT_TYPES]
+    result = input.dup.extend(AddressHelper)
+    types_to_process = %i[COUNTRY_IDENTIFIERS STATES STREET_NUMBERS STREET_DIRECTIONS STREET_LABELS UNIT_DESIGNATIONS]
     types_to_process.each do |type|
       constants(region, type).each do |full_string, abbreviation|
         result.gsub!(/\b#{full_string}\b/i, abbreviation)
       end
     end
-    remove_cross_street(result)
+    result.remove_cross_street.separate_unit
   end
 
-  # 1505 & 1510 -> 1505
-  def self.remove_cross_street(input)
-    input.gsub(/(\d+)\s*&\s*\d+/, '\1')
+  module AddressHelper
+    # 1505 & 1510 -> 1505
+    def remove_cross_street
+      self.gsub(/(\d+)\s*&\s*\d+/, '\1').extend(AddressHelper)
+    end
+
+    # 100-1500 -> #100 1500
+    def separate_unit
+      regex = /
+        \A      # Only look at first word
+        (\d+)   # Digit
+        [\/-]   # hyphen or slash
+        (\d+)
+      /x
+      self.sub(regex, '#\1 \2').extend(AddressHelper)
+    end
   end
 end

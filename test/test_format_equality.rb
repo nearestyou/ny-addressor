@@ -139,6 +139,13 @@ class TestFormatEquality < Minitest::Test
     )
   end
 
+  def test_unit_designations
+    assert_equal(
+      NYAddressor::Addressor.new('15355 Main Ave, Unit 700, Washington, DC 20500'),
+      NYAddressor::Addressor.new('15355 Main Ave, Apt 700, Washington, DC 20500')
+    )
+  end
+
   def test_leading_unit_designations
     original = NYAddressor::Addressor.new('15355 Main Ave, #700, Washington, DC 20500')
     assert_equal(

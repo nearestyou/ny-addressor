@@ -63,6 +63,16 @@ module NYAddressor
         [-1, *positions].compact.max
       end
 
+      # Get the next part
+      # @param part [AddressPart]
+      # @return [AddressPart, nil]
+      def next_part(part, same_group=false)
+        position_to_find = part.position + 1
+        @parts.flatten.find do |prt|
+          prt.position == position_to_find && (!same_group || prt.group == part.group)
+        end
+      end
+
       private
 
       def set_options
@@ -173,13 +183,13 @@ module NYAddressor
       # @param part [AddressPart] to evaluate
       # @return [Boolean] does the part follow a street number pattern?
       def street_number_pattern? part
-        return false if NYAddressor::constants(@region, :UNIT_TYPES).values.include? part.text
+        return false if NYAddressor::constants(@region, :UNIT_DESIGNATIONS).values.include? part.text
         return true if part.text.has_digits?
         false
       end
 
       def street_name_pattern? part
-        return false if NYAddressor::constants(@region, :UNIT_TYPES).values.include? part.text
+        return false if NYAddressor::constants(@region, :UNIT_DESIGNATIONS).values.include? part.text
         return false if part.text.numeric?
         true
       end
@@ -193,9 +203,12 @@ module NYAddressor
       end
 
       def unit_pattern? part
-        return true if NYAddressor::constants(@region, :UNIT_TYPES).values.include? part.text
         return true if part.text.has_digits?
-        false
+        unit_designation_pattern?(part)
+      end
+
+      def unit_designation_pattern? part
+        return true if NYAddressor::constants(@region, :UNIT_DESIGNATIONS).values.include? part.text
       end
 
       def city_pattern? part
@@ -293,7 +306,28 @@ module NYAddressor
       end
 
       def confirm_unit
-        potential(AddressField::UNIT)&.first&.confirm(AddressField::UNIT)
+        parts = potential(AddressField::UNIT)
+        return unless parts.any?
+
+        first_part = parts.first # Apt
+        second_part = parts[1]   # 700
+
+        def remove_unit_designation input
+          input.sub(/^\#|\b(#{Constants::Generics::UNIT_DESIGNATIONS.values.join('|')})\b/i, '').strip
+        end
+
+        # Check if data is leftover after unit is removed
+        # If no data, the unit is probably in the next part
+        designationless = remove_unit_designation(first_part.text)
+        unless designationless.empty?
+          first_part.set_text(designationless)
+          first_part.confirm(AddressField::UNIT)
+          return
+        end
+
+        return unless !second_part.nil? && second_part == next_part(first_part, true)
+        second_part.set_text(remove_unit_designation(second_part.text))
+        second_part.confirm(AddressField::UNIT)
       end
 
       def confirm_street_name
@@ -325,7 +359,7 @@ module NYAddressor
       end
 
       def confirm_city
-        known_after = [AddressField::STREET_NAME, AddressField::STREET_LABEL, AddressField::STREET_DIRECTION]
+        known_after = [AddressField::STREET_NAME, AddressField::STREET_LABEL, AddressField::STREET_DIRECTION, AddressField::UNIT]
         known_before = [AddressField::STATE, AddressField::POSTAL, AddressField::COUNTRY]
         parts = potential_between(AddressField::CITY, known_after, known_before)
         parts&.first&.confirm(AddressField::CITY)

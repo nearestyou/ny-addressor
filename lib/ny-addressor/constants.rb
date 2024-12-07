@@ -60,7 +60,7 @@ module NYAddressor
         'way' => 'wy'
       }.freeze
 
-      UNIT_TYPES = {
+      UNIT_DESIGNATIONS = {
         'no' => '#',
         'unit' => '#',
         'apartment' => 'apt',
@@ -91,7 +91,7 @@ module NYAddressor
 
     STREET_LABELS = { }.freeze
 
-    UNIT_TYPES = { }.freeze
+    UNIT_DESIGNATIONS = { }.freeze
 
     STATES = {
       :US => {

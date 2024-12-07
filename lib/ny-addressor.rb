@@ -14,7 +14,7 @@ module NYAddressor
 
     def initialize(full_address, country = :AUTO)
       @input = full_address
-      # @region = country
+      @region = country
       @region = :US
       return if full_address.nil? || full_address.length < 4
       @parser = NYAddressor::Parsers::GenericParser.new(@input, @region)
