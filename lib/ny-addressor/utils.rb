@@ -36,6 +36,7 @@ module NYAddressor
         \A                 # Only look at first word
         (\d+)              # Digit
         ([-]?[a-z]{1})     # ONE letter, optional dash
+        \b
       /x
       self.sub!(regex) do |match|
         "##{$2.delete('-').strip} #{$1}"
@@ -46,6 +47,7 @@ module NYAddressor
         \A                 # Only look at first word
         ([-]?[a-z]{1})     # ONE letter, optional dash
         (\d+)              # Digit
+        \b
       /x
       self.sub!(regex) do |match|
         "##{$1.delete('-').strip} #{$2}"
@@ -57,6 +59,7 @@ module NYAddressor
         (\d+)   # Digit (unit number)
         [\/-]   # hyphen or slash
         (\d+)   # Digit (street number)
+        \b
       /x
       self.sub(regex, '#\1 \2').extend(AddressHelper)
     end
