@@ -1,5 +1,4 @@
 require 'minitest/autorun'
-require_relative '../lib/ny-addressor/parsers/generic_parser'
 require_relative '../lib/ny-addressor'
 require 'byebug'
 
@@ -99,6 +98,10 @@ class TestFormatEquality < Minitest::Test
     assert !NYAddressor::Addressor.new('260 Court St Unit 6, Middlebury, VT 05753, USA').hash.nil?
   end
 
+  def test_number_as_street
+    assert !NYAddressor::Addressor.new('1600 24 Ave, Washington, DC 20500').hash.nil?
+  end
+
   def test_double_entry
     base = NYAddressor::Addressor.new('1600 Pennsylvania Ave, Washington, DC 20500')
     assert_equal(
@@ -112,6 +115,13 @@ class TestFormatEquality < Minitest::Test
     assert_equal(
       base,
       NYAddressor::Addressor.new('1600 Pennsylvania Ave, Washington, DC, DC 20500')
+    )
+  end
+
+  def test_double_comma
+    assert_equal(
+      NYAddressor::Addressor.new('602 21st r  NW, portland,, or 97209'),
+      NYAddressor::Addressor.new('602 21st r  NW, portland, or 97209'),
     )
   end
 
@@ -163,6 +173,13 @@ class TestFormatEquality < Minitest::Test
     )
   end
 
+  def test_missing_unit_designation
+    assert_equal(
+      NYAddressor::Addressor.new('1600 Pennsylvania 700, Minneapolis, MN 55555'),
+      NYAddressor::Addressor.new('1600 Pennsylvania #700, Minneapolis, MN 55555'),
+    )
+  end
+
   def test_unit_in_street_num
     original = NYAddressor::Addressor.new('1600 Pennsylvania Ave N, Minneapolis, MN 55555')
     with_dash = NYAddressor::Addressor.new('1600-A Pennsylvania Ave N, Minneapolis, MN 55555')
@@ -176,6 +193,44 @@ class TestFormatEquality < Minitest::Test
       dashless.unitless_hash
     )
     assert_equal(with_dash, dashless)
+  end
+
+  def test_unit_formats
+    numberless = 'Pennsylvania Ave N, Minneapolis, MN 55555'
+    assert_equal(
+      NYAddressor::Addressor.new(original).hash,
+      NYAddressor::Addressor.new("B2 - 1600 #{original}").unitless_hash
+    )
+    assert_equal(
+      NYAddressor::Addressor.new(original).hash,
+      NYAddressor::Addressor.new("B2-1600 #{original}").unitless_hash
+    )
+    assert_equal(
+      NYAddressor::Addressor.new(original).hash,
+      NYAddressor::Addressor.new("1600-B2 #{original}").unitless_hash
+    )
+    assert_equal(
+      NYAddressor::Addressor.new(original).hash,
+      NYAddressor::Addressor.new("1600 - B2 #{original}").unitless_hash
+    )
+  end
+
+  def test_leading_description
+    description = 'Jacksonville International Airport'
+    base_address = '2400 Yankee Clipper Dr, Jacksonville, FL 32218, United States'
+    assert_equal(
+      NYAddressor::Addressor.new(base_address),
+      NYAddressor::Addressor.new("#{description}, #{base_address}"),
+    )
+  end
+
+  def test_missing_zip
+    zipless = '1600 Pennsylvania Ave, Washington, DC'
+    zip = zipless + ' 55555'
+    assert_equal(
+      NYAddressor::Addressor.new(zipless).hash99999,
+      NYAddressor::Addressor.new(zip).hash99999
+    )
   end
 
 end
