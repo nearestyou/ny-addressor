@@ -30,13 +30,33 @@ module NYAddressor
       self.gsub(/(\d+)\s*&\s*\d+/, '\1').extend(AddressHelper)
     end
 
-    # 100-1500 -> #100 1500
     def separate_unit
+      # Match patterns like 1600-A
+      regex = /
+        \A                 # Only look at first word
+        (\d+)              # Digit
+        ([-]?[a-z]{1})     # ONE letter, optional dash
+      /x
+      self.sub!(regex) do |match|
+        "##{$2.delete('-').strip} #{$1}"
+      end
+
+      # Match patterns like A-1600
+      regex = /
+        \A                 # Only look at first word
+        ([-]?[a-z]{1})     # ONE letter, optional dash
+        (\d+)              # Digit
+      /x
+      self.sub!(regex) do |match|
+        "##{$1.delete('-').strip} #{$2}"
+      end
+
+      # Match patterns like 100-1500
       regex = /
         \A      # Only look at first word
-        (\d+)   # Digit
+        (\d+)   # Digit (unit number)
         [\/-]   # hyphen or slash
-        (\d+)
+        (\d+)   # Digit (street number)
       /x
       self.sub(regex, '#\1 \2').extend(AddressHelper)
     end

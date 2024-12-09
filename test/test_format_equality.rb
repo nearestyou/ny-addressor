@@ -165,14 +165,17 @@ class TestFormatEquality < Minitest::Test
 
   def test_unit_in_street_num
     original = NYAddressor::Addressor.new('1600 Pennsylvania Ave N, Minneapolis, MN 55555')
+    with_dash = NYAddressor::Addressor.new('1600-A Pennsylvania Ave N, Minneapolis, MN 55555')
+    dashless = NYAddressor::Addressor.new('1600A Pennsylvania Ave N, Minneapolis, MN 55555')
     assert_equal(
       original.hash,
-      NYAddressor::Addressor.new('1600-A Pennsylvania Ave N, Minneapolis, MN 55555').unitless_hash
+      with_dash.unitless_hash
     )
     assert_equal(
       original.hash,
-      NYAddressor::Addressor.new('1600A Pennsylvania Ave N, Minneapolis, MN 55555').unitless_hash
+      dashless.unitless_hash
     )
+    assert_equal(with_dash, dashless)
   end
 
 end
