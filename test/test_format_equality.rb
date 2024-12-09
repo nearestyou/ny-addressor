@@ -61,6 +61,11 @@ class TestFormatEquality < Minitest::Test
       NYAddressor::Addressor.new('1600 North Penn Ave, Washington, DC, 20500, United States'),
       NYAddressor::Addressor.new('1600 Penn Ave North, Washington, DC, 20500, USA'),
     )
+
+    assert_equal(
+      NYAddressor::Addressor.new('1600 North Penn Ave, Washington, DC, 20500, United States of America'),
+      NYAddressor::Addressor.new('1600 Penn Ave North, Washington, DC, 20500, United States'),
+    )
   end
 
   def test_label_abrev

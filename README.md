@@ -3,4 +3,5 @@ A Ruby gem for parsing, normalizing, and comparing address data. It supports var
 
 ```bash
 rake test
+ruby -Itest test/test_format_equality.rb --name test_unit_designations
 ```
