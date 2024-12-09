@@ -312,10 +312,6 @@ module NYAddressor
         first_part = parts.first # Apt
         second_part = parts[1]   # 700
 
-        def remove_unit_designation input
-          input.sub(/^\#|\b(#{Constants::Generics::UNIT_DESIGNATIONS.values.join('|')})\b/i, '').strip
-        end
-
         # Check if data is leftover after unit is removed
         # If no data, the unit is probably in the next part
         designationless = remove_unit_designation(first_part.text)
@@ -328,6 +324,10 @@ module NYAddressor
         return unless !second_part.nil? && second_part == next_part(first_part, true)
         second_part.set_text(remove_unit_designation(second_part.text))
         second_part.confirm(AddressField::UNIT)
+      end
+
+      def remove_unit_designation input
+        input.sub(/^\#|\b(#{Constants::Generics::UNIT_DESIGNATIONS.values.join('|')})\b/i, '').strip
       end
 
       def confirm_street_name
