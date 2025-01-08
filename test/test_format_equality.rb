@@ -198,20 +198,24 @@ class TestFormatEquality < Minitest::Test
   def test_unit_formats
     numberless = 'Pennsylvania Ave N, Minneapolis, MN 55555'
     assert_equal(
-      NYAddressor::Addressor.new(original).hash,
-      NYAddressor::Addressor.new("B2 - 1600 #{original}").unitless_hash
+      NYAddressor::Addressor.new("1600 #{numberless}").hash,
+      NYAddressor::Addressor.new("B2 - 1600 #{numberless}").unitless_hash,
+      "B2 - not recognized as unit"
     )
     assert_equal(
-      NYAddressor::Addressor.new(original).hash,
-      NYAddressor::Addressor.new("B2-1600 #{original}").unitless_hash
+      NYAddressor::Addressor.new("1600 #{numberless}").hash,
+      NYAddressor::Addressor.new("B2-1600 #{numberless}").unitless_hash,
+      "B2- not recognized as unit"
     )
     assert_equal(
-      NYAddressor::Addressor.new(original).hash,
-      NYAddressor::Addressor.new("1600-B2 #{original}").unitless_hash
+      NYAddressor::Addressor.new("1600 #{numberless}").hash,
+      NYAddressor::Addressor.new("1600-B2 #{numberless}").unitless_hash,
+      "-B2 not recognized as unit"
     )
     assert_equal(
-      NYAddressor::Addressor.new(original).hash,
-      NYAddressor::Addressor.new("1600 - B2 #{original}").unitless_hash
+      NYAddressor::Addressor.new("1600 #{numberless}").hash,
+      NYAddressor::Addressor.new("1600 - B2 #{numberless}").unitless_hash,
+      "- B2 not recognized as unit"
     )
   end
 

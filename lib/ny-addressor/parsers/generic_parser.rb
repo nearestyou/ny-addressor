@@ -208,6 +208,7 @@ module NYAddressor
       end
 
       def unit_designation_pattern? part
+        return true if part.text.include? '#'
         return true if NYAddressor::constants(@region, :UNIT_DESIGNATIONS).values.include? part.text
       end
 
