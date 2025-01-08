@@ -31,21 +31,33 @@ module NYAddressor
     end
 
     def separate_unit
-      # Match patterns like 1600-A
+      unit_postfix = /
+        \s*[-]?\s*      # Optional dash around spaces
+        [a-zA-Z]{1}     # Match ONE letter
+        \d*             # 0 or more numbers
+      /x
+
+      # Match patterns like 1600-A, 1600A
       regex = /
         \A                 # Only look at first word
         (\d+)              # Digit
-        ([-]?[a-z]{1})     # ONE letter, optional dash
+        (#{unit_postfix})
         \b
       /x
       self.sub!(regex) do |match|
         "##{$2.delete('-').strip} #{$1}"
       end
 
-      # Match patterns like A-1600
+      unit_prefix =/
+        [a-zA-Z]{1}     # ONE letter
+        \d*             # 0 or more numbers
+        \s*[-]\s*       # dash, optional spaces
+      /x
+
+      # Match patterns like A-1600 or A1-1600
       regex = /
         \A                 # Only look at first word
-        ([-]?[a-z]{1})     # ONE letter, optional dash
+        (#{unit_prefix})
         (\d+)              # Digit
         \b
       /x
@@ -53,15 +65,18 @@ module NYAddressor
         "##{$1.delete('-').strip} #{$2}"
       end
 
-      # Match patterns like 100-1500
-      regex = /
-        \A      # Only look at first word
-        (\d+)   # Digit (unit number)
-        [\/-]   # hyphen or slash
-        (\d+)   # Digit (street number)
-        \b
-      /x
-      self.sub(regex, '#\1 \2').extend(AddressHelper)
+      # commenting this for now, as I've never seen an address like this
+      # --Cooper
+      # # Match patterns like 100-1500
+      # regex = /
+      #   \A      # Only look at first word
+      #   (\d+)   # Digit (unit number)
+      #   [\/-]   # hyphen or slash
+      #   (\d+)   # Digit (street number)
+      #   \b
+      # /x
+      # self.sub(regex, '#\1 \2').extend(AddressHelper)
+      self.extend(AddressHelper)
     end
   end
 end
