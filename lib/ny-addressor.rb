@@ -15,7 +15,6 @@ module NYAddressor
     def initialize(full_address, country = :AUTO)
       @input = full_address
       @region = country
-      @region = :US
       return if full_address.nil? || full_address.length < 4
       @parser = NYAddressor::Parsers::GenericParser.new(@input, @region)
       # puts debug
@@ -62,7 +61,7 @@ module NYAddressor
       addr_str = fields.map {|field| @parser.get_field(field)}.compact.map(&:to_s).join
 
       if opts[:include_postal]
-        addr_str << (opts[:overwrite_postal] ? '99999' : @parser.get_field(AddressField::POSTAL)&.to_s)[0..4]
+        addr_str << (opts[:overwrite_postal] ? '99999' : @parser.get_field(AddressField::POSTAL).to_s)[0..4]
       end
 
       addr_str.standardize

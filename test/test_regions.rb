@@ -8,7 +8,7 @@ class TestRegions < Minitest::Test
     assert NYAddressor::Addressor.new('W204 N11912 Goldendale Rd,AURORA,OR,97002').sns == 'w204n11912goldendaleor'
   end
 
-  def test_puero_rican
+  def test_puerto_rican
     assert !NYAddressor::Addressor.new('1310 Ashford Ave San Juan PR 907', :US).hash.nil?
     assert !NYAddressor::Addressor.new('Carretera Estatal 115, Km. 26.9 Bo. Tablonal AGUADA PR 00602', :US).hash.nil?
   end
@@ -25,7 +25,7 @@ class TestRegions < Minitest::Test
 
   def test_canadian_hiway
     assert_equal(
-      NYAddressor.new('2070 BC-3, Cawston, BC V0X 1C2', :CA).sns,
+      NYAddressor::Addressor.new('2070 BC-3, Cawston, BC V0X 1C2', :CA).sns,
       '2070bc3bc'
     )
   end
