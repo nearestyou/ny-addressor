@@ -14,14 +14,14 @@ module NYAddressor
 
   # Normalize a string for a given region
   def self.normalize(input, region)
-    result = input.dup.extend(AddressHelper)
+    result = input.dup.extend(AddressHelper).remove_cross_street.separate_unit
     types_to_process = %i[COUNTRY_IDENTIFIERS STATES STREET_NUMBERS STREET_DIRECTIONS STREET_LABELS UNIT_DESIGNATIONS]
     types_to_process.each do |type|
       constants(region, type).each do |full_string, abbreviation|
         result.gsub!(/\b#{full_string}\b/i, abbreviation)
       end
     end
-    result.remove_cross_street.separate_unit
+    result
   end
 
   module AddressHelper
