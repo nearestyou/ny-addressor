@@ -68,14 +68,14 @@ class TestNormalization < Minitest::Test
       'A1 - 1600 Penn Ave'.extend(NYAddressor::AddressHelper).separate_unit
     )
 
-    # assert_equal(
-    #   '#1 1600 Penn Ave',
-    #   '1-1600 Penn Ave'.extend(NYAddressor::AddressHelper).separate_unit
-    # )
+    assert_equal(
+      '#1 1600 Penn Ave',
+      '1-1600 Penn Ave'.extend(NYAddressor::AddressHelper).separate_unit
+    )
 
-    # assert_equal(
-    #   '#1 1600 Penn Ave',
-    #   '1 - 1600 Penn Ave'.extend(NYAddressor::AddressHelper).separate_unit
-    # )
+    assert_equal(
+      '#1 1600 Penn Ave',
+      '1 - 1600 Penn Ave'.extend(NYAddressor::AddressHelper).separate_unit
+    )
   end #test_unit_formats
 end

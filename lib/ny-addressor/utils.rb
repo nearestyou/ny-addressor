@@ -78,18 +78,15 @@ module NYAddressor
         "##{$1.delete('-').strip} #{$2}"
       end
 
-      # commenting this for now, as I've never seen an address like this
-      # --Cooper
-      # # Match patterns like 100-1500
-      # regex = /
-      #   \A      # Only look at first word
-      #   (\d+)   # Digit (unit number)
-      #   [\/-]   # hyphen or slash
-      #   (\d+)   # Digit (street number)
-      #   \b
-      # /x
-      # self.sub(regex, '#\1 \2').extend(AddressHelper)
-      self.extend(AddressHelper)
+      # Match patterns like 100-1500
+      regex = /
+        \A            # Only look at first word
+        (\d+)         # Digit (unit number)
+        \s*[\/-]\s*   # hyphen or slash
+        (\d+)         # Digit (street number)
+        \b
+      /x
+      self.sub(regex, '#\1 \2').extend(AddressHelper)
     end
   end
 end
