@@ -83,7 +83,7 @@ class TestFormatEquality < Minitest::Test
 
   def test_double_direction
     assert_equal(
-      NYAddressor::Addressor.new('232 N Main St N, Stillwater, MN 55082, USA'),
+      NYAddressor::Addressor.new('232 North Main St N, Stillwater, MN 55082, USA'),
       NYAddressor::Addressor.new('232 Main St N, Stillwater, MN 55082, USA')
     )
   end
