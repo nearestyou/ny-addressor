@@ -14,7 +14,7 @@ module NYAddressor
 
   # Normalize a string for a given region
   def self.normalize(input, region)
-    result = input.dup.extend(AddressHelper).remove_cross_street.separate_unit
+    result = input.dup.extend(AddressHelper).remove_description.remove_cross_street.separate_unit
     types_to_process = %i[COUNTRY_IDENTIFIERS STATES STREET_NUMBERS STREET_DIRECTIONS STREET_LABELS UNIT_DESIGNATIONS]
     types_to_process.each do |type|
       constants(region, type).each do |full_string, abbreviation|
@@ -25,6 +25,19 @@ module NYAddressor
   end
 
   module AddressHelper
+    # Whole Foods Market, 1500... -> 1500 Penn Ave
+    def remove_description
+      first_part = self.split(',').first
+      unless first_part.match(/\d+/)
+        self.sub!(/
+                  ^       # Only look at start
+                  [^,]+,  # Grab everything, except the first comma
+                  \s*     # Match any whitespace after the comma
+                 /x, '')
+      end
+      self.extend(AddressHelper)
+    end
+
     # 1505 & 1510 -> 1505
     def remove_cross_street
       self.gsub(/(\d+)\s*&\s*\d+/, '\1').extend(AddressHelper)
