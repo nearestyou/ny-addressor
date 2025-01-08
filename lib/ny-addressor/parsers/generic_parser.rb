@@ -367,12 +367,19 @@ module NYAddressor
       end
 
       def fixup!
+        fixup_no_street
+      end
+
+      def fixup_no_street
         no_street_name = get_field(AddressField::STREET_NAME).nil?
         return unless no_street_name
 
-        # Direction is street name
+        # Set the unit as the street name
+        unit = get_field(AddressField::UNIT)
+        unit.confirm(AddressField::STREET_NAME) and return if unit
+
         direction = get_field(AddressField::STREET_DIRECTION)
-        direction.confirm(AddressField::STREET_NAME) if no_street_name && direction && direction.from_all.include?(AddressField::STREET_NAME)
+        direction.confirm(AddressField::STREET_NAME) if direction && direction.from_all.include?(AddressField::STREET_NAME)
       end
     end
   end
