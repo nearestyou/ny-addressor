@@ -1,6 +1,7 @@
 module NYAddressor
 
   def self.string_inclusion(str1, str2, numeric_failure = false)
+    return 1 if str1.empty? && str2.empty?
     return 0 if str1.empty? || str2.empty?
     strs = [ str1.downcase.gsub(/[^a-z0-9]/, ''), str2.downcase.gsub(/[^a-z0-9]/, '') ].sort_by{|str| str.length}
     case
