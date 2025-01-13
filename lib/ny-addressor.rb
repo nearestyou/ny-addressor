@@ -2,6 +2,7 @@
 require 'digest'
 require_relative 'extensions/string'
 require_relative 'ny-addressor/constants'
+require_relative 'ny-addressor/utils'
 require_relative 'ny-addressor/address_field'
 require_relative 'ny-addressor/parsers/generic_parser'
 
@@ -95,6 +96,32 @@ module NYAddressor
       })
     end
 
+    def compare(other)
+      return 0 unless other.is_a?(Addressor)
+
+      fields_to_compare = [
+        { name: AddressField::STREET_NUMBER, weight: 1.0 },
+        { name: AddressField::STREET_NAME, weight: 1.0 },
+        { name: AddressField::STATE, weight: 1.0 },
+        { name: AddressField::CITY, weight: 0.5 },
+        { name: AddressField::UNIT, weight: 0.25 },
+        { name: AddressField::POSTAL, weight: 0.8 },
+      ]
+
+      score = 0
+      weight = 0
+
+      fields_to_compare.each do |field|
+        self_field = self.parser.get_field(field[:name])&.text.to_s.strip.downcase
+        other_field = other.parser.get_field(field[:name])&.text.to_s.strip.downcase
+        match_score = self_field == other_field ? 1 : NYAddressor::string_inclusion(self_field, other_field, true)
+        score += match_score * field[:weight]
+        weight += field[:weight]
+      end
+
+      score / weight
+    end
+
     private
 
     def _hash input
@@ -104,42 +131,3 @@ module NYAddressor
 
   end
 end
-
-# # Addressor
-# class NYAddressor
-#   attr_reader :sep_map, :input, :parts, :confirmed
-#
-#   def initialize(input)
-#     reset(input)
-#   end
-#
-#   def self.determine_state(state_name, postal_code = nil)
-#     AddressorUtils.determine_state(state_name, postal_code)
-#   end
-#
-#   def self.string_inclusion(str1, str2, numeric_failure: false)
-#     AddressorUtils.string_inclusion(str1, str2, numeric_failure)
-#   end
-#
-#   def self.comp(*args)
-#     AddressorUtils.comp(*args)
-#   end
-#
-#   def comp(nya, comparison_keys = %i[street_number street_name postal])
-#     AddressorUtils.comp(@parts, nya.parts, comparison_keys)
-#   end
-#
-#   def construct(opts = {})
-#     return nil unless @parts
-#     return nil unless @parts.slice(:street_number, :street_name, :state).keys.length == 3
-#
-#     opts = { include_unit: true, include_label: true, include_dir: true, include_postal: true }.merge(opts)
-#     addr = "#{@parts[:street_number]}#{@parts[:street_name]}#{@parts[:city]}#{@parts[:state]}"
-#     return nil if addr.length < 2
-#
-#     addr << @parts[:unit].to_s if opts[:include_unit]
-#     addr << @parts[:street_label].to_s if opts[:include_label]
-#     addr << @parts[:street_direction].to_s if opts[:include_dir]
-#     addr << (@parts[:postal] || '99999').to_s[0..4] if opts[:include_postal]
-#     addr.standardize.unrepeat
-#   end
