@@ -5,11 +5,12 @@ require_relative 'ny-addressor/constants'
 require_relative 'ny-addressor/utils'
 require_relative 'ny-addressor/address_field'
 require_relative 'ny-addressor/parsers/generic_parser'
+require_relative 'ny-addressor/parsers/german_parser'
 
 module NYAddressor
 
   class Addressor
-    attr_reader :parser
+    attr_reader :parser, :region
     def self.get_capabilities
       {:AUTO => "Auto-detect"}.merge(Constants::COUNTRIES)
     end
@@ -50,8 +51,13 @@ module NYAddressor
       @input = full_address
       @region = country == :AUTO ? Addressor::detect_region(full_address) : country
       return unless @region
-      @parser = NYAddressor::Parsers::GenericParser.new(@input, @region)
-      # puts debug
+
+      @parser = case @region
+                when :DE
+                  NYAddressor::Parsers::GermanParser.new(@input, @region)
+                else
+                  NYAddressor::Parsers::GenericParser.new(@input, @region)
+                end
     end
 
     def ==(other)

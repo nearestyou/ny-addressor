@@ -82,7 +82,8 @@ module NYAddressor
       :CA => "Canada",
       :UK => "United Kingdom",
       :AU => "Australia",
-      :CB => "Carribean Islands"
+      :CB => "Carribean Islands",
+      :DE => "Germany"
     }.freeze
 
     STREET_NUMBERS = { }.freeze
@@ -94,6 +95,7 @@ module NYAddressor
     UNIT_DESIGNATIONS = { }.freeze
 
     STATES = {
+      :DE => {},
       :US => {
         'alabama' => 'al',
         'alaska' => 'ak',
@@ -221,7 +223,10 @@ module NYAddressor
       UK: /[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}/i,
 
       # 2000
-      AU: /\d{4}/i
+      AU: /\d{4}/i,
+
+      # 52064
+      DE: /\d{5}/i,
     }.freeze
 
     COUNTRY_IDENTIFIERS = {
@@ -232,7 +237,8 @@ module NYAddressor
       },
       CA: { "canada" => "ca" },
       UK: { "united kingdom" => "uk" },
-      AU: { "australia" => "au" }
+      AU: { "australia" => "au" },
+      DE: { "germany" => "de" }
     }.freeze
   end
 end
