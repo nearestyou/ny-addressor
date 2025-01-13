@@ -3,6 +3,10 @@ require_relative '../lib/ny-addressor'
 require 'byebug'
 
 class TestRegions < Minitest::Test
+  def setup
+    @fields = NYAddressor::AddressField
+  end
+
   def test_wisconsin_addresses
     assert NYAddressor::Addressor.new('W204N11912 Goldendale Rd,AURORA,OR,97002').sns == 'w204n11912goldendaleor'
     assert NYAddressor::Addressor.new('W204 N11912 Goldendale Rd,AURORA,OR,97002').sns == 'w204n11912goldendaleor'
@@ -17,8 +21,15 @@ class TestRegions < Minitest::Test
     zip = 'H0H 0H0'
     zip_no_space = zip.delete(' ')
     base_address = '1500 Pennsylvania Ave, Washington, ON '
+
+    addr = NYAddressor::Addressor.new(base_address + zip, :CA)
     assert_equal(
-      NYAddressor::Addressor.new(base_address + zip, :CA),
+      zip_no_space.downcase,
+      addr.parser.get_field(@fields::POSTAL).text
+    )
+
+    assert_equal(
+      addr,
       NYAddressor::Addressor.new(base_address + zip_no_space, :CA)
     )
   end

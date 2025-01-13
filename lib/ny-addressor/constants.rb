@@ -211,10 +211,17 @@ module NYAddressor
     }.freeze
 
     POSTAL_FORMATS = {
-      US: /\d{5}(-\d{4})?/i,                       # 12345 or 12345-6789
-      CA: /[A-Z]\d[A-Z] \d[A-Z]\d/i,               # A1B 2C3
-      UK: /[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}/i,      # SW1A 1AA
-      AU: /\d{4}/i                                 # 2000
+      # 12345 or 12345-6789
+      US: /\d{5}(-\d{4})?/i,
+
+      # A1B 2C3
+      CA: /[A-Z]\d[A-Z]\s?\d[A-Z]\d/i,
+
+      # SW1A 2BC
+      UK: /[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}/i,
+
+      # 2000
+      AU: /\d{4}/i
     }.freeze
 
     COUNTRY_IDENTIFIERS = {

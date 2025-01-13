@@ -8,13 +8,14 @@ require_relative 'ny-addressor/parsers/generic_parser'
 module NYAddressor
 
   class Addressor
+    attr_reader :parser
     def self.get_capabilities
       {:AUTO => "Auto-detect"}.merge(Constants::COUNTRIES)
     end
 
     def initialize(full_address, country = :AUTO)
       @input = full_address
-      @region = country
+      @region = country == :AUTO ? :US : country # TEMPORARY
       return if full_address.nil? || full_address.length < 4
       @parser = NYAddressor::Parsers::GenericParser.new(@input, @region)
       # puts debug

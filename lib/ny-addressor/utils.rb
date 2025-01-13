@@ -14,7 +14,7 @@ module NYAddressor
 
   # Normalize a string for a given region
   def self.normalize(input, region)
-    result = input.dup.extend(AddressHelper).remove_description.remove_cross_street.separate_unit
+    result = input.dup.extend(AddressHelper).remove_description.remove_cross_street.separate_unit.merge_postal(region)
     types_to_process = %i[COUNTRY_IDENTIFIERS STATES STREET_NUMBERS STREET_DIRECTIONS STREET_LABELS UNIT_DESIGNATIONS]
     types_to_process.each do |type|
       constants(region, type).each do |full_string, abbreviation|
@@ -87,6 +87,15 @@ module NYAddressor
         \b
       /x
       self.sub(regex, '#\1 \2').extend(AddressHelper)
+    end
+
+    # A1B 2C3 -> a1b2c3
+    def merge_postal region
+      regex = NYAddressor::Constants::POSTAL_FORMATS[region]
+      self.gsub!(regex) do |match|
+        match.gsub(/\s+/, '')
+      end
+      self.extend(AddressHelper)
     end
   end
 end
