@@ -8,8 +8,8 @@ class TestRegions < Minitest::Test
   end
 
   def test_wisconsin_addresses
-    assert NYAddressor::Addressor.new('W204N11912 Goldendale Rd,AURORA,OR,97002').sns == 'w204n11912goldendaleor'
-    assert NYAddressor::Addressor.new('W204 N11912 Goldendale Rd,AURORA,OR,97002').sns == 'w204n11912goldendaleor'
+    assert NYAddressor::Addressor.new('W204N11912 Goldendale Rd,AURORA,Wi,97002').sns == 'w204n11912goldendalewi'
+    assert NYAddressor::Addressor.new('W204 N11912 Goldendale Rd,AURORA,Wi,97002').sns == 'w204n11912goldendalewi'
   end
 
   def test_puerto_rican

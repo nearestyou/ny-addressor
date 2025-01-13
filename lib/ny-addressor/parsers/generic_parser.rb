@@ -368,6 +368,7 @@ module NYAddressor
 
       def fixup!
         fixup_no_street
+        fixup_wisconsin
       end
 
       def fixup_no_street
@@ -380,6 +381,26 @@ module NYAddressor
 
         direction = get_field(AddressField::STREET_DIRECTION)
         direction.confirm(AddressField::STREET_NAME) if direction && direction.from_all.include?(AddressField::STREET_NAME)
+      end
+
+      # fixup W204 picking up as unit in W204 N11912 street number
+      def fixup_wisconsin
+        return unless @region == :US && get_field(AddressField::STATE)&.text == 'wi'
+
+        # unit must be present
+        unit = get_field(AddressField::UNIT)
+        return unless unit
+
+        # unit must be touching street number
+        street_num = get_field(AddressField::STREET_NUMBER)
+        return unless street_num && (unit.position - street_num.position).abs == 1
+
+        # both unit and street number must match the correct form
+        regex = /\A[WENS]\d{3,5}\z/i
+        return unless street_num.text.match?(regex) && unit.text.match?(regex)
+
+        unit.confirm(nil)
+        street_num.set_text "#{unit.text}#{street_num.text}"
       end
     end
   end

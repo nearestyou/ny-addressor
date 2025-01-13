@@ -48,12 +48,14 @@ module NYAddressor
         include_unit: true,
         include_label: true,
         include_dir: true,
+        include_city: true,
         include_postal: true,
         include_country: false,
         overwrite_postal: false
       }.merge(opts)
 
-      fields = required_fields + [AddressField::CITY]
+      fields = required_fields
+      fields << AddressField::CITY if opts[:include_city]
       fields << AddressField::UNIT if opts[:include_unit]
       fields << AddressField::STREET_LABEL if opts[:include_label]
       fields << AddressField::STREET_DIRECTION if opts[:include_dir]
@@ -87,6 +89,7 @@ module NYAddressor
         include_unit: false,
         include_label: false,
         include_dir: false,
+        include_city: false,
         include_postal: false,
         include_country: false
       })
