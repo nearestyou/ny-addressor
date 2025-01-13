@@ -143,8 +143,8 @@ class TestFormatEquality < Minitest::Test
   end
 
   def test_error
-    assert_nil NYAddressor::Addressor.new(nil).hash
-    assert_nil NYAddressor::Addressor.new('sad;lkjfasdkj;fjaks;df').hash
+    assert_nil NYAddressor::Addressor.new(nil, :US).hash
+    assert_nil NYAddressor::Addressor.new('sad;lkjfasdkj;fjaks;df', :US).hash
   end
 
   def test_zip_extension
@@ -232,8 +232,8 @@ class TestFormatEquality < Minitest::Test
     zipless = '1600 Pennsylvania Ave, Washington, DC'
     zip = zipless + ' 55555'
     assert_equal(
-      NYAddressor::Addressor.new(zipless).hash99999,
-      NYAddressor::Addressor.new(zip).hash99999
+      NYAddressor::Addressor.new(zipless, :US).hash99999,
+      NYAddressor::Addressor.new(zip, :US).hash99999
     )
   end
 

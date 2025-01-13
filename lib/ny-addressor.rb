@@ -14,10 +14,24 @@ module NYAddressor
       {:AUTO => "Auto-detect"}.merge(Constants::COUNTRIES)
     end
 
+    def self.detect_region full_address
+      formats = NYAddressor::Constants::POSTAL_FORMATS
+      matches = []
+
+      formats.each do |region, regex|
+        match = full_address.match(regex)
+        matches << { name: region, position: match.begin(0) } if match
+      end
+
+      return if matches.empty? # default to US
+
+      matches.max_by { |match| match[:position] }[:name]
+    end
+
     def initialize(full_address, country = :AUTO)
-      @input = full_address
-      @region = country == :AUTO ? :US : country # TEMPORARY
       return if full_address.nil? || full_address.length < 4
+      @input = full_address
+      @region = country == :AUTO ? Addressor::detect_region(full_address) : country
       @parser = NYAddressor::Parsers::GenericParser.new(@input, @region)
       # puts debug
     end

@@ -45,4 +45,10 @@ class TestRegions < Minitest::Test
     assert !NYAddressor::Addressor.new('234 West George Street (West Campbell Street), Glasgow, Glasgow City, Scotland G2 4QY, United Kingdom', :UK).hash.nil?
   end
 
+  def test_region_detection
+    assert_equal NYAddressor::Addressor.detect_region("123 Penn Ave, Washington, DC, 20500"), :US
+    assert_equal NYAddressor::Addressor.detect_region("123 Penn Ave, Montreal, QC, H2Y 2R2"), :CA
+    assert_equal NYAddressor::Addressor.detect_region("123 Penn Ave, London, SW1A 2AA"), :UK
+    assert_equal NYAddressor::Addressor.detect_region("123 Penn Ave, Sydney, NSW, 2000"), :AU
+  end
 end
