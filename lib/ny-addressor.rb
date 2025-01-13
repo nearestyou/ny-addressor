@@ -11,16 +11,22 @@ module NYAddressor
 
   class Addressor
     attr_reader :parser, :region
+
+    # @return [Hash] countries with supported address parsers
     def self.get_capabilities
       {:AUTO => "Auto-detect"}.merge(Constants::COUNTRIES)
     end
 
-    def self.detect_region full_address
+    # Detects which region an address is from based on it's postal and state information
+    #
+    # @param address [String] the full address
+    # @return [Symbol, nil] detected region or nil if not found
+    def self.detect_region address
       formats = NYAddressor::Constants::POSTAL_FORMATS
       matches = []
 
       formats.each do |region, regex|
-        match = full_address.match(regex)
+        match = address.match(regex)
         matches << { name: region, position: match.begin(0) } if match
       end
 
@@ -28,12 +34,15 @@ module NYAddressor
 
       possible_regions = matches.sort_by { |match| match[:position] }.reverse.map { |m| m[:name] }
       possible_regions.each do |region|
-        return region if state_matches_region?(full_address, region)
+        return region if state_matches_region?(address, region)
       end
 
       nil
     end
 
+    # @param address [String] address to check
+    # @param region [Symbol] Region to check against
+    # @return [Boolean] `true` if the address contains a state found in input region
     def self.state_matches_region?(address, region)
       states = NYAddressor::Constants::STATES[region]
       return false unless states
@@ -46,6 +55,8 @@ module NYAddressor
       false
     end
 
+    # @param full_address [String] A full address
+    # @param country [Symbol] The country code, or `:AUTO` for auto-detection
     def initialize(full_address, country = :AUTO)
       return if full_address.nil? || full_address.length < 4
       @input = full_address
@@ -60,25 +71,36 @@ module NYAddressor
                 end
     end
 
+    # Compares two Addressor objects for equality based on their hash
+    #
+    # @param other [Addressor]
+    # @return [Boolean] `true` if they match
     def ==(other)
       return false unless other.is_a?(Addressor)
       self.hash == other.hash
     end
 
+    # @return [String] normalized address string
     def to_s
       construct
     end
 
+    # @return [String] a defailted representation of the addressor instance
     def inspect
       "#<NYAddressor::Addressor(#{@input}, #{@region}): #{to_s}"
     end
 
+    # @return [String] formatted debugging information
     def debug
       output = inspect
       @parser.parts.flatten.each {|part| output << "\n#{part.debug}" }
       output
     end
 
+    # Constructs a standardized address string based on parsed fields
+    #
+    # @param opts [Hash] Options for including/excluding fields
+    # @return [String, nil] The constructed address
     def construct(opts = {})
       required_fields = [AddressField::STREET_NUMBER, AddressField::STREET_NAME, AddressField::STATE]
       return nil if required_fields.any? { |field| @parser&.get_field(field).nil? }
@@ -109,20 +131,22 @@ module NYAddressor
       addr_str.standardize
     end
 
+    # @return [String, nil] The hash value
     def hash
       _hash(construct)
     end
 
+    # @return [String, nil] The hash value, not taking unit field into consideration
     def unitless_hash
       _hash(construct({ include_unit: false }))
     end
 
-    # for searching by missing/erroneous ZIP
+    # @return [String, nil] The hash value, not taking postal code into consideration
     def hash99999
       _hash(construct({ overwrite_postal: true }))
     end
 
-    # Street num/name + state
+    # @return [String, nil] Street number, name, and state
     def sns
       construct({
         include_unit: false,
@@ -134,6 +158,10 @@ module NYAddressor
       })
     end
 
+    # Compares two Addressor instances for similarity
+    #
+    # @param other [Addressor] Another instance to compare to
+    # @return [Float] A score between 0 and 1 representing similarity
     def compare(other)
       return 0 unless other.is_a?(Addressor)
       return 0 unless other.parser
