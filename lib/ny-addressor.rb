@@ -23,15 +23,33 @@ module NYAddressor
         matches << { name: region, position: match.begin(0) } if match
       end
 
-      return if matches.empty? # default to US
+      return if matches.empty?
 
-      matches.max_by { |match| match[:position] }[:name]
+      possible_regions = matches.sort_by { |match| match[:position] }.reverse.map { |m| m[:name] }
+      possible_regions.each do |region|
+        return region if state_matches_region?(full_address, region)
+      end
+
+      nil
+    end
+
+    def self.state_matches_region?(address, region)
+      states = NYAddressor::Constants::STATES[region]
+      return false unless states
+      address = address.downcase
+
+      states.each do |name, abbr|
+        regex = /\b(#{Regexp.escape(name)}|#{Regexp.escape(abbr)})\b/
+        return true if address.match?(regex)
+      end
+      false
     end
 
     def initialize(full_address, country = :AUTO)
       return if full_address.nil? || full_address.length < 4
       @input = full_address
       @region = country == :AUTO ? Addressor::detect_region(full_address) : country
+      return unless @region
       @parser = NYAddressor::Parsers::GenericParser.new(@input, @region)
       # puts debug
     end
@@ -112,6 +130,8 @@ module NYAddressor
 
     def compare(other)
       return 0 unless other.is_a?(Addressor)
+      return 0 unless other.parser
+      return 0 unless self.parser
 
       fields_to_compare = [
         { name: AddressField::STREET_NUMBER, weight: 1.0 },
