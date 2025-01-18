@@ -208,6 +208,22 @@ module NYAddressor
       score / weight
     end
 
+    # @deprecated Please use {#compare} instead
+    def comp(other, comparison_keys = [:street_number, :street_name, :postal])
+      warn "[DEPRECATION] `NYAddressor.comp` is deprecated. Please use `compare` instead"
+      these_parts = parts
+      those_parts = other.parts
+      return 0 if these_parts.nil?
+      return 0 if those_parts.nil?
+      sims = 0
+
+      comparison_keys.each do |k|
+        sims += 1 if these_parts[k] == those_parts[k]
+      end
+
+      sims
+    end
+
     private
 
     def _hash input
