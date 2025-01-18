@@ -28,24 +28,6 @@ module NYAddressor
         set_options
       end
 
-      # @param field [AddressField] which field to look for (ex :street_name)
-      # @return [Array<AddressPart>]
-      def potential(field)
-        @parts.flatten.select do |part|
-          part.confirmed.nil? && part.from_all.include?(field)
-        end
-      end
-
-      # @param field [AddressField] which field to look for
-      # @param after [Array<AddressField>] result comes after these fields
-      # @param before [Array<AddressField>] result comes before these fields
-      # @return [Array<AddressField>]
-      def potential_between(field, after=[], before=[])
-        min = last_instance_of(after)
-        max = first_instance_of(before)
-        potential(field).select { |part| part.position > min && part.position < max }
-      end
-
       # @param field [AddressField] which `confirmed` field to get
       # @param all [Boolean] Whether to return all matching parts or not
       # @return [AddressPart, nil] or [Array<AddressPart>]
@@ -65,6 +47,26 @@ module NYAddressor
         [-1, *positions].compact.max
       end
 
+      private
+
+      # @param field [AddressField] which field to look for (ex :street_name)
+      # @return [Array<AddressPart>]
+      def potential(field)
+        @parts.flatten.select do |part|
+          part.confirmed.nil? && part.from_all.include?(field)
+        end
+      end
+
+      # @param field [AddressField] which field to look for
+      # @param after [Array<AddressField>] result comes after these fields
+      # @param before [Array<AddressField>] result comes before these fields
+      # @return [Array<AddressField>]
+      def potential_between(field, after=[], before=[])
+        min = last_instance_of(after)
+        max = first_instance_of(before)
+        potential(field).select { |part| part.position > min && part.position < max }
+      end
+
       # Get the next part
       # @param part [AddressPart]
       # @return [AddressPart, nil]
@@ -75,7 +77,24 @@ module NYAddressor
         end
       end
 
-      private
+      # Returns a subarray of consecutive parts
+      # meaning the parts come one after eachother
+      # and are within the same comma group
+      #
+      # @param parts [Array<AddressPart>] super array
+      # @return [Array<AddressPart>]
+      def consecutive parts
+        return [] unless parts&.any?
+
+        comma = parts.first.group
+        result = [parts.first]
+        parts[1..].each do |part|
+          break if part.group != comma || part.position != result.last.position + 1
+          result << part
+        end
+
+        result
+      end
 
       def set_options
         # Determine what a part likely is based off it's position
@@ -248,7 +267,7 @@ module NYAddressor
         confirm_street_direction
 
         # If we know the number and a label or direction
-        # the street name will be whatever remains
+        # the street name will be whatever remains in the comma group
         confirm_street_name
 
         # A unit will be in it's own comma group
@@ -340,7 +359,9 @@ module NYAddressor
         (label_touching_number? ? after_fields : before_fields) << AddressField::STREET_LABEL
 
         parts = potential_between(AddressField::STREET_NAME, after_fields, before_fields)
-        parts&.first&.confirm(AddressField::STREET_NAME)
+        return unless parts
+
+        consecutive(parts).each { |part| part.confirm(AddressField::STREET_NAME) }
       end
 
       # Address is of the form 123 North Main St
@@ -365,7 +386,9 @@ module NYAddressor
         known_after = [AddressField::STREET_NAME, AddressField::STREET_LABEL, AddressField::STREET_DIRECTION, AddressField::UNIT]
         known_before = [AddressField::STATE, AddressField::POSTAL, AddressField::COUNTRY]
         parts = potential_between(AddressField::CITY, known_after, known_before)
-        parts&.first&.confirm(AddressField::CITY)
+        return unless parts
+
+        consecutive(parts).each { |part| part.confirm(AddressField::CITY) }
       end
 
       def fixup!

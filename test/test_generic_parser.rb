@@ -67,4 +67,11 @@ class TestGenericParser < Minitest::Test
     assert_equal "main", @parser.get_field(@fields::STREET_NAME)&.text
     assert_equal "springfield", @parser.get_field(@fields::CITY)&.text
   end
+
+  def test_multiple_fields
+    address = "123 New Hope St N, New Hope, IL 62704"
+    parser = NYAddressor::Parsers::GenericParser.new(address, :US)
+    assert_equal "new hope", parser.get_field(@fields::STREET_NAME, all: true).map(&:text).join(" ")
+    assert_equal "new hope", parser.get_field(@fields::CITY, all: true).map(&:text).join(" ")
+  end
 end

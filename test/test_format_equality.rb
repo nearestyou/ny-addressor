@@ -175,8 +175,8 @@ class TestFormatEquality < Minitest::Test
 
   def test_missing_unit_designation
     assert_equal(
-      NYAddressor::Addressor.new('1600 Pennsylvania 700, Minneapolis, MN 55555'),
-      NYAddressor::Addressor.new('1600 Pennsylvania #700, Minneapolis, MN 55555'),
+      NYAddressor::Addressor.new('1600 Pennsylvania Ave 700, Minneapolis, MN 55555'),
+      NYAddressor::Addressor.new('1600 Pennsylvania Ave #700, Minneapolis, MN 55555'),
     )
   end
 

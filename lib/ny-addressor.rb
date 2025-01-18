@@ -135,7 +135,12 @@ module NYAddressor
       fields << AddressField::STREET_DIRECTION if opts[:include_dir]
       fields << AddressField::COUNTRY if opts[:include_country]
 
-      addr_str = fields.map {|field| @parser.get_field(field)}.compact.map(&:to_s).join
+      addr_str = fields.map do |field|
+        parts = @parser.get_field(field, all: true)
+        next if parts.empty?
+
+        parts.map(&:text)
+      end.flatten.compact.join
 
       if opts[:include_postal]
         addr_str << (opts[:overwrite_postal] ? '99999' : @parser.get_field(AddressField::POSTAL).to_s)[0..4]
