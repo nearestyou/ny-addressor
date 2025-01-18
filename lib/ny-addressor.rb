@@ -9,6 +9,10 @@ require_relative 'ny-addressor/parsers/german_parser'
 
 module NYAddressor
 
+  def self.new(*args)
+    Addressor.new(*args)
+  end
+
   class Addressor
     attr_reader :parser, :region
 
