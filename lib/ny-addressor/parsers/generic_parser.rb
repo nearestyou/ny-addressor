@@ -47,9 +47,11 @@ module NYAddressor
       end
 
       # @param field [AddressField] which `confirmed` field to get
-      # @return [AddressPart, nil]
-      def get_field(field)
-        @parts.flatten.find { |part| part.confirmed == field }
+      # @param all [Boolean] Whether to return all matching parts or not
+      # @return [AddressPart, nil] or [Array<AddressPart>]
+      def get_field(field, all: false)
+        matches = @parts.flatten.select { |part| part.confirmed == field }
+        all ? matches : matches.first
       end
 
       # @param fields [Array<AddressField>] List of address fields

@@ -101,6 +101,15 @@ module NYAddressor
       output
     end
 
+    def parts
+      AddressField.constants.each_with_object({}) do |field, result|
+        key = AddressField.const_get(field)
+        values = @parser.get_field(key, all: true)
+        value = values.map(&:text).join(" ")
+        result[key] = value unless value.empty?
+      end
+    end
+
     # Constructs a standardized address string based on parsed fields
     #
     # @param opts [Hash] Options for including/excluding fields
