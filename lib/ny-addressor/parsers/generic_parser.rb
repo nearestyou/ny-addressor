@@ -125,7 +125,7 @@ module NYAddressor
         when 1
           [f::STREET_NUMBER, f::STREET_NAME, f::STREET_DIRECTION, f::STREET_LABEL, f::UNIT]
         when 2
-          [f::STREET_NUMBER, f::STREET_NAME, f::STREET_LABEL, f::UNIT, f::STREET_DIRECTION]
+          [f::STREET_NUMBER, f::STREET_NAME, f::STREET_LABEL, f::UNIT, f::STREET_DIRECTION, f::CITY]
         when 3
           [f::STREET_NAME, f::STREET_LABEL, f::UNIT, f::STREET_DIRECTION, f::CITY, f::STATE]
         when num_parts - 4

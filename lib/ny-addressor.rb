@@ -27,7 +27,9 @@ module NYAddressor
       return if full_address.nil? || full_address.length < 4
       @input = full_address
       @region = country == :AUTO ? NYAddressor::detect_region(full_address) : country
-      return unless @region
+      # Assume US if no zip is entered
+      @region ||= :US if NYAddressor::state_matches_region?(full_address, :US)
+      return nil unless @region
 
       @parser = case @region
                 when :DE
@@ -58,6 +60,7 @@ module NYAddressor
 
     # @return [String] formatted debugging information
     def debug
+      return unless @parser
       output = inspect
       @parser.parts.flatten.each {|part| output << "\n#{part.debug}" }
       output
