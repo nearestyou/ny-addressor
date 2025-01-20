@@ -25,7 +25,11 @@ class TestRegions < Minitest::Test
   end
 
   def test_uk_postal_format
-    assert_match @postals[:UK], "SW1A 2BC"
+    assert_match @postals[:UK], "SW1W 0NY"
+    assert_match @postals[:UK], "PO16 7GZ"
+    assert_match @postals[:UK], "GU16 7HF"
+    assert_match @postals[:UK], "L1 8JQ"
+
     refute_match @postals[:UK], "A1B 2C3"
     refute_match @postals[:UK], "12345"
   end

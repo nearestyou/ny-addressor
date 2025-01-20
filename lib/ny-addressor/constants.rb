@@ -220,7 +220,9 @@ module NYAddressor
       CA: /\b[A-Z]\d[A-Z]\s?\d[A-Z]\d\b/i,
 
       # SW1A 2BC
-      UK: /\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/i,
+      # The first part is 2-4 in length, starts with letter, contains at least one number
+      # second part is digit, letter, letter
+      UK: /\b[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}\b/i,
 
       # 2000
       AU: /\b\d{4}\b/i,
