@@ -6,6 +6,7 @@ require_relative 'ny-addressor/utils'
 require_relative 'ny-addressor/address_field'
 require_relative 'ny-addressor/parsers/generic_parser'
 require_relative 'ny-addressor/parsers/german_parser'
+require_relative 'ny-addressor/parsers/caribbean_parser'
 
 module NYAddressor
 
@@ -32,6 +33,8 @@ module NYAddressor
       @parser = case @region
                 when :DE
                   NYAddressor::Parsers::GermanParser.new(@input, @region)
+                when :CB
+                  NYAddressor::Parsers::CaribbeanParser.new(@input, @region)
                 else
                   NYAddressor::Parsers::GenericParser.new(@input, @region)
                 end

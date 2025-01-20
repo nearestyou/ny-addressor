@@ -15,17 +15,7 @@ module NYAddressor
         @region = region
         # must unrepeat first, otherwise new york, NY will be overwritten
         @normalized = NYAddressor::normalize(@raw_input.unrepeat, @region).clean
-
-        full_position = -1
-        # Splits the address into comma-separated groups
-        # @return [Array<Array<AddressPart>>] An array of address part arrays,
-        # separated by comma groups
-        @parts = @normalized.split(',').map.with_index do |group, group_index|
-          group.split(' ').map.with_index do |word, group_position|
-            full_position += 1
-            AddressPart.new(word, full_position, group_index, group_position)
-          end
-        end
+        split # sets @parts
         set_options
       end
 
@@ -49,6 +39,20 @@ module NYAddressor
       end
 
       private
+
+      # split the address into multiple parts
+      def split
+        full_position = -1
+        # Splits the address into comma-separated groups
+        # @return [Array<Array<AddressPart>>] An array of address part arrays,
+        # separated by comma groups
+        @parts = @normalized.split(',').map.with_index do |group, group_index|
+          group.split(' ').map.with_index do |word, group_position|
+            full_position += 1
+            AddressPart.new(word, full_position, group_index, group_position)
+          end
+        end
+      end
 
       # @param field [AddressField] which field to look for (ex :street_name)
       # @return [Array<AddressPart>]

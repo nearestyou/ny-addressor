@@ -11,8 +11,10 @@ inp = '161 Victoria St N, Saint Paul, MN 55104, United States'
 inp = '1102 Larpenteur, Saint Paul, MN, United States'
 inp = '4051 Broadway, New York, NY 10032, United States'
 inp = '2656 Parkway, Pigeon Forge, TN 37863, United States'
+inp = '4127 6 Street NE, Calgary AB T2E, Canada'
+inp = '128 Middle Road, Warwick, Bermuda WK04, United States'
 
-nya = NYAddressor::Addressor.new(inp)
+nya = NYAddressor::Addressor.new(inp, :CB)
 puts nya.debug
 puts nya.sns
 puts nya.construct

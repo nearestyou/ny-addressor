@@ -86,14 +86,6 @@ module NYAddressor
       :DE => "Germany"
     }.freeze
 
-    STREET_NUMBERS = { }.freeze
-
-    STREET_DIRECTIONS = { }.freeze
-
-    STREET_LABELS = { }.freeze
-
-    UNIT_DESIGNATIONS = { }.freeze
-
     STATES = {
       :DE => {},
       :US => {
@@ -230,6 +222,9 @@ module NYAddressor
 
       # 52064
       DE: /\b\d{5}\b/i,
+
+      # Match nothing
+      CB: /^$/,
     }.freeze
 
     COUNTRY_IDENTIFIERS = {
@@ -241,7 +236,8 @@ module NYAddressor
       CA: { "canada" => "ca" },
       UK: { "united kingdom" => "uk" },
       AU: { "australia" => "au" },
-      DE: { "germany" => "de" }
+      DE: { "germany" => "de" },
+      CB: STATES[:CB]
     }.freeze
   end
 end
