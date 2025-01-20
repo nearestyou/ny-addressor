@@ -406,7 +406,10 @@ module NYAddressor
         unit.confirm(AddressField::STREET_NAME) and return if unit
 
         direction = get_field(AddressField::STREET_DIRECTION)
-        direction.confirm(AddressField::STREET_NAME) if direction && direction.from_all.include?(AddressField::STREET_NAME)
+        direction.confirm(AddressField::STREET_NAME) and return if direction && direction.from_all.include?(AddressField::STREET_NAME)
+
+        label = get_field(AddressField::STREET_LABEL)
+        label.confirm(AddressField::STREET_NAME) and return if label && label.from_all.include?(AddressField::STREET_NAME)
       end
 
       # fixup W204 picking up as unit in W204 N11912 street number

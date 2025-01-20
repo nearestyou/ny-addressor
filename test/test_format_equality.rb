@@ -96,6 +96,7 @@ class TestFormatEquality < Minitest::Test
 
   def test_label_as_street
     assert !NYAddressor::Addressor.new('260 Court St Unit 6, Middlebury, VT 05753, USA').hash.nil?
+    assert !NYAddressor::Addressor.new('2656 Parkway, Pigeon Forge, TN 37863, United States').hash.nil?
   end
 
   def test_number_as_street

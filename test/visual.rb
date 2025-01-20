@@ -10,6 +10,7 @@ inp = 'E-9 Av. Luis Muñoz Marín, Caguas, 00725, Puerto Rico'
 inp = '161 Victoria St N, Saint Paul, MN 55104, United States'
 inp = '1102 Larpenteur, Saint Paul, MN, United States'
 inp = '4051 Broadway, New York, NY 10032, United States'
+inp = '2656 Parkway, Pigeon Forge, TN 37863, United States'
 
 nya = NYAddressor::Addressor.new(inp)
 puts nya.debug
