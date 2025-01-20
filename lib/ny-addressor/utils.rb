@@ -55,7 +55,7 @@ module NYAddressor
         result.gsub!(/\b#{full_string}\b/i, abbreviation)
       end
     end
-    result
+    result.gsub('saint', 'st')
   end
 
     # Detects which region an address is from based on it's postal and state information
