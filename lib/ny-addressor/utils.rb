@@ -95,6 +95,30 @@ module NYAddressor
       false
     end
 
+    # Detects region based on country identifiers found in address string
+    # If multiple regions found, returns last found identifier
+    #
+    # @param address [String] the address string to search
+    # @return [Symbol, nil] The country code for the region
+    def self.detect_region_from_address(address)
+      address = address.to_s.downcase
+      identifiers = NYAddressor::Constants::COUNTRY_IDENTIFIERS
+      matches = []
+
+      identifiers.each do |region, map|
+        map.each do |full_string, abbrev|
+          [full_string, abbrev].each do |identifier|
+            position = address.rindex(identifier)
+            matches << { name: region, position: position } if position
+          end
+        end
+      end
+
+      return if matches.empty?
+
+      matches.sort_by { |match| match[:position] }.last[:name]
+    end
+
   module AddressHelper
     # Whole Foods Market, 1500... -> 1500 Penn Ave
     def remove_description
