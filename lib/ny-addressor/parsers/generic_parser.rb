@@ -13,7 +13,8 @@ module NYAddressor
       def initialize(address, region)
         @raw_input = address.downcase
         @region = region
-        @normalized = NYAddressor::normalize(@raw_input, @region).clean.unrepeat
+        # must unrepeat first, otherwise new york, NY will be overwritten
+        @normalized = NYAddressor::normalize(@raw_input.unrepeat, @region).clean
 
         full_position = -1
         # Splits the address into comma-separated groups

@@ -116,6 +116,8 @@ class TestFormatEquality < Minitest::Test
       base,
       NYAddressor::Addressor.new('1600 Pennsylvania Ave, Washington, DC, DC 20500')
     )
+
+    assert(!NYAddressor::Addressor.new('4051 Broadway, New York, NY 10032, United States').hash.nil?)
   end
 
   def test_double_comma
@@ -237,11 +239,11 @@ class TestFormatEquality < Minitest::Test
     )
   end
 
-def test_saint
-  assert_equal(
-    NYAddressor::Addressor.new('161 Victoria St N, Saint Paul, MN 55104', :US),
-    NYAddressor::Addressor.new('161 Victoria St N, St. Paul, MN 55104', :US)
-  )
-end
+  def test_saint
+    assert_equal(
+      NYAddressor::Addressor.new('161 Victoria St N, Saint Paul, MN 55104', :US),
+      NYAddressor::Addressor.new('161 Victoria St N, St. Paul, MN 55104', :US)
+    )
+  end
 
 end
