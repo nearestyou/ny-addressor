@@ -16,11 +16,29 @@ module NYAddressor
         set_options
       end
 
+      def confirm_options
+        confirm_postal
+        confirm_country
+        confirm_state
+        confirm_street_number
+        confirm_street_label
+        confirm_street_direction
+        confirm_street_name
+        confirm_unit
+        confirm_city
+      end
+
       # United States -> usa
       def remove_united_states
         NYAddressor::constants(:US, :COUNTRY_IDENTIFIERS).each do |full_string, abbreviation|
           @normalized.gsub!(/\b#{full_string}\b/i, abbreviation)
         end
+      end
+
+      def state_pattern? part
+        states = NYAddressor::constants(@region, :STATES).values
+        state_words = states.map { |state| state.split(' ') }.flatten
+        state_words.include? part.text
       end
 
       def postal_pattern? part
@@ -29,6 +47,11 @@ module NYAddressor
 
       def country_pattern? part
         NYAddressor::constants(:US, :COUNTRY_IDENTIFIERS).values.include? part.text
+      end
+
+      def confirm_state
+        parts = potential(AddressField::STATE)
+        consecutive(parts.reverse).each { |part| part.confirm(AddressField::STATE) }
       end
     end
   end

@@ -14,6 +14,8 @@ inp = '2656 Parkway, Pigeon Forge, TN 37863, United States'
 inp = '4127 6 Street NE, Calgary AB T2E, Canada'
 inp = '128 Middle Road, Warwick, Bermuda WK04, United States'
 inp = '21 Rue du Mesnil, 50400 Granville, FR'
+inp = '501 Avenida Julio Andino, San Juan, 00924, Puerto Rico'
+inp = '128 Middle Road, Warwick, Saint Barthelemy WK04, United States'
 
 nya = NYAddressor::Addressor.new(inp)
 puts nya.debug

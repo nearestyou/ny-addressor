@@ -86,7 +86,7 @@ module NYAddressor
       # meaning the parts come one after eachother
       # and are within the same comma group
       #
-      # @param parts [Array<AddressPart>] super array
+      # @param parts [Array<AddressPart>] SORTED super array
       # @return [Array<AddressPart>]
       def consecutive parts
         return [] unless parts&.any?
@@ -94,7 +94,7 @@ module NYAddressor
         comma = parts.first.group
         result = [parts.first]
         parts[1..].each do |part|
-          break if part.group != comma || part.position != result.last.position + 1
+          break if part.group != comma || (part.position - result.last.position).abs != 1
           result << part
         end
 
@@ -289,12 +289,8 @@ module NYAddressor
       end
 
       def confirm_state
-        postal = get_field(AddressField::POSTAL)
-        parts = potential(AddressField::STATE)
-
-        # State must come before postal code
-        parts.select! {|part| part.position < postal.position} if postal
-
+        known_before = [AddressField::POSTAL]
+        parts = potential_between(AddressField::STATE, [], known_before)
         parts&.last&.confirm(AddressField::STATE)
       end
 

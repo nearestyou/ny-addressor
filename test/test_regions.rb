@@ -44,9 +44,11 @@ class TestRegions < Minitest::Test
     assert NYAddressor::Addressor.new('W204 N11912 Goldendale Rd,AURORA,Wi,97002').sns == 'w204n11912goldendalewi'
   end
 
-  def test_puerto_rican
-    assert !NYAddressor::Addressor.new('1310 Ashford Ave San Juan PR 907', :US).hash.nil?
-    assert !NYAddressor::Addressor.new('Carretera Estatal 115, Km. 26.9 Bo. Tablonal AGUADA PR 00602', :US).hash.nil?
+  def test_caribbean
+    assert !NYAddressor::Addressor.new('1310 Ashford Ave San Juan PR 907').hash.nil?
+    assert !NYAddressor::Addressor.new('Carretera Estatal 115, Km. 26.9 Bo. Tablonal AGUADA PR 00602').hash.nil?
+    assert !NYAddressor::Addressor.new('128 Middle Road, Warwick, Bermuda WK04, United States').hash.nil?
+    assert !NYAddressor::Addressor.new('128 Middle Road, Warwick, Saint Barthelemy WK04, United States').hash.nil?
   end
 
   def test_canadian_zip
