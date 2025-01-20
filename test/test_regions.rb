@@ -1,10 +1,36 @@
 require 'minitest/autorun'
 require_relative '../lib/ny-addressor'
+require_relative '../lib/ny-addressor/constants'
 require 'byebug'
 
 class TestRegions < Minitest::Test
   def setup
     @fields = NYAddressor::AddressField
+    @postals = NYAddressor::Constants::POSTAL_FORMATS
+  end
+
+  def test_us_postal_format
+    assert_match @postals[:US], "12345"
+    assert_match @postals[:US], "12345-6789"
+    refute_match @postals[:US], "AA12345BB"
+    refute_match @postals[:US], "1234"
+  end
+
+  def test_ca_postal_format
+    assert_match @postals[:CA], "A1B 2C3"
+    refute_match @postals[:CA], "SW1A 2BC"
+    refute_match @postals[:CA], "12345"
+  end
+
+  def test_uk_postal_format
+    assert_match @postals[:UK], "SW1A 2BC"
+    refute_match @postals[:UK], "A1B 2C3"
+    refute_match @postals[:UK], "12345"
+  end
+
+  def test_au_postal_format
+    assert_match @postals[:AU], "1234"
+    refute_match @postals[:AU], "12345"
   end
 
   def test_wisconsin_addresses

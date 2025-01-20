@@ -237,4 +237,11 @@ class TestFormatEquality < Minitest::Test
     )
   end
 
+def test_saint
+  assert_equal(
+    NYAddressor::Addressor.new('161 Victoria St N, Saint Paul, MN 55104', :US),
+    NYAddressor::Addressor.new('161 Victoria St N, St. Paul, MN 55104', :US)
+  )
+end
+
 end

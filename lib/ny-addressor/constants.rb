@@ -214,19 +214,19 @@ module NYAddressor
 
     POSTAL_FORMATS = {
       # 12345 or 12345-6789
-      US: /\d{5}(-\d{4})?/i,
+      US: /\b\d{5}(-\d{4})?\b/i,
 
       # A1B 2C3
-      CA: /[A-Z]\d[A-Z]\s?\d[A-Z]\d/i,
+      CA: /\b[A-Z]\d[A-Z]\s?\d[A-Z]\d\b/i,
 
       # SW1A 2BC
-      UK: /[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}/i,
+      UK: /\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b/i,
 
       # 2000
-      AU: /\d{4}/i,
+      AU: /\b\d{4}\b/i,
 
       # 52064
-      DE: /\d{5}/i,
+      DE: /\b\d{5}\b/i,
     }.freeze
 
     COUNTRY_IDENTIFIERS = {
