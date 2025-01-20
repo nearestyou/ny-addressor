@@ -27,7 +27,6 @@ module NYAddressor
       return if full_address.nil? || full_address.length < 4
       @input = full_address
       @region = country == :AUTO ? NYAddressor::detect_region(full_address) : country
-      @region ||= NYAddressor::detect_region_from_address(full_address)
       return nil unless @region
 
       @parser = case @region

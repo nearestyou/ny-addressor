@@ -58,26 +58,59 @@ module NYAddressor
     result.gsub('saint', 'st')
   end
 
-    # Detects which region an address is from based on it's postal and state information
+  # Detects which region an address is in
+  # requires a postal code or country name along with a state
+  #
+  # @param address [String] the full address
+  # @return [Symbol, nil] detected region
+  def self.detect_region address
+    matches = detect_region_by_postal(address) + detect_region_by_country(address)
+    return unless matches
+
+    possible_regions = matches.sort_by { |match| match[:position] }.reverse.map { |m| m[:name] }.uniq
+    possible_regions.each do |region|
+      return region if state_matches_region?(address, region)
+    end
+
+    nil
+  end
+
+  # Detects possible region based on postal pattern
+  #
+  # @param address [String]
+  # @return [Array]
+  def self.detect_region_by_postal address
+    formats = NYAddressor::Constants::POSTAL_FORMATS
+    matches = []
+
+    formats.each do |region, regex|
+      match = address.match(regex)
+      matches << { name: region, position: match.begin(0) } if match
+    end
+
+    matches
+  end
+
+    # Detects region based on country identifiers found in address string
+    # If multiple regions found, returns last found identifier
     #
-    # @param address [String] the full address
-    # @return [Symbol, nil] detected region or nil if not found
-    def self.detect_region address
-      formats = NYAddressor::Constants::POSTAL_FORMATS
+    # @param address [String] the address string to search
+    # @return [Array] The country code for the region
+    def self.detect_region_by_country address
+      address = address.to_s.downcase
+      identifiers = NYAddressor::Constants::COUNTRY_IDENTIFIERS
       matches = []
 
-      formats.each do |region, regex|
-        match = address.match(regex)
-        matches << { name: region, position: match.begin(0) } if match
+      identifiers.each do |region, map|
+        map.each do |full_string, abbrev|
+          [full_string, abbrev].each do |identifier|
+            position = address.rindex(identifier)
+            matches << { name: region, position: position } if position
+          end
+        end
       end
 
-      return if matches.empty?
-      possible_regions = matches.sort_by { |match| match[:position] }.reverse.map { |m| m[:name] }
-      possible_regions.each do |region|
-        return region if state_matches_region?(address, region)
-      end
-
-      nil
+      matches
     end
 
     # @param address [String] address to check
@@ -93,30 +126,6 @@ module NYAddressor
         return true if address.match?(regex)
       end
       false
-    end
-
-    # Detects region based on country identifiers found in address string
-    # If multiple regions found, returns last found identifier
-    #
-    # @param address [String] the address string to search
-    # @return [Symbol, nil] The country code for the region
-    def self.detect_region_from_address(address)
-      address = address.to_s.downcase
-      identifiers = NYAddressor::Constants::COUNTRY_IDENTIFIERS
-      matches = []
-
-      identifiers.each do |region, map|
-        map.each do |full_string, abbrev|
-          [full_string, abbrev].each do |identifier|
-            position = address.rindex(identifier)
-            matches << { name: region, position: position } if position
-          end
-        end
-      end
-
-      return if matches.empty?
-
-      matches.sort_by { |match| match[:position] }.last[:name]
     end
 
   module AddressHelper
