@@ -83,11 +83,13 @@ module NYAddressor
       :UK => "United Kingdom",
       :AU => "Australia",
       :CB => "Carribean Islands",
-      :DE => "Germany"
+      :DE => "Germany",
+      :FR => "France"
     }.freeze
 
     STATES = {
       :DE => {},
+      :FR => {},
       :US => {
         'alabama' => 'al',
         'alaska' => 'ak',
@@ -202,7 +204,7 @@ module NYAddressor
         'saint barthelemy' => 'st barthelemy',
         'barbados' => 'barbados',
         'antigua' => 'antigua'
-      }
+      },
     }.freeze
 
     POSTAL_FORMATS = {
@@ -222,6 +224,7 @@ module NYAddressor
 
       # 52064
       DE: /\b\d{5}\b/i,
+      FR: /\b\d{5}\b/i,
 
       # Match nothing
       CB: /^$/,
@@ -237,7 +240,8 @@ module NYAddressor
       UK: { "united kingdom" => "uk" },
       AU: { "australia" => "au" },
       DE: { "germany" => "de" },
-      CB: STATES[:CB]
+      CB: STATES[:CB],
+      FR: { "france" => "fr" },
     }.freeze
   end
 end
