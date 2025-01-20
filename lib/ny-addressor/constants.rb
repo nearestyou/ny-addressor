@@ -213,8 +213,8 @@ module NYAddressor
     }.freeze
 
     POSTAL_FORMATS = {
-      # 12345 or 12345-6789
-      US: /\b\d{5}(-\d{4})?\b/i,
+      # 12345 or 12345-6789 or 123456789
+      US: /\b\d{5}(-\d{4})?\b|\b\d{9}\b/i,
 
       # A1B 2C3
       CA: /\b[A-Z]\d[A-Z]\s?\d[A-Z]\d\b/i,

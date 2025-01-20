@@ -12,8 +12,10 @@ class TestRegions < Minitest::Test
   def test_us_postal_format
     assert_match @postals[:US], "12345"
     assert_match @postals[:US], "12345-6789"
+    assert_match @postals[:US], "123456789"
     refute_match @postals[:US], "AA12345BB"
     refute_match @postals[:US], "1234"
+    refute_match @postals[:US], "123456"
   end
 
   def test_ca_postal_format
