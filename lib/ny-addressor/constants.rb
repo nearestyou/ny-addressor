@@ -168,6 +168,7 @@ module NYAddressor
       :UK => {
         'eng' => 'england',
         'en' => 'england',
+        'greater london' => 'england',
         'wls' => 'wales',
         'wal' => 'wales',
         'ws' => 'wales',
