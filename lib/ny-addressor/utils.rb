@@ -59,17 +59,23 @@ module NYAddressor
   end
 
   # Detects which region an address is in
-  # requires a postal code or country name along with a state
+  # Algorithm: (state && [postal || country]) || (postal && country)
   #
   # @param address [String] the full address
   # @return [Symbol, nil] detected region
   def self.detect_region address
-    matches = detect_region_by_postal(address) + detect_region_by_country(address)
+    postal_matches = detect_region_by_postal(address)
+    country_matches = detect_region_by_country(address)
+    matches = (postal_matches + country_matches).sort_by { |match| match[:position] }.reverse
     return unless matches
 
-    possible_regions = matches.sort_by { |match| match[:position] }.reverse.map { |m| m[:name] }.uniq
+    possible_regions = matches.map {|match| match[:name] }.uniq
     possible_regions.each do |region|
       return region if state_matches_region?(address, region)
+    end
+
+    possible_regions.each do |region|
+      return region if postal_matches.any? { |m| m[:name] == region } && country_matches.any? { |m| m[:name] == region }
     end
 
     nil

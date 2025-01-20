@@ -86,6 +86,7 @@ class TestRegions < Minitest::Test
     assert_equal NYAddressor::detect_region("123 Penn Ave, London, England United Kingdom"), :UK
     assert_equal NYAddressor::detect_region("123 Penn Ave, Sydney, NSW, 2000"), :AU
     assert_equal NYAddressor::detect_region("123 Penn Ave, Sydney, NSW, Australia"), :AU
+    assert_equal NYAddressor::detect_region("Schillerstr. 20-40, 52064 Aachen, Germany"), :DE
   end
 
   def test_german_address
