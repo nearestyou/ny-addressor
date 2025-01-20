@@ -58,6 +58,43 @@ module NYAddressor
     result
   end
 
+    # Detects which region an address is from based on it's postal and state information
+    #
+    # @param address [String] the full address
+    # @return [Symbol, nil] detected region or nil if not found
+    def self.detect_region address
+      formats = NYAddressor::Constants::POSTAL_FORMATS
+      matches = []
+
+      formats.each do |region, regex|
+        match = address.match(regex)
+        matches << { name: region, position: match.begin(0) } if match
+      end
+
+      return if matches.empty?
+      possible_regions = matches.sort_by { |match| match[:position] }.reverse.map { |m| m[:name] }
+      possible_regions.each do |region|
+        return region if state_matches_region?(address, region)
+      end
+
+      nil
+    end
+
+    # @param address [String] address to check
+    # @param region [Symbol] Region to check against
+    # @return [Boolean] `true` if the address contains a state found in input region
+    def self.state_matches_region?(address, region)
+      states = NYAddressor::Constants::STATES[region]
+      return false unless states
+      address = address.downcase
+
+      states.each do |name, abbr|
+        regex = /\b(#{Regexp.escape(name)}|#{Regexp.escape(abbr)})\b/
+        return true if address.match?(regex)
+      end
+      false
+    end
+
   module AddressHelper
     # Whole Foods Market, 1500... -> 1500 Penn Ave
     def remove_description

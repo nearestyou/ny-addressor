@@ -21,50 +21,12 @@ module NYAddressor
       {:AUTO => "Auto-detect"}.merge(Constants::COUNTRIES)
     end
 
-    # Detects which region an address is from based on it's postal and state information
-    #
-    # @param address [String] the full address
-    # @return [Symbol, nil] detected region or nil if not found
-    def self.detect_region address
-      formats = NYAddressor::Constants::POSTAL_FORMATS
-      matches = []
-
-      formats.each do |region, regex|
-        match = address.match(regex)
-        matches << { name: region, position: match.begin(0) } if match
-      end
-
-      return if matches.empty?
-
-      possible_regions = matches.sort_by { |match| match[:position] }.reverse.map { |m| m[:name] }
-      possible_regions.each do |region|
-        return region if state_matches_region?(address, region)
-      end
-
-      nil
-    end
-
-    # @param address [String] address to check
-    # @param region [Symbol] Region to check against
-    # @return [Boolean] `true` if the address contains a state found in input region
-    def self.state_matches_region?(address, region)
-      states = NYAddressor::Constants::STATES[region]
-      return false unless states
-      address = address.downcase
-
-      states.each do |name, abbr|
-        regex = /\b(#{Regexp.escape(name)}|#{Regexp.escape(abbr)})\b/
-        return true if address.match?(regex)
-      end
-      false
-    end
-
     # @param full_address [String] A full address
     # @param country [Symbol] The country code, or `:AUTO` for auto-detection
     def initialize(full_address, country = :AUTO)
       return if full_address.nil? || full_address.length < 4
       @input = full_address
-      @region = country == :AUTO ? Addressor::detect_region(full_address) : country
+      @region = country == :AUTO ? NYAddressor::detect_region(full_address) : country
       return unless @region
 
       @parser = case @region
