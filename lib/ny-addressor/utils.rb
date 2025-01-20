@@ -59,7 +59,7 @@ module NYAddressor
   end
 
   # Detects which region an address is in
-  # Algorithm: (state && [postal || country]) || (postal && country)
+  # Algorithm: (postal && country) || (state && [postal || country])
   #
   # @param address [String] the full address
   # @return [Symbol, nil] detected region
@@ -70,13 +70,15 @@ module NYAddressor
     return unless matches
 
     possible_regions = matches.map {|match| match[:name] }.uniq
-    possible_regions.each do |region|
-      return region if state_matches_region?(address, region)
-    end
 
     possible_regions.each do |region|
       return region if postal_matches.any? { |m| m[:name] == region } && country_matches.any? { |m| m[:name] == region }
     end
+
+    possible_regions.each do |region|
+      return region if state_matches_region?(address, region)
+    end
+
 
     nil
   end
@@ -110,8 +112,8 @@ module NYAddressor
       identifiers.each do |region, map|
         map.each do |full_string, abbrev|
           [full_string, abbrev].each do |identifier|
-            position = address.rindex(identifier)
-            matches << { name: region, position: position } if position
+            match = address.match(/\b#{Regexp.escape(identifier)}\b/)
+            matches << { name: region, position: match.begin(0) } if match
           end
         end
       end

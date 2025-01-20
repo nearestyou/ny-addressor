@@ -16,6 +16,8 @@ inp = '128 Middle Road, Warwick, Bermuda WK04, United States'
 inp = '21 Rue du Mesnil, 50400 Granville, FR'
 inp = '501 Avenida Julio Andino, San Juan, 00924, Puerto Rico'
 inp = '128 Middle Road, Warwick, Saint Barthelemy WK04, United States'
+inp = '120 Carretera 183, Las Piedras, 00771, Puerto Rico'
+inp = '92 Route de Marienthal, 67500 Haguenau, FR'
 
 nya = NYAddressor::Addressor.new(inp)
 puts nya.debug
