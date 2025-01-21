@@ -83,7 +83,10 @@ class String
       searched += unsearched[0..location - 1] if location > 0
 
       # Do not collapse 'unit A1010'
-      safe_to_collapse = dupe[0].squeeze.length > 1 && (dupe[0].mostly_letters? || dupe[0].split(' ').length > 2)
+      long_enough = dupe[0].squeeze.length > 1
+      not_a_number = dupe[0].mostly_letters? || dupe[0].split(' ').length > 2
+      not_a_separator = dupe[0].strip != ','
+      safe_to_collapse = long_enough && not_a_number && not_a_separator
 
       searched += if safe_to_collapse
                     dupe[1] + dupe[2] # delimiter + repeating string
