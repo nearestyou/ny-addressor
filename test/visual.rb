@@ -8,6 +8,7 @@ end
 
 inp = ARGV.join(' ')
 nya = NYAddressor::Addressor.new(inp)
+puts "Region not detected" unless nya.region
 puts nya.debug
 puts nya.sns
 puts nya.construct
