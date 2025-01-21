@@ -95,7 +95,12 @@ class TestRegions < Minitest::Test
 
   def test_german_address
     assert_equal(
-      NYAddressor::Addressor.new('Schillerstr. 20-40, 52064 Aachen', :DE).sns,
+      NYAddressor::Addressor.new('Schillerstr. 20-40, 52064, Aachen', :DE).sns,
+      '2040schillerstraachen'
+    )
+
+    assert_equal(
+      NYAddressor::Addressor.new('Schillerstr. 20-40, 52064, Aachen, Germany').sns,
       '2040schillerstraachen'
     )
   end

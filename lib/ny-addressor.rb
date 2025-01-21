@@ -71,6 +71,7 @@ module NYAddressor
     end
 
     def parts
+      return {} unless @parser
       AddressField.constants.each_with_object({}) do |field, result|
         key = AddressField.const_get(field)
         values = @parser.get_field(key, all: true)

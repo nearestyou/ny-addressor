@@ -16,28 +16,31 @@ module NYAddressor
         f = AddressField
         num_parts = @parts.flatten.size
         case part.position
-        when 0
-          [f::STREET_NAME]
-        when 1
-          [f::STREET_NAME, f::STREET_NUMBER, f::STREET_LABEL]
-        when 2
-          [f::STREET_NUMBER, f::UNIT]
-        when num_parts - 4
-          [f::UNIT]
-        when num_parts - 3
-          [f::UNIT, f::POSTAL]
-        when num_parts - 2
-          [f::POSTAL, f::STATE]
         when num_parts - 1
-          [f::STATE, f::COUNTRY]
+          [f::COUNTRY, f::STATE]
+        when num_parts - 2
+          [f::STATE, f::POSTAL]
+        when num_parts - 3
+          [f::STATE, f::POSTAL, f::STREET_NUMBER, f::STREET_NAME, f::STREET_LABEL]
         else
-          [f::STREET_NUMBER, f::STREET_NAME, f::UNIT, f::STATE, f::POSTAL, f::COUNTRY]
+          [f::STREET_NUMBER, f::STREET_NAME, f::STREET_LABEL, f::POSTAL]
         end
       end
 
       def comma_position_options part
         f = AddressField
-        [f::STREET_NUMBER, f::STREET_NAME, f::STREET_LABEL, f::UNIT, f::STATE, f::POSTAL, f::COUNTRY]
+        default = [f::STREET_NUMBER, f::STREET_NAME, f::STREET_LABEL]
+        num_groups = @parts.size
+        case part.group
+        when num_groups - 1
+          [f::COUNTRY, f::STATE]
+        when num_groups - 2
+          [f::STATE, f::POSTAL]
+        when num_groups - 3
+          [f::POSTAL] + default
+        else
+          default
+        end
       end
 
       def set_pattern_options
