@@ -19,7 +19,9 @@ module NYAddressor
         when 0
           [f::STREET_NAME]
         when 1
-          [f::STREET_NUMBER]
+          [f::STREET_NAME, f::STREET_NUMBER, f::STREET_LABEL]
+        when 2
+          [f::STREET_NUMBER, f::UNIT]
         when num_parts - 4
           [f::UNIT]
         when num_parts - 3
@@ -35,13 +37,14 @@ module NYAddressor
 
       def comma_position_options part
         f = AddressField
-        [f::STREET_NUMBER, f::STREET_NAME, f::UNIT, f::STATE, f::POSTAL, f::COUNTRY]
+        [f::STREET_NUMBER, f::STREET_NAME, f::STREET_LABEL, f::UNIT, f::STATE, f::POSTAL, f::COUNTRY]
       end
 
       def set_pattern_options
         @parts.flatten.each do |part|
           part.determine_pattern(AddressField::STREET_NUMBER, method(:street_number_pattern?))
           part.determine_pattern(AddressField::STREET_NAME, method(:street_name_pattern?))
+          part.determine_pattern(AddressField::STREET_LABEL, method(:street_label_pattern?))
           part.determine_pattern(AddressField::UNIT, method(:unit_pattern?))
           part.determine_pattern(AddressField::STATE, method(:state_pattern?))
           part.determine_pattern(AddressField::POSTAL, method(:postal_pattern?))
@@ -57,6 +60,7 @@ module NYAddressor
         confirm_postal
         confirm_country
         confirm_street_number
+        confirm_street_label
         confirm_state
         confirm_street_name
         confirm_unit
@@ -72,6 +76,11 @@ module NYAddressor
         known_after = [AddressField::POSTAL]
         known_before = [AddressField::COUNTRY]
         potential_between(AddressField::STATE, known_after, known_before)&.last&.confirm(AddressField::STATE)
+      end
+
+      def confirm_street_label
+        known_before = [AddressField::COUNTRY, AddressField::POSTAL]
+        potential_between(AddressField::STREET_LABEL, [], known_before)&.first&.confirm(AddressField::STREET_LABEL)
       end
 
       def confirm_street_name

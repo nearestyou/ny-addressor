@@ -55,6 +55,7 @@ module NYAddressor
         'route' => 'rt',
         'square' => 'sq',
         'street' => 'st',
+        'str' => 'st',
         'terrace' => 'tr',
         'trail' => 'trl',
         'way' => 'wy'
