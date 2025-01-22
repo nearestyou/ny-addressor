@@ -1,7 +1,6 @@
 require 'minitest/autorun'
 require_relative '../lib/ny-addressor'
 require_relative '../lib/ny-addressor/constants'
-require 'byebug'
 
 class TestRegions < Minitest::Test
   def setup
