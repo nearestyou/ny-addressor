@@ -7,13 +7,18 @@ class String
   end
 
   def clean
-    self&.gsub(/\s*\(.+\)/, '')&.gsub(',', ' ')&.delete("'")&.downcase&.gsub("\u00A0", ' ')
-    # regex: https://stackoverflow.com/questions/8708515/ruby-rails-remove-text-inside-parentheses-from-a-string
+    self
+      &.gsub(/\s*\(.+\)/, '') # https://stackoverflow.com/questions/8708515/ruby-rails-remove-text-inside-parentheses-from-a-string
+      &.delete("'")
+      &.delete(".")
+      &.downcase
+      &.gsub("\u00A0", ' ')
+      &.gsub(/\s+/, ' ') # remove multiple spaces in a row
+      &.strip
   end
 
   # Standardize strings for comparison testing
   def standardize
-    # clean.delete(' ').delete('-').delete('.')
     clean.gsub(/[-\s.#]/, '')
   end
 
@@ -30,8 +35,6 @@ class String
   end
 
   def has_letters?
-    # alphabet = %w[a b c d e f g h i j k l m n o p q r s t u v w x y z]
-    # split('').each { |char| return true if alphabet.include? char }
     match(/[a-zA-Z]/) ? true : false
   end
 
@@ -41,6 +44,14 @@ class String
 
   def digit_count
     split('').select(&:numeric?).length
+  end
+
+  def mostly_numeric?
+    digit_count > letter_count
+  end
+
+  def mostly_letters?
+    !mostly_numeric?
   end
 
   def strip_digits
@@ -53,33 +64,37 @@ class String
 
   # https://stackoverflow.com/questions/7184123/check-if-string-is-repetition-of-an-unknown-substring
   # , Washington, DC 20500, Washington, DC 20500, Washington, DC 20500, Washington, DC 20500 -> , Washington, DC 20500,
-  # def unrepeat
-  #   n = size
-  #   newstr = dup
-  #   n.times do |i|
-  #     newstr = newstr[-1] + newstr[0..-2]
-  #     return self[0..i + 1] if newstr == self
-  #   end
-  # end
   def unrepeat
     searched = ''
     unsearched = dup
-    dupe = match(/(.+)\1+/)
-    # Dupe[0] = pattern found, [1] group found
+    # regex = /(.+)\1+/ # basic matching
+    regex = /
+      (^|\b|, )       # word boundary or comma + space
+      (.+?)           # Repeating string
+      (,\s*|\s+)\2    # Check for repeating string after a delimiter
+      ($|\b|,)        # Match to the end of a word boundary
+    /x
+    dupe = match(regex)
 
     until unsearched.empty?
       return searched + unsearched unless dupe
 
       location = unsearched.index(dupe[0])
       searched += unsearched[0..location - 1] if location > 0
-      searched += if dupe[0].squeeze.length > 1 && dupe[0].has_letters? # &&
-                    # ([' ', ',', '.'].include?(dupe[0][0]) || dupe[1].length > 8)
-                    dupe[1]
+
+      # Do not collapse 'unit A1010'
+      long_enough = dupe[0].squeeze.length > 1
+      not_a_number = dupe[0].mostly_letters? || dupe[0].split(' ').length > 2
+      not_a_separator = dupe[0].strip != ','
+      safe_to_collapse = long_enough && not_a_number && not_a_separator
+
+      searched += if safe_to_collapse
+                    dupe[1] + dupe[2] # delimiter + repeating string
                   else
                     dupe[0]
                   end
       unsearched = unsearched[location + dupe[0].length..]
-      dupe = unsearched.match(/(.+)\1+/)
+      dupe = unsearched.match(regex)
     end
     searched
   end
