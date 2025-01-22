@@ -20,3 +20,8 @@ adr.compare(adr2) # 0.78
 rake test
 ruby -Itest test/test_format_equality.rb --name test_unit_designations
 ```
+
+### Deployment
+
+1. Bump version in `ny-addressor.gemspec`
+2. `gem build ny-addressor.gemspec`
