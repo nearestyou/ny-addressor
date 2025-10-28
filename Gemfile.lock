@@ -1,0 +1,31 @@
+PATH
+  remote: .
+  specs:
+    ny-addressor (1.0.0)
+      ruby_postal (~> 1.0.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ansi (1.5.0)
+    builder (3.3.0)
+    minitest (5.26.0)
+    minitest-reporters (1.7.1)
+      ansi
+      builder
+      minitest (>= 5.0)
+      ruby-progressbar
+    ruby-progressbar (1.13.0)
+    ruby_postal (1.0.1)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  minitest
+  minitest-reporters
+  ny-addressor!
+
+BUNDLED WITH
+   2.6.9
