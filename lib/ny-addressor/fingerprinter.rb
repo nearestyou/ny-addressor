@@ -10,7 +10,7 @@ module NYAddressor
       unit
       city
       state
-      postal
+      postcode
       country
     ].freeze
 
@@ -41,7 +41,7 @@ module NYAddressor
           include_set << field if opts[:include_unit]
         when :city
           include_set << field if opts[:include_city]
-        when :postal
+        when :postcode
           include_set << field if opts[:include_postcode]
         when :country
           include_set << field if opts[:include_country]
@@ -51,7 +51,7 @@ module NYAddressor
       tokens = include_set.map do |field|
         next if parts[field].to_s.empty?
 
-        if field == :postal
+        if field == :postcode
           val = opts[:overwrite_postcode] ? "99999" : parts[:postcode].to_s
           next if val.empty?
           val
@@ -60,7 +60,7 @@ module NYAddressor
         end
       end.compact
 
-      tokens.join(" ").strip.gsub(/\s+/, " ").downcase
+      tokens.join("").strip.gsub(/\s+/, "").downcase
     end
 
     # @param parts [Hash{Symbol=>String}] parsed address components
@@ -68,13 +68,13 @@ module NYAddressor
     def self.all(parts)
       {
         full: Digest::SHA256.hexdigest(construct(parts)),
-        zipless: Digest::SHA256.hexdigest(construct(parts, {overwrite_postal: true})),
+        zipless: Digest::SHA256.hexdigest(construct(parts, {overwrite_postcode: true})),
         unitless: Digest::SHA256.hexdigest(construct(parts, {include_unit: false})),
         countryless: Digest::SHA256.hexdigest(construct(parts, {include_country: false})),
         sns: Digest::SHA256.hexdigest(construct(parts, {
           include_unit: false,
           include_city: false,
-          include_postal: false,
+          include_postcode: false,
           include_country: false
         }))
       }
