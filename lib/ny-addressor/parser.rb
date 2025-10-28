@@ -6,9 +6,10 @@ module NYAddressor
       "ne"=>"ne","northeast"=>"ne","nw"=>"nw","northwest"=>"nw","se"=>"se","southeast"=>"se","sw"=>"sw","southwest"=>"sw" }.freeze
 
     STREET_LABELS = %w[
-      st street rd road ave avenue blvd boulevard ln lane dr drive
-      ct court cir circle pl place ter terrace way hwy highway
-      pkwy parkway sq square loop walk trail trl
+      street road avenue boulevard lane drive
+      court circle place terrace way highway
+      parkway square loop walk trail plaza
+      expressway route
     ].freeze
 
     # N Main St -> dir=N, name=Main, label=St
