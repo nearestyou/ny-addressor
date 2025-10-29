@@ -49,7 +49,7 @@ class AddressEquivalenceTest < Minitest::Test
   end
 
   def test_country
-    assert_same_full(
+    assert_same_countryless(
       '1600 North Penn Ave, Washington, DC, 20500, United States',
       '1600 Penn Ave North, Washington, DC, 20500',
     )
@@ -91,18 +91,18 @@ class AddressEquivalenceTest < Minitest::Test
 
   
   def test_direction_as_street
-    assert !NYAddressor.process('901 Avenue E, Wisner, NE 68791, United States').fingerprints.nil?
-    assert !NYAddressor.process('260 North St N, Middlebury, VT 05753, USA').fingerprints.nil?
-    assert !NYAddressor.process('11030 East Blvd, Cleveland, OH 44106, United States').fingerprints.nil?
+    assert !NYAddressor.process('901 Avenue E, Wisner, NE 68791, United States').fingerprints[:full].nil?
+    assert !NYAddressor.process('260 North St N, Middlebury, VT 05753, USA').fingerprints[:full].nil?
+    assert !NYAddressor.process('11030 East Blvd, Cleveland, OH 44106, United States').fingerprints[:full].nil?
   end
 
   def test_label_as_street
-    assert !NYAddressor.process('260 Court St Unit 6, Middlebury, VT 05753, USA').fingerprints.nil?
-    assert !NYAddressor.process('2656 Parkway, Pigeon Forge, TN 37863, United States').fingerprints.nil?
+    assert !NYAddressor.process('260 Court St Unit 6, Middlebury, VT 05753, USA').fingerprints[:full].nil?
+    assert !NYAddressor.process('2656 Parkway, Pigeon Forge, TN 37863, United States').fingerprints[:full].nil?
   end
 
   def test_number_as_street
-    assert !NYAddressor.process('1600 24 Ave, Washington, DC 20500').fingerprints.nil?
+    assert !NYAddressor.process('1600 24 Ave, Washington, DC 20500').fingerprints[:full].nil?
   end
 
   def test_double_entry
@@ -120,7 +120,7 @@ class AddressEquivalenceTest < Minitest::Test
       '1600 Pennsylvania Ave, Washington, DC, DC 20500'
     )
 
-    assert(!NYAddressor.process('4051 Broadway, New York, NY 10032, United States').fingerprints.nil?)
+    assert(!NYAddressor.process('4051 Broadway, New York, NY 10032, United States').fingerprints[:full].nil?)
   end
 
   def test_double_comma
@@ -152,8 +152,8 @@ class AddressEquivalenceTest < Minitest::Test
   end
 
   def test_error
-    assert_nil NYAddressor.process(nil).fingerprints
-    assert_nil NYAddressor.process('sad;lkjfasdkj;fjaks;df').fingerprints
+    assert_nil NYAddressor.process(nil).fingerprints[:full]
+    assert_nil NYAddressor.process('sad;lkjfasdkj;fjaks;df').fingerprints[:full]
   end
 
 
