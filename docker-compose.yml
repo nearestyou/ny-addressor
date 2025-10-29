@@ -1,0 +1,8 @@
+services:
+  ruby_libpostal:
+    build: .
+    container_name: ruby_libpostal
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/app
