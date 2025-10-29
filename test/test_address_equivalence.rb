@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 require "test_helper"
-require "byebug"
 
 class AddressEquivalenceTest < Minitest::Test
+
   def test_simple_equality_same_string
     str = "1600 Penn Ave, Washington, DC, 20500"
     assert_same_full str, str
@@ -13,255 +13,246 @@ class AddressEquivalenceTest < Minitest::Test
     str2 = "1601 Penn Ave, Washington, DC, 20500"
     refute_same_full str1, str2
   end
+
+  def test_numeric_full_equivalence
+    assert_same_full(
+      '1600 First Ave, Washington, DC, 20500',
+      '1600 1st Ave, Washington, DC, 20500',
+    )
+  end
+
+
+  def test_periods
+    assert_same_full(
+      '1600 Penn Ave, Washington, D.C., 20500',
+      '1600 Penn Ave, Washington, DC, 20500',
+    )
+
+    assert_same_full(
+      '1600 Penn St., Washington, DC, 20500',
+      '1600 Penn St, Washington, DC, 20500',
+    )
+  end
+
+  def test_prefix_suffix
+    assert_same_full(
+      '1600 North Penn Ave, Washington, DC, 20500',
+      '1600 Penn Ave North, Washington, DC, 20500',
+    )
+  end
+
+  def test_state_abrev
+    assert_same_full(
+      '1600 North Penn Ave, Washington, DC, 20500',
+      '1600 Penn Ave North, Washington, District of Columbia, 20500',
+    )
+  end
+
+  def test_country
+    assert_same_full(
+      '1600 North Penn Ave, Washington, DC, 20500, United States',
+      '1600 Penn Ave North, Washington, DC, 20500',
+    )
+  end
+
+  def test_country_abrev
+    assert_same_full(
+      '1600 North Penn Ave, Washington, DC, 20500, United States',
+      '1600 Penn Ave North, Washington, DC, 20500, USA',
+    )
+
+    assert_same_full(
+      '1600 North Penn Ave, Washington, DC, 20500, United States of America',
+      '1600 Penn Ave North, Washington, DC, 20500, United States',
+    )
+  end
+
+
+  def test_label_abrev
+    assert_same_full(
+      '13322 Airport Boulevard, Sugar, TX 77478',
+      '13322 Airport Blvd, Sugar, TX 77478'
+    )
+  end
+
+  def test_no_prezip_comma
+    assert_same_full(
+      '1600 Pennsylvania Ave, Washington, DC 20500',
+      '1600 Pennsylvania Ave, Washington, DC, 20500'
+    )
+  end
+
+  def test_double_direction
+    assert_same_full(
+      '232 North Main St N, Stillwater, MN 55082, USA',
+      '232 Main St N, Stillwater, MN 55082, USA'
+    )
+  end
+
+  
+  def test_direction_as_street
+    assert !NYAddressor.process('901 Avenue E, Wisner, NE 68791, United States').fingerprints.nil?
+    assert !NYAddressor.process('260 North St N, Middlebury, VT 05753, USA').fingerprints.nil?
+    assert !NYAddressor.process('11030 East Blvd, Cleveland, OH 44106, United States').fingerprints.nil?
+  end
+
+  def test_label_as_street
+    assert !NYAddressor.process('260 Court St Unit 6, Middlebury, VT 05753, USA').fingerprints.nil?
+    assert !NYAddressor.process('2656 Parkway, Pigeon Forge, TN 37863, United States').fingerprints.nil?
+  end
+
+  def test_number_as_street
+    assert !NYAddressor.process('1600 24 Ave, Washington, DC 20500').fingerprints.nil?
+  end
+
+  def test_double_entry
+    base = '1600 Pennsylvania Ave, Washington, DC 20500'
+    assert_same_full(
+      base,
+      '1600 Pennsylvania Ave, Washington, DC 20500, Washington, DC 20500'
+    )
+    assert_same_full(
+      base,
+      '1600 Pennsylvania Ave, Washington DC, DC 20500'
+    )
+    assert_same_full(
+      base,
+      '1600 Pennsylvania Ave, Washington, DC, DC 20500'
+    )
+
+    assert(!NYAddressor.process('4051 Broadway, New York, NY 10032, United States').fingerprints.nil?)
+  end
+
+  def test_double_comma
+    assert_same_full(
+      '602 21st r  NW, portland,, or 97209',
+      '602 21st r  NW, portland, or 97209',
+    )
+
+    assert_same_full(
+      '602 21st r  NW,, portland, or 97209',
+      '602 21st r  NW, portland, or 97209',
+    )
+  end
+
+  def test_cross_street
+    assert_same_full(
+      '1600 North Pennsylvania (at 16th) Ave, Washington, DC, 20500',
+      '1600 Pennsylvania Ave N, Washington, DC, 20500'
+    )
+    assert_same_full(
+      '1505 & 1507 10TH AVE, SEATTLE, WA 98120',
+      '1505 10TH AVE, SEATTLE, WA 98120',
+    )
+
+    assert_same_full(
+      '1505&1507 10TH AVE, SEATTLE, WA 98120',
+      '1505 10TH AVE, SEATTLE, WA 98120',
+    )
+  end
+
+  def test_error
+    assert_nil NYAddressor.process(nil).fingerprints
+    assert_nil NYAddressor.process('sad;lkjfasdkj;fjaks;df').fingerprints
+  end
+
+
+  def test_zip_extension
+    assert_same_full(
+      '13322 Airport Blvd, Sugar, TX 77478-9898',
+      '13322 Airport Blvd, Sugar, TX 77478'
+    )
+  end
+
+  def test_unit_designations
+    assert_same_full(
+      '15355 Main Ave, Unit 700, Washington, DC 20500',
+      '15355 Main Ave, Apt 700, Washington, DC 20500'
+    )
+  end
+
+  def test_leading_unit_designations
+    original = '15355 Main Ave, #700, Washington, DC 20500'
+    assert_same_full(
+      original,
+      '700-15355 Main Ave, Washington, DC 20500'
+    )
+    assert_same_full(
+      original,
+      '700/15355 Main Ave, Washington, DC 20500'
+    )
+  end
+
+  def test_missing_unit_designation
+    assert_same_full(
+      '1600 Pennsylvania Ave 700, Minneapolis, MN 55555',
+      '1600 Pennsylvania Ave #700, Minneapolis, MN 55555',
+    )
+  end
+
+  def test_unit_in_street_num
+    original = NYAddressor.process('1600 Pennsylvania Ave N, Minneapolis, MN 55555')
+    with_dash = NYAddressor.process('1600-A Pennsylvania Ave N, Minneapolis, MN 55555')
+    dashless = NYAddressor.process('1600A Pennsylvania Ave N, Minneapolis, MN 55555')
+    assert_equal(
+      original.fingerprints[:full],
+      with_dash.fingerprints[:unitless]
+    )
+    assert_equal(
+      original.fingerprints[:full],
+      dashless.fingerprints[:unitless]
+    )
+    assert_equal(with_dash.fingerprints[:full], dashless.fingerprints[:full])
+  end
+
+  def test_unit_formats
+    numberless = 'Pennsylvania Ave N, Minneapolis, MN 55555'
+    assert_equal(
+      NYAddressor.process("1600 #{numberless}").fingerprints[:full],
+      NYAddressor.process("B2 - 1600 #{numberless}").fingerprints[:unitless],
+      "B2 - not recognized as unit"
+    )
+    assert_equal(
+      NYAddressor.process("1600 #{numberless}").fingerprints[:full],
+      NYAddressor.process("B2-1600 #{numberless}").fingerprints[:unitless],
+      "B2- not recognized as unit"
+    )
+    assert_equal(
+      NYAddressor.process("1600 #{numberless}").fingerprints[:full],
+      NYAddressor.process("1600-B2 #{numberless}").fingerprints[:unitless],
+      "-B2 not recognized as unit"
+    )
+    assert_equal(
+      NYAddressor.process("1600 #{numberless}").fingerprints[:full],
+      NYAddressor.process("1600 - B2 #{numberless}").fingerprints[:unitless],
+      "- B2 not recognized as unit"
+    )
+  end
+
+  def test_leading_description
+    description = 'Jacksonville International Airport'
+    base_address = '2400 Yankee Clipper Dr, Jacksonville, FL 32218, United States'
+    assert_same_full(
+      base_address,
+      "#{description}, #{base_address}",
+    )
+  end
+
+  def test_missing_zip
+    zipless = '1600 Pennsylvania Ave, Washington, DC'
+    zip = zipless + ' 55555'
+    assert_same_zipless(
+      zipless,
+      zip,
+    )
+  end
+
+  def test_saint
+    assert_same_full(
+      '161 Victoria St N, Saint Paul, MN 55104',
+      '161 Victoria St N, St. Paul, MN 55104'
+    )
+  end
+
 end
 
-
-# require_relative '../lib/ny-addressor'
-# require 'byebug'
-#
-# class TestFormatEquality < Minitest::Test
-#   def test_simple_equality
-#     str = '1600 Penn Ave, Washington, DC, 20500'
-#     assert_equal NYAddressor::Addressor.new(str), NYAddressor::Addressor.new(str)
-#   end
-#
-#   def test_case
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 Penn Ave, Washington, DC, 20500'),
-#       NYAddressor::Addressor.new('1600 pENN aVE, wASHINGTON, dc, 20500'),
-#     )
-#   end
-#
-#   def test_numeric
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 First Ave, Washington, DC, 20500'),
-#       NYAddressor::Addressor.new('1600 1st Ave, Washington, DC, 20500'),
-#     )
-#   end
-#
-#   def test_periods
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 Penn Ave, Washington, D.C., 20500'),
-#       NYAddressor::Addressor.new('1600 Penn Ave, Washington, DC, 20500'),
-#     )
-#
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 Penn St., Washington, DC, 20500'),
-#       NYAddressor::Addressor.new('1600 Penn St, Washington, DC, 20500'),
-#     )
-#   end
-#
-#   def test_prefix_suffix
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 North Penn Ave, Washington, DC, 20500'),
-#       NYAddressor::Addressor.new('1600 Penn Ave North, Washington, DC, 20500'),
-#     )
-#   end
-#
-#   def test_state_abrev
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 North Penn Ave, Washington, DC, 20500'),
-#       NYAddressor::Addressor.new('1600 Penn Ave North, Washington, District of Columbia, 20500'),
-#     )
-#   end
-#
-#   def test_country
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 North Penn Ave, Washington, DC, 20500, United States'),
-#       NYAddressor::Addressor.new('1600 Penn Ave North, Washington, DC, 20500'),
-#     )
-#   end
-#
-#   def test_country_abrev
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 North Penn Ave, Washington, DC, 20500, United States'),
-#       NYAddressor::Addressor.new('1600 Penn Ave North, Washington, DC, 20500, USA'),
-#     )
-#
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 North Penn Ave, Washington, DC, 20500, United States of America'),
-#       NYAddressor::Addressor.new('1600 Penn Ave North, Washington, DC, 20500, United States'),
-#     )
-#   end
-#
-#   def test_label_abrev
-#     assert_equal(
-#       NYAddressor::Addressor.new('13322 Airport Boulevard, Sugar, TX 77478'),
-#       NYAddressor::Addressor.new('13322 Airport Blvd, Sugar, TX 77478')
-#     )
-#   end
-#
-#   def test_no_prezip_comma
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 Pennsylvania Ave, Washington, DC 20500'),
-#       NYAddressor::Addressor.new('1600 Pennsylvania Ave, Washington, DC, 20500')
-#     )
-#   end
-#
-#   def test_double_direction
-#     assert_equal(
-#       NYAddressor::Addressor.new('232 North Main St N, Stillwater, MN 55082, USA'),
-#       NYAddressor::Addressor.new('232 Main St N, Stillwater, MN 55082, USA')
-#     )
-#   end
-#
-#   def test_direction_as_street
-#     assert !NYAddressor::Addressor.new('260 North St N, Middlebury, VT 05753, USA').hash.nil?
-#     assert !NYAddressor::Addressor.new('901 Avenue E, Wisner, NE 68791, United States').hash.nil?
-#     assert !NYAddressor::Addressor.new('11030 East Blvd, Cleveland, OH 44106, United States').hash.nil?
-#   end
-#
-#   def test_label_as_street
-#     assert !NYAddressor::Addressor.new('260 Court St Unit 6, Middlebury, VT 05753, USA').hash.nil?
-#     assert !NYAddressor::Addressor.new('2656 Parkway, Pigeon Forge, TN 37863, United States').hash.nil?
-#   end
-#
-#   def test_number_as_street
-#     assert !NYAddressor::Addressor.new('1600 24 Ave, Washington, DC 20500').hash.nil?
-#   end
-#
-#   def test_double_entry
-#     base = NYAddressor::Addressor.new('1600 Pennsylvania Ave, Washington, DC 20500')
-#     assert_equal(
-#       base,
-#       NYAddressor::Addressor.new('1600 Pennsylvania Ave, Washington, DC 20500, Washington, DC 20500')
-#     )
-#     assert_equal(
-#       base,
-#       NYAddressor::Addressor.new('1600 Pennsylvania Ave, Washington DC, DC 20500')
-#     )
-#     assert_equal(
-#       base,
-#       NYAddressor::Addressor.new('1600 Pennsylvania Ave, Washington, DC, DC 20500')
-#     )
-#
-#     assert(!NYAddressor::Addressor.new('4051 Broadway, New York, NY 10032, United States').hash.nil?)
-#   end
-#
-#   def test_double_comma
-#     assert_equal(
-#       NYAddressor::Addressor.new('602 21st r  NW, portland,, or 97209'),
-#       NYAddressor::Addressor.new('602 21st r  NW, portland, or 97209'),
-#     )
-#   end
-#
-#   def test_cross_street
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 North Pennsylvania (at 16th) Ave, Washington, DC, 20500'),
-#       NYAddressor::Addressor.new('1600 Pennsylvania Ave N, Washington, DC, 20500')
-#     )
-#
-#     assert_equal(
-#       NYAddressor::Addressor.new('1505 & 1507 10TH AVE, SEATTLE, WA 98120'),
-#       NYAddressor::Addressor.new('1505 10TH AVE, SEATTLE, WA 98120'),
-#     )
-#
-#     assert_equal(
-#       NYAddressor::Addressor.new('1505&1507 10TH AVE, SEATTLE, WA 98120'),
-#       NYAddressor::Addressor.new('1505 10TH AVE, SEATTLE, WA 98120'),
-#     )
-#   end
-#
-#   def test_error
-#     assert_nil NYAddressor::Addressor.new(nil, :US).hash
-#     assert_nil NYAddressor::Addressor.new('sad;lkjfasdkj;fjaks;df', :US).hash
-#   end
-#
-#   def test_zip_extension
-#     assert_equal(
-#       NYAddressor::Addressor.new('13322 Airport Blvd, Sugar, TX 77478-9898'),
-#       NYAddressor::Addressor.new('13322 Airport Blvd, Sugar, TX 77478')
-#     )
-#   end
-#
-#   def test_unit_designations
-#     assert_equal(
-#       NYAddressor::Addressor.new('15355 Main Ave, Unit 700, Washington, DC 20500'),
-#       NYAddressor::Addressor.new('15355 Main Ave, Apt 700, Washington, DC 20500')
-#     )
-#   end
-#
-#   def test_leading_unit_designations
-#     original = NYAddressor::Addressor.new('15355 Main Ave, #700, Washington, DC 20500')
-#     assert_equal(
-#       original,
-#       NYAddressor::Addressor.new('700-15355 Main Ave, Washington, DC 20500')
-#     )
-#     assert_equal(
-#       original,
-#       NYAddressor::Addressor.new('700/15355 Main Ave, Washington, DC 20500')
-#     )
-#   end
-#
-#   def test_missing_unit_designation
-#     assert_equal(
-#       NYAddressor::Addressor.new('1600 Pennsylvania Ave 700, Minneapolis, MN 55555'),
-#       NYAddressor::Addressor.new('1600 Pennsylvania Ave #700, Minneapolis, MN 55555'),
-#     )
-#   end
-#
-#   def test_unit_in_street_num
-#     original = NYAddressor::Addressor.new('1600 Pennsylvania Ave N, Minneapolis, MN 55555')
-#     with_dash = NYAddressor::Addressor.new('1600-A Pennsylvania Ave N, Minneapolis, MN 55555')
-#     dashless = NYAddressor::Addressor.new('1600A Pennsylvania Ave N, Minneapolis, MN 55555')
-#     assert_equal(
-#       original.hash,
-#       with_dash.unitless_hash
-#     )
-#     assert_equal(
-#       original.hash,
-#       dashless.unitless_hash
-#     )
-#     assert_equal(with_dash, dashless)
-#   end
-#
-#   def test_unit_formats
-#     numberless = 'Pennsylvania Ave N, Minneapolis, MN 55555'
-#     assert_equal(
-#       NYAddressor::Addressor.new("1600 #{numberless}").hash,
-#       NYAddressor::Addressor.new("B2 - 1600 #{numberless}").unitless_hash,
-#       "B2 - not recognized as unit"
-#     )
-#     assert_equal(
-#       NYAddressor::Addressor.new("1600 #{numberless}").hash,
-#       NYAddressor::Addressor.new("B2-1600 #{numberless}").unitless_hash,
-#       "B2- not recognized as unit"
-#     )
-#     assert_equal(
-#       NYAddressor::Addressor.new("1600 #{numberless}").hash,
-#       NYAddressor::Addressor.new("1600-B2 #{numberless}").unitless_hash,
-#       "-B2 not recognized as unit"
-#     )
-#     assert_equal(
-#       NYAddressor::Addressor.new("1600 #{numberless}").hash,
-#       NYAddressor::Addressor.new("1600 - B2 #{numberless}").unitless_hash,
-#       "- B2 not recognized as unit"
-#     )
-#   end
-#
-#   def test_leading_description
-#     description = 'Jacksonville International Airport'
-#     base_address = '2400 Yankee Clipper Dr, Jacksonville, FL 32218, United States'
-#     assert_equal(
-#       NYAddressor::Addressor.new(base_address),
-#       NYAddressor::Addressor.new("#{description}, #{base_address}"),
-#     )
-#   end
-#
-#   def test_missing_zip
-#     zipless = '1600 Pennsylvania Ave, Washington, DC'
-#     zip = zipless + ' 55555'
-#     assert_equal(
-#       NYAddressor::Addressor.new(zipless, :US).hash99999,
-#       NYAddressor::Addressor.new(zip, :US).hash99999
-#     )
-#   end
-#
-#   def test_saint
-#     assert_equal(
-#       NYAddressor::Addressor.new('161 Victoria St N, Saint Paul, MN 55104', :US),
-#       NYAddressor::Addressor.new('161 Victoria St N, St. Paul, MN 55104', :US)
-#     )
-#   end
-#
-# end
