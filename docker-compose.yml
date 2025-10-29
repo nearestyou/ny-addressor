@@ -1,8 +1,8 @@
 services:
-  ruby_libpostal:
+  ny-addressor:
     build: .
-    container_name: ruby_libpostal
+    container_name: ny-addressor
     tty: true
     stdin_open: true
     volumes:
-      - .:/app
+      - .:/app:z

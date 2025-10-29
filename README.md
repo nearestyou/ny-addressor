@@ -40,6 +40,9 @@ ruby -Itest test/test_format_equality.rb --name test_unit_designations
 
 
 ### Docker
-
 1. `docker compose up -d`
 2. `docker exec -it ruby_libpostal bash`
+
+### Run Docker Tests
+1. `docker-compose run --rm ny-addressor rake test`
+

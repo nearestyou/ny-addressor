@@ -20,8 +20,12 @@ RUN git clone https://github.com/openvenues/libpostal /tmp/libpostal \
   && ldconfig \
   && rm -rf /tmp/libpostal
 
-# 📦 Install Ruby gems
-RUN gem install bundler ruby_postal
-
 WORKDIR /app
+
+COPY . .
+
+# 📦 Install Ruby gems
+RUN gem install bundler && bundle install
+
+
 CMD ["/bin/bash"]
