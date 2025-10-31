@@ -53,6 +53,12 @@ module TestHelpers
     end
   end
 
+  def assert_same_countryless(a, b, msg=nil)
+    assert_with_diag("countryless fingerprint mismatch", a, b) do
+      assert_equal(fingerprints(a)[:countryless], fingerprints(b)[:countryless], msg)
+    end
+  end
+
   def assert_same_unitless(a, b, msg=nil)
     assert_with_diag("unitless fingerprint mismatch", a, b) do
       assert_equal(fingerprints(a)[:unitless], fingerprints(b)[:unitless], msg)
