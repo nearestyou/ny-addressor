@@ -1,6 +1,6 @@
 require_relative "lib/ny-addressor/version"
 Gem::Specification.new do |s|
-  s.name = 'ny-addressor'
+  s.name = 'ny-addressor-new'
   s.version = NYAddressor::VERSION
   s.summary = 'Address parsing/normalization with libpostal'
   s.authors = ['P Kirwin', 'C Hanson']
