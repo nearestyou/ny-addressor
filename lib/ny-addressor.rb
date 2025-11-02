@@ -10,7 +10,7 @@ require_relative "ny-addressor/fingerprinter"
 require_relative "ny-addressor/canonicalizer"
 require_relative "ny-addressor/selectors"
 
-module NYAddressor
+module NYAddressorNEW
   # @param raw [String] the address text
   # @param expand_opts [Hash] options passed to libpostal expand
   # @param selector [Proc,nil] optional block to choose an expansion
