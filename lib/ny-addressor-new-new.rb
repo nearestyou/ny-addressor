@@ -2,13 +2,13 @@
 require "ruby_postal/expand"
 require "ruby_postal/parser"
 
-require_relative "ny-addressor/version"
-require_relative "ny-addressor/result"
-require_relative "ny-addressor/expander"
-require_relative "ny-addressor/parser"
-require_relative "ny-addressor/fingerprinter"
-require_relative "ny-addressor/canonicalizer"
-require_relative "ny-addressor/selectors"
+require_relative "ny-addressor-new/version"
+require_relative "ny-addressor-new/result"
+require_relative "ny-addressor-new/expander"
+require_relative "ny-addressor-new/parser"
+require_relative "ny-addressor-new/fingerprinter"
+require_relative "ny-addressor-new/canonicalizer"
+require_relative "ny-addressor-new/selectors"
 
 module NYAddressorNEW
   # @param raw [String] the address text
