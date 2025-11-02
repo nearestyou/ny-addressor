@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-module NYAddressor
+module NYAddressorNEW
   class Parser
     DIRECTIONALS = {
       "n"=>"n","north"=>"n","s"=>"s","south"=>"s","e"=>"e","east"=>"e","w"=>"w","west"=>"w",

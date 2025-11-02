@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-module NYAddressor
+module NYAddressorNEW
   class Expander
 
     # @param raw [String]

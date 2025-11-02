@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'digest'
 require "countries"
-module NYAddressor
+module NYAddressorNEW
   class Fingerprinter
     DEFAULT_ORDER = %i[
       house_number

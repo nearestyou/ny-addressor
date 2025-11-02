@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require "countries"
-module NYAddressor
+module NYAddressorNEW
   module Canonicalizer
     STATES = {
       "district of columbia" => "dc"

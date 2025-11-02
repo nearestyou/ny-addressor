@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module NYAddressor
+module NYAddressorNEW
   class Result
     attr_reader :raw
 

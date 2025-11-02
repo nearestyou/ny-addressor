@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-module NYAddressor
+module NYAddressorNEW
   module Selectors
     MIN   = ->(variants) { variants.min_by { |v| [v.length, v] } }
     MAX   = ->(variants) { variants.max_by { |v| [v.length, v] } }
