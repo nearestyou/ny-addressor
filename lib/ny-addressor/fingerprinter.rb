@@ -15,6 +15,13 @@ module NYAddressor
       country
     ].freeze
 
+    def self.normalize_country(string)
+      country = ISO3166::Country.find_country_by_any_name(string) ||
+                ISO3166::Country.find_country_by_alpha2(string) ||
+                ISO3166::Country.find_country_by_alpha3(string)
+      (country&.alpha2 || string).downcase
+    end
+
     # @param parts [Hash{Symbol=>String}] parsed address components
     # @return [String,nil]
     def self.construct(parts, opts = {})
@@ -56,14 +63,8 @@ module NYAddressor
           res = parts[field].to_s
           next if res.empty?
 
-          if field == :country
-            country = ISO3166::Country.find_country_by_any_name(res) ||
-                      ISO3166::Country.find_country_by_alpha2(res) ||
-                      ISO3166::Country.find_country_by_alpha3(res)
-            (country&.alpha2 || res).downcase
-          else
-            res
-          end
+          res = normalize_country(res) if field == :country
+          res
         end
       end.compact
 
