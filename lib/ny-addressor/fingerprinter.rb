@@ -74,18 +74,23 @@ module NYAddressor
     # @param parts [Hash{Symbol=>String}] parsed address components
     # @return [Hash{Symbol=>String}]
     def self.all(parts)
-      {
-        full: Digest::SHA256.hexdigest(construct(parts)),
-        zipless: Digest::SHA256.hexdigest(construct(parts, {overwrite_postcode: true})),
-        unitless: Digest::SHA256.hexdigest(construct(parts, {include_unit: false})),
-        countryless: Digest::SHA256.hexdigest(construct(parts, {include_country: false})),
-        sns: Digest::SHA256.hexdigest(construct(parts, {
+      variants = {
+        full: {},
+        zipless: { overwrite_postcode: true },
+        unitless: { include_unit: false },
+        countryless: { include_country: false },
+        sns: {
           include_unit: false,
           include_city: false,
           include_postcode: false,
           include_country: false
-        }))
+        }
       }
+
+      variants.transform_values do |opts|
+        str = construct(parts, opts)
+        str ? Digest::SHA256.hexdigest(str) : nil
+      end
     end
   end
 end
