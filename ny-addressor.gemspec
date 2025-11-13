@@ -8,4 +8,5 @@ Gem::Specification.new do |s|
   s.homepage = 'http://www.puzzlesandwich.com'
   s.files = Dir["lib/**/*.rb"] + ["README.md"]
   s.add_dependency "ruby_postal", "~> 1.0.1"
+  s.add_dependency "countries", "~> 5.7"
 end

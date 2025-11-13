@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'digest'
+require "countries"
 module NYAddressor
   class Fingerprinter
     DEFAULT_ORDER = %i[
@@ -54,7 +55,15 @@ module NYAddressor
         else
           res = parts[field].to_s
           next if res.empty?
-          res
+
+          if field == :country
+            country = ISO3166::Country.find_country_by_any_name(res) ||
+                      ISO3166::Country.find_country_by_alpha2(res) ||
+                      ISO3166::Country.find_country_by_alpha3(res)
+            (country&.alpha2 || res).downcase
+          else
+            res
+          end
         end
       end.compact
 
