@@ -49,14 +49,12 @@ module NYAddressor
       end
 
       tokens = include_set.map do |field|
-        next if parts[field].to_s.empty?
-
-        if field == :postcode
-          val = opts[:overwrite_postcode] ? "99999" : parts[:postcode].to_s
-          next if val.empty?
-          val
+        if field == :postcode && opts[:overwrite_postcode]
+          "99999"
         else
-          parts[field].to_s
+          res = parts[field].to_s
+          next if res.empty?
+          res
         end
       end.compact
 
