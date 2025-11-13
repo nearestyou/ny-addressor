@@ -26,7 +26,10 @@ WORKDIR /app
 COPY Gemfile Gemfile.lock ./
 COPY ny-addressor.gemspec ./
 COPY lib/ny-addressor/version.rb lib/ny-addressor/version.rb
-RUN gem install bundler && bundle install
+# RUN gem install bundler && bundle install
+RUN gem install bundler \
+  && bundle config set without '' \
+  && bundle install
 
 COPY . .
 
