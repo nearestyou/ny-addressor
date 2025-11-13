@@ -11,8 +11,6 @@ module TestHelpers
     r = result(addr)
     <<~TXT
     -- Address: #{addr.inspect}
-    normalized: #{r.normalized.inspect}
-
     expanded_variants:
     #{r.expanded_variants.take(expansions).map { |v| " - #{v}" }.join("\n")}
 
@@ -26,6 +24,8 @@ module TestHelpers
   rescue Minitest::Assertion => e
     diag = <<~MSG
     #{msg_prefix}
+    #{result(a).normalized.inspect}
+    #{result(b).normalized.inspect}
       === A ===
     #{debug_dump(a)}
 
