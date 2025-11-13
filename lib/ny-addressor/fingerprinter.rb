@@ -64,6 +64,7 @@ module NYAddressor
           next if res.empty?
 
           res = normalize_country(res) if field == :country
+          res = res[..4] if field == :postcode # remove zip extension
           res
         end
       end.compact
