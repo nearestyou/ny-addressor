@@ -23,10 +23,25 @@ module NYAddressor
       string[..4]
     end
 
+    # minneapolis mn, mn -> minneapolis, mn
+    def strip_state_from_city(city, state)
+      tokens = city.split(/\s+/)
+      return city if tokens.size < 2
+
+      if tokens.last == state
+        tokens[0..-2].join(" ")
+      else
+        city
+      end
+    end
+
     def apply(parts)
       parts[:country] = normalize_country(parts[:country]) if parts[:country]
       parts[:state] = normalize_state(parts[:state]) if parts[:state]
       parts[:postcode] = normalize_postcode(parts[:postcode]) if parts[:postcode]
+
+      parts[:city] = strip_state_from_city(parts[:city], parts[:state]) if parts[:city] && parts[:state]
+
       parts
     end
   end
