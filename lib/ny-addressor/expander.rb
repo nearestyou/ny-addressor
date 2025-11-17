@@ -15,10 +15,10 @@ module NYAddressor
     # @param opts [Hash]
     # @yield [variants] optional block to pick custom variant
     # @return [String]
-    def self.normalize(raw, opts = {}, &canonicalizer)
+    def self.normalize(raw, opts = {}, &selector)
       variants = expand(raw, opts).uniq
       return "" if variants.empty?
-      canonicalizer ? canonicalizer.call(variants) : variants.min_by { |v| [v.length, v] }
+      selector ? selector.call(variants) : variants.min_by { |v| [v.length, v] }
     end
   end
 end

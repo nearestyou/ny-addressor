@@ -6,17 +6,17 @@ module NYAddressor
 
     # @param raw [String] address
     # @param expand_opts [Hash] options passed to libpostal expand
-    # @param canonicalizer [Proc,nil] optional selector for expand variant
-    def initialize(raw, expand_opts: {}, canonicalizer: nil)
+    # @param selector [Proc,nil] optional selector for expand variant
+    def initialize(raw, expand_opts: {}, selector: nil)
       @raw = raw.to_s
       @expand_opts = expand_opts || {}
-      @canonicalizer = canonicalizer
+      @selector = selector
       @__normalized = @__parts = @__fingerprints = @__variants = nil
     end
 
     # @return [String]
     def normalized
-      @__normalized ||= Expander.normalize(@raw, @expand_opts, &@canonicalizer)
+      @__normalized ||= Expander.normalize(@raw, @expand_opts, &@selector)
     end
 
     # @return [Hash{Symbol=>String}]

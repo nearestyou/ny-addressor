@@ -12,10 +12,10 @@ require_relative "ny-addressor/canonicalizer"
 module NYAddressor
   # @param raw [String] the address text
   # @param expand_opts [Hash] options passed to libpostal expand
-  # @param canonicalizer [Proc,nil] optional block to choose an expansion
+  # @param selector [Proc,nil] optional block to choose an expansion
   # @return [NYAddressor::Result]
-  def self.process(raw, expand_opts: {}, canonicalizer: nil)
-    Result.new(raw, expand_opts: expand_opts, canonicalizer: canonicalizer)
+  def self.process(raw, expand_opts: {}, selector: nil)
+    Result.new(raw, expand_opts: expand_opts, selector: selector)
   end
 
   # @see NYAddressor::Result#normalized
