@@ -15,12 +15,6 @@ module NYAddressor
       country
     ].freeze
 
-    def self.normalize_country(string)
-      country = ISO3166::Country.find_country_by_any_name(string) ||
-                ISO3166::Country.find_country_by_alpha2(string) ||
-                ISO3166::Country.find_country_by_alpha3(string)
-      (country&.alpha2 || string).downcase
-    end
 
     # @param parts [Hash{Symbol=>String}] parsed address components
     # @return [String,nil]
@@ -63,8 +57,6 @@ module NYAddressor
           res = parts[field].to_s
           next if res.empty?
 
-          res = normalize_country(res) if field == :country
-          res = res[..4] if field == :postcode # remove zip extension
           res
         end
       end.compact
