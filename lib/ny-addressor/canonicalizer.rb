@@ -35,11 +35,32 @@ module NYAddressor
       end
     end
 
+    def strip_cross_street(string)
+      # remove "at <number>"
+      # penn at 16th -> penn
+      n = string.sub(/
+                      \b at           # look for "at" after word
+                      \s+\d+          # whitespace & number
+                      (st|nd|rd|th)?  # optional ordinal
+                      \b
+                     /x, "").strip
+
+      # remove &
+      # 1505&1507 -> 1505
+      n = n.sub(/
+                \A(?:&|and)          # match & || "and" at start of string
+                \s*\d+\s+            # whitespace, number, whitespace
+                /x, "").strip
+
+      n.strip
+    end
+
     def apply(parts)
       parts[:country] = normalize_country(parts[:country]) if parts[:country]
       parts[:state] = normalize_state(parts[:state]) if parts[:state]
       parts[:postcode] = normalize_postcode(parts[:postcode]) if parts[:postcode]
 
+      parts[:street_name] = strip_cross_street(parts[:street_name]) if parts[:street_name]
       parts[:city] = strip_state_from_city(parts[:city], parts[:state]) if parts[:city] && parts[:state]
 
       parts
