@@ -6,8 +6,8 @@ module NYAddressor
 
     # @param raw [String] address
     # @param expand_opts [Hash] options passed to libpostal expand
-    # @param selector [Proc,nil] optional selector for expand variant
-    def initialize(raw, expand_opts: {}, selector: nil)
+    # @param selector [Proc] selector for expand variant
+    def initialize(raw, expand_opts: {}, selector: Selectors::HEURISTIC)
       @raw = raw.to_s
       @expand_opts = expand_opts || {}
       @selector = selector

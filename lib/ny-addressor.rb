@@ -8,6 +8,7 @@ require_relative "ny-addressor/expander"
 require_relative "ny-addressor/parser"
 require_relative "ny-addressor/fingerprinter"
 require_relative "ny-addressor/canonicalizer"
+require_relative "ny-addressor/selectors"
 
 module NYAddressor
   # @param raw [String] the address text
@@ -15,6 +16,7 @@ module NYAddressor
   # @param selector [Proc,nil] optional block to choose an expansion
   # @return [NYAddressor::Result]
   def self.process(raw, expand_opts: {}, selector: nil)
+    selector ||= Selectors::HEURISTIC
     Result.new(raw, expand_opts: expand_opts, selector: selector)
   end
 

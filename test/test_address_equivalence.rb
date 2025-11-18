@@ -99,6 +99,11 @@ class AddressEquivalenceTest < Minitest::Test
   def test_label_as_street
     assert !NYAddressor.process('260 Court St Unit 6, Middlebury, VT 05753, USA').fingerprints[:full].nil?
     assert !NYAddressor.process('2656 Parkway, Pigeon Forge, TN 37863, United States').fingerprints[:full].nil?
+
+    assert_same_full(
+      '260 Court St Unit 6, Middlebury, VT 05753, USA',
+      '260 Court Street Unit 6, Middlebury, VT 05753, USA'
+    )
   end
 
   def test_number_as_street
