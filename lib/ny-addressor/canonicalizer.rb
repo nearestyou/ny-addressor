@@ -69,14 +69,33 @@ module NYAddressor
       n.strip
     end
 
+    # street_name: penn 7, unit: nil => street_name: penn, unit: 7
+    def extract_trailing_unit_from_street(parts)
+      return parts if parts[:unit].to_s.strip != ""
+      return parts unless parts[:street_name]
+      return parts unless parts[:street_label]
+
+      tokens = parts[:street_name].split(/\s+/)
+      return parts if tokens.size < 2
+
+      last = tokens.last
+      return parts unless last =~ /\A[0-9][0-9a-z\-]*\z/i
+
+      parts[:unit] = last
+      parts[:street_name] = tokens[0..-2].join(" ")
+      parts
+    end
+
     def apply(parts)
       parts[:country] = normalize_country(parts[:country]) if parts[:country]
       parts[:state] = normalize_state(parts[:state]) if parts[:state]
       parts[:postcode] = normalize_postcode(parts[:postcode]) if parts[:postcode]
-      parts[:unit] = normalize_unit(parts[:unit]) if parts[:unit]
 
       parts[:street_name] = strip_cross_street(parts[:street_name]) if parts[:street_name]
       parts[:city] = strip_state_from_city(parts[:city], parts[:state]) if parts[:city] && parts[:state]
+
+      parts = extract_trailing_unit_from_street(parts)
+      parts[:unit] = normalize_unit(parts[:unit]) if parts[:unit]
 
       parts
     end
