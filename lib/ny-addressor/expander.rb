@@ -29,7 +29,8 @@ module NYAddressor
         score = 0
         score += 20 if parts[:house_number]
         score += 15 if parts[:street_name]
-        score += 10 if parts[:street_label]
+        score += 1 if parts[:street_label]
+
         score += 5 if parts[:city]
         score += 3 if parts[:state]
         score += 2 if parts[:postcode]

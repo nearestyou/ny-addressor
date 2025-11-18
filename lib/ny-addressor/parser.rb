@@ -19,7 +19,8 @@ module NYAddressor
     # @return [Hash{Symbol=>String}]
     def self.parse_road(road)
       tokens = road.downcase.split(/\s+/)
-      return { street_name: road } if tokens.empty?
+      return { street_name: road } if tokens.size <= 1
+
 
       # Pick out the label
       label_index = tokens.rindex { |t| STREET_LABELS.include?(t) }
