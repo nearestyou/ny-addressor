@@ -29,8 +29,8 @@ module NYAddressor
 
       # Pick out the direction
       direction_prefix = tokens.size == 1 ? nil : DIRECTIONALS[tokens.first]
-      direction_suffix = tokens.size == 1 ? nil : DIRECTIONALS[tokens.last]
       tokens.shift if direction_prefix
+      direction_suffix = tokens.size == 1 ? nil : DIRECTIONALS[tokens.last]
       tokens.pop if direction_suffix
 
       {
