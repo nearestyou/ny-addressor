@@ -23,6 +23,20 @@ module NYAddressor
       string[..4]
     end
 
+    def normalize_unit(string)
+      tokens = string.split(/\s+/)
+
+      # Look for a number
+      unit = tokens.find { |t| t =~ /\d/ }
+      return string if unit.nil?
+
+      unit = unit
+        .sub(/\A[^0-9a-z]+/, "")  # strip #, no., etc
+        .gsub(/[^0-9a-z\-]/, "")  # strip interior punctuation
+
+      unit
+    end
+
     # minneapolis mn, mn -> minneapolis, mn
     def strip_state_from_city(city, state)
       tokens = city.split(/\s+/)
@@ -59,6 +73,7 @@ module NYAddressor
       parts[:country] = normalize_country(parts[:country]) if parts[:country]
       parts[:state] = normalize_state(parts[:state]) if parts[:state]
       parts[:postcode] = normalize_postcode(parts[:postcode]) if parts[:postcode]
+      parts[:unit] = normalize_unit(parts[:unit]) if parts[:unit]
 
       parts[:street_name] = strip_cross_street(parts[:street_name]) if parts[:street_name]
       parts[:city] = strip_state_from_city(parts[:city], parts[:state]) if parts[:city] && parts[:state]
