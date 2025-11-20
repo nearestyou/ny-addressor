@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 module NYAddressor
-  class Expander
+  module Expander
+    module_function
 
-    def self.normalize_commas(raw)
+    # Make commas safe for libpostal
+    def normalize_commas(raw)
       raw.to_s
         .gsub(/,(\S)/, ', \1')  # add space after commas
         .gsub(/\s+/, ' ')       # collapse crazy whitespace
@@ -12,7 +14,7 @@ module NYAddressor
     # @param raw [String]
     # @param opts [Hash] override defaults
     # @return [Array<String>]
-    def self.expand(raw, opts = {})
+    def expand(raw, opts = {})
       # options = DEFAULTS.merge(opts || {})
       # Postal::Expand.expand_address(raw.to_s, **options) || []
       Postal::Expand.expand_address(normalize_commas(raw)) || []
@@ -22,14 +24,15 @@ module NYAddressor
     # @param opts [Hash]
     # @yield [variants] an expanded address
     # @return [String]
-    def self.normalize(raw, opts = {}, &selector)
+    def normalize(raw, opts = {}, &selector)
       variants = expand(raw, opts).uniq
       return "" if variants.empty?
 
-      yield(variants)
+      (selector || method(:best_variant_by_heuristic)).call(variants)
+      # yield(variants)
     end
 
-    def self.best_variant_by_heuristic(variants)
+    def best_variant_by_heuristic(variants)
       scored = variants.map do |v|
         parts = Parser.parts(v)
 
