@@ -211,25 +211,36 @@ class AddressEquivalenceTest < Minitest::Test
   end
 
   def test_unit_formats
-    numberless = 'Pennsylvania Ave N, Minneapolis, MN 55555'
+    numberless  = 'Pennsylvania Ave N, Minneapolis, MN 55555'
+    full        = NYAddressor.process("1600 #{numberless}")
+    lead        = NYAddressor.process("B2 1600 #{numberless}")
+    lead_dash   = NYAddressor.process("B2-1600 #{numberless}")
+    lead_space  = NYAddressor.process("B2 - 1600 #{numberless}")
+    trail       = NYAddressor.process("1600 B2 #{numberless}")
+    trail_dash  = NYAddressor.process("1600-B2 #{numberless}")
+    trail_space = NYAddressor.process("1600 - B2 #{numberless}")
+
     assert_equal(
-      NYAddressor.process("1600 #{numberless}").fingerprints[:full],
-      NYAddressor.process("B2 - 1600 #{numberless}").fingerprints[:unitless],
-      "B2 - not recognized as unit"
-    )
-    assert_equal(
-      NYAddressor.process("1600 #{numberless}").fingerprints[:full],
-      NYAddressor.process("B2-1600 #{numberless}").fingerprints[:unitless],
+      full.fingerprints[:full],
+      lead_dash.fingerprints[:unitless],
       "B2- not recognized as unit"
     )
+
     assert_equal(
-      NYAddressor.process("1600 #{numberless}").fingerprints[:full],
-      NYAddressor.process("1600-B2 #{numberless}").fingerprints[:unitless],
+      full.fingerprints[:full],
+      lead_space.fingerprints[:unitless],
+      "B2 - not recognized as unit"
+    )
+
+    assert_equal(
+      full.fingerprints[:full],
+      trail_dash.fingerprints[:unitless],
       "-B2 not recognized as unit"
     )
+
     assert_equal(
-      NYAddressor.process("1600 #{numberless}").fingerprints[:full],
-      NYAddressor.process("1600 - B2 #{numberless}").fingerprints[:unitless],
+      full.fingerprints[:full],
+      trail_space.fingerprints[:unitless],
       "- B2 not recognized as unit"
     )
   end

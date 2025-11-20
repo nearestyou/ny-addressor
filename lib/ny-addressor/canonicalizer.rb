@@ -75,31 +75,27 @@ module NYAddressor
 
     def extract_unit_from_house_number!(parts)
       hn = parts[:house_number].to_s.strip
+      return parts if parts[:unit]  # unit already selected
 
-      if hn =~ TRAILING_ALPHA_UNIT_RE
+      if hn =~ /\A(\d+)[-\s]*([a-z][0-9a-z]*)\z/i
         base = Regexp.last_match(1)
-        suf  = Regexp.last_match(2).downcase
-        parts[:unit] ||= suf
+        unit = Regexp.last_match(2).downcase
+        parts[:unit] ||= unit
         parts[:house_number] = base
+        return parts
       end
 
-      if hn =~ LEADING_ALPHA_UNIT_RE
-        pre  = Regexp.last_match(1)
-        base = Regexp.last_match(2)
+      tokens = hn.split(/[-\s]+/)
+      numeric_tokens = tokens.select { |t| t =~ /\A\d+\z/ }
+      return parts if tokens.size < 2 || numeric_tokens.empty?
 
-        parts[:unit] ||= pre
-        parts[:house_number] = base
-      end
+      house_number = numeric_tokens.max_by(&:to_i)  # House number is probably the biggest number
 
-      if hn =~ LEADING_NUMERIC_UNIT_RE
-          first  = Regexp.last_match(1)
-          second = Regexp.last_match(2)
-          if second.to_i > first.to_i
-            parts[:unit] ||= first
-            parts[:house_number] = second
-          end
-      end
+      unit_parts = []
+      tokens.each { |t| unit_parts << t if t != house_number }
 
+      parts[:unit] ||= unit_parts.join
+      parts[:house_number] = house_number
       parts
     end
 
