@@ -7,6 +7,8 @@ require_relative "ny-addressor-new/result"
 require_relative "ny-addressor-new/expander"
 require_relative "ny-addressor-new/parser"
 require_relative "ny-addressor-new/fingerprinter"
+require_relative "ny-addressor-new/canonicalizer"
+require_relative "ny-addressor-new/selectors"
 
 module NYAddressorNEW
   # @param raw [String] the address text
