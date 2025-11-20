@@ -223,6 +223,14 @@ class AddressEquivalenceTest < Minitest::Test
     assert_unitless_equivalent(full, trail_space, "- B2 not recognized as unit")
   end
 
+  def test_unit_order
+    numberless   = 'Pennsylvania Ave N, Minneapolis, MN 55555'
+    alphanumeric = "B2 1600 #{numberless}"
+    numericalpha = "2B 1600 #{numberless}"
+
+    assert_same_full(alphanumeric, numericalpha)
+  end
+
   def test_leading_description
     description = 'Jacksonville International Airport'
     base_address = '2400 Yankee Clipper Dr, Jacksonville, FL 32218, United States'
