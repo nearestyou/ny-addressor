@@ -2,13 +2,20 @@
 module NYAddressor
   class Expander
 
+    def self.normalize_commas(raw)
+      raw.to_s
+        .gsub(/,(\S)/, ', \1')  # add space after commas
+        .gsub(/\s+/, ' ')       # collapse crazy whitespace
+        .strip
+    end
+
     # @param raw [String]
     # @param opts [Hash] override defaults
     # @return [Array<String>]
     def self.expand(raw, opts = {})
       # options = DEFAULTS.merge(opts || {})
       # Postal::Expand.expand_address(raw.to_s, **options) || []
-      Postal::Expand.expand_address(raw.to_s) || []
+      Postal::Expand.expand_address(normalize_commas(raw)) || []
     end
 
     # @param raw [String]
