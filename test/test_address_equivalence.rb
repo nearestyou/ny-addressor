@@ -215,8 +215,10 @@ class AddressEquivalenceTest < Minitest::Test
     trail_dash  = "1600-B2 #{numberless}"
     trail_space = "1600 - B2 #{numberless}"
 
+    assert_unitless_equivalent(full, lead)
     assert_unitless_equivalent(full, lead_dash, "B2- not recognized as unit")
     assert_unitless_equivalent(full, lead_space, "B2 - not recognized as unit")
+    assert_unitless_equivalent(full, trail)
     assert_unitless_equivalent(full, trail_dash, "-B2 not recognized as unit")
     assert_unitless_equivalent(full, trail_space, "- B2 not recognized as unit")
   end
