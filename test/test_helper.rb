@@ -12,6 +12,7 @@ module TestHelpers
     r = result(addr)
     <<~TXT
     -- Address: #{addr.inspect}
+    normalized: #{r.normalized.inspect}
     expanded_variants:
     #{r.expanded_variants.take(expansions).map { |v| " - #{v}" }.join("\n")}
 
@@ -25,8 +26,6 @@ module TestHelpers
   rescue Minitest::Assertion => e
     diag = <<~MSG
     #{msg_prefix}
-    #{result(a).normalized.inspect}
-    #{result(b).normalized.inspect}
       === A ===
     #{debug_dump(a)}
 
@@ -69,6 +68,12 @@ module TestHelpers
   def assert_same_sns(a, b, msg=nil)
     assert_with_diag("SNS fingerprint mismatch", a, b) do
       assert_equal(fingerprints(a)[:sns], fingerprints(b)[:sns], msg)
+    end
+  end
+
+  def assert_unitless_equivalent(base, unit, msg=nil)
+    assert_with_diag("Unit unequivalent", base, unit) do
+      assert_equal(fingerprints(base)[:full], fingerprints(unit)[:unitless], msg)
     end
   end
 end

@@ -196,53 +196,29 @@ class AddressEquivalenceTest < Minitest::Test
   end
 
   def test_unit_in_street_num
-    original = NYAddressor.process('1600 Pennsylvania Ave N, Minneapolis, MN 55555')
-    with_dash = NYAddressor.process('1600-A Pennsylvania Ave N, Minneapolis, MN 55555')
-    dashless = NYAddressor.process('1600A Pennsylvania Ave N, Minneapolis, MN 55555')
-    assert_equal(
-      original.fingerprints[:full],
-      with_dash.fingerprints[:unitless]
-    )
-    assert_equal(
-      original.fingerprints[:full],
-      dashless.fingerprints[:unitless]
-    )
-    assert_equal(with_dash.fingerprints[:full], dashless.fingerprints[:full])
+    original = '1600 Pennsylvania Ave N, Minneapolis, MN 55555'
+    with_dash = '1600-A Pennsylvania Ave N, Minneapolis, MN 55555'
+    dashless = '1600A Pennsylvania Ave N, Minneapolis, MN 55555'
+
+    assert_unitless_equivalent(original, with_dash)
+    assert_unitless_equivalent(original, dashless)
+    assert_same_full(with_dash, dashless)
   end
 
   def test_unit_formats
     numberless  = 'Pennsylvania Ave N, Minneapolis, MN 55555'
-    full        = NYAddressor.process("1600 #{numberless}")
-    lead        = NYAddressor.process("B2 1600 #{numberless}")
-    lead_dash   = NYAddressor.process("B2-1600 #{numberless}")
-    lead_space  = NYAddressor.process("B2 - 1600 #{numberless}")
-    trail       = NYAddressor.process("1600 B2 #{numberless}")
-    trail_dash  = NYAddressor.process("1600-B2 #{numberless}")
-    trail_space = NYAddressor.process("1600 - B2 #{numberless}")
+    full        = "1600 #{numberless}"
+    lead        = "B2 1600 #{numberless}"
+    lead_dash   = "B2-1600 #{numberless}"
+    lead_space  = "B2 - 1600 #{numberless}"
+    trail       = "1600 B2 #{numberless}"
+    trail_dash  = "1600-B2 #{numberless}"
+    trail_space = "1600 - B2 #{numberless}"
 
-    assert_equal(
-      full.fingerprints[:full],
-      lead_dash.fingerprints[:unitless],
-      "B2- not recognized as unit"
-    )
-
-    assert_equal(
-      full.fingerprints[:full],
-      lead_space.fingerprints[:unitless],
-      "B2 - not recognized as unit"
-    )
-
-    assert_equal(
-      full.fingerprints[:full],
-      trail_dash.fingerprints[:unitless],
-      "-B2 not recognized as unit"
-    )
-
-    assert_equal(
-      full.fingerprints[:full],
-      trail_space.fingerprints[:unitless],
-      "- B2 not recognized as unit"
-    )
+    assert_unitless_equivalent(full, lead_dash, "B2- not recognized as unit")
+    assert_unitless_equivalent(full, lead_space, "B2 - not recognized as unit")
+    assert_unitless_equivalent(full, trail_dash, "-B2 not recognized as unit")
+    assert_unitless_equivalent(full, trail_space, "- B2 not recognized as unit")
   end
 
   def test_leading_description
