@@ -69,8 +69,32 @@ module NYAddressor
       n.strip
     end
 
+    def extract_unit_from_house_number!(parts)
+      hn = parts[:house_number].to_s.strip
+
+      # 16-A -> house_number: 16, unit: A
+      if hn =~ /\A(\d+)[-\s]*([a-z])\z/i
+        base = Regexp.last_match(1)
+        suf  = Regexp.last_match(2).downcase
+        parts[:unit] ||= suf
+        parts[:house_number] = base
+      end
+
+      # 70-15355 -> house_number: 15355, unit: 70
+      if hn =~ /\A(\d+)[\-\s]+(\d+)\z/
+          first  = Regexp.last_match(1)
+          second = Regexp.last_match(2)
+          if second.to_i > first.to_i
+            parts[:unit] ||= first
+            parts[:house_number] = second
+          end
+      end
+
+      parts
+    end
+
     # street_name: penn 7, unit: nil => street_name: penn, unit: 7
-    def extract_trailing_unit_from_street(parts)
+    def extract_trailing_unit_from_street!(parts)
       return parts if parts[:unit].to_s.strip != ""
       return parts unless parts[:street_name]
       return parts unless parts[:street_label]
@@ -94,7 +118,8 @@ module NYAddressor
       parts[:street_name] = strip_cross_street(parts[:street_name]) if parts[:street_name]
       parts[:city] = strip_state_from_city(parts[:city], parts[:state]) if parts[:city] && parts[:state]
 
-      parts = extract_trailing_unit_from_street(parts)
+      parts = extract_unit_from_house_number!(parts)
+      parts = extract_trailing_unit_from_street!(parts)
       parts[:unit] = normalize_unit(parts[:unit]) if parts[:unit]
 
       parts
