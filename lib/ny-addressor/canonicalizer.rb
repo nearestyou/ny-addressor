@@ -2,6 +2,10 @@
 require "countries"
 module NYAddressor
   module Canonicalizer
+    TRAILING_ALPHA_UNIT_RE  = /\A(\d+)[-\s]*([a-z][0-9a-z]*)\z/i  # 16A, 16-A, 16 A -> house_number: 16, unit: A
+    LEADING_ALPHA_UNIT_RE   = /\A([a-z][0-9a-z]*)[-\s]+(\d+)\z/i
+    LEADING_NUMERIC_UNIT_RE = /\A(\d+)[-\s]+(\d+)\z/              # 70-15355 -> house_number: 15355, unit: 70
+
     STATES = {
       "district of columbia" => "dc"
     }.freeze
@@ -72,16 +76,22 @@ module NYAddressor
     def extract_unit_from_house_number!(parts)
       hn = parts[:house_number].to_s.strip
 
-      # 16-A -> house_number: 16, unit: A
-      if hn =~ /\A(\d+)[-\s]*([a-z])\z/i
+      if hn =~ TRAILING_ALPHA_UNIT_RE
         base = Regexp.last_match(1)
         suf  = Regexp.last_match(2).downcase
         parts[:unit] ||= suf
         parts[:house_number] = base
       end
 
-      # 70-15355 -> house_number: 15355, unit: 70
-      if hn =~ /\A(\d+)[\-\s]+(\d+)\z/
+      if hn =~ LEADING_ALPHA_UNIT_RE
+        pre  = Regexp.last_match(1)
+        base = Regexp.last_match(2)
+
+        parts[:unit] ||= pre
+        parts[:house_number] = base
+      end
+
+      if hn =~ LEADING_NUMERIC_UNIT_RE
           first  = Regexp.last_match(1)
           second = Regexp.last_match(2)
           if second.to_i > first.to_i
