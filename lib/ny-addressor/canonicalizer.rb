@@ -2,10 +2,6 @@
 require "countries"
 module NYAddressor
   module Canonicalizer
-    TRAILING_ALPHA_UNIT_RE  = /\A(\d+)[-\s]*([a-z][0-9a-z]*)\z/i  # 16A, 16-A, 16 A -> house_number: 16, unit: A
-    LEADING_ALPHA_UNIT_RE   = /\A([a-z][0-9a-z]*)[-\s]+(\d+)\z/i
-    LEADING_NUMERIC_UNIT_RE = /\A(\d+)[-\s]+(\d+)\z/              # 70-15355 -> house_number: 15355, unit: 70
-
     STATES = {
       "district of columbia" => "dc"
     }.freeze
