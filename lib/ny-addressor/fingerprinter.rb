@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require 'digest'
 require "countries"
+require_relative '../ny-addressor/utils'
 module NYAddressor
   module Fingerprinter
     DEFAULT_ORDER = %i[
@@ -20,8 +21,13 @@ module NYAddressor
     # @param parts [Hash{Symbol=>String}] parsed address components
     # @return [String,nil]
     def construct(parts, opts = {})
-      required = %i[house_number street_name city]
-      return nil if required.any? { |f| parts[f].to_s.empty? }
+      required = {
+        house_number: NYAddressor.first_present(parts[:house_number], parts[:house]),
+        street_name: parts[:street_name],
+        city: NYAddressor.first_present(parts[:city], parts[:city_district], parts[:state])
+      }
+
+      return nil if required.values.any? { |v| v.to_s.empty? }
 
       opts = {
         include_label: false,
@@ -33,7 +39,7 @@ module NYAddressor
         overwrite_postcode: false
       }.merge(opts)
 
-      include_set = required
+      include_set = required.keys.dup # [:house_number, :street_name, :city]
       DEFAULT_ORDER.each do |field|
         case field
         when :street_label
@@ -55,10 +61,9 @@ module NYAddressor
         if field == :postcode && opts[:overwrite_postcode]
           "99999"
         else
-          res = parts[field].to_s
-          next if res.empty?
-
-          res
+          res = required[field] || parts[field] || ""
+          next if res.to_s.empty?
+          res.to_s
         end
       end.compact
 
