@@ -20,14 +20,14 @@ module NYAddressor
     # @param parts [Hash{Symbol=>String}] parsed address components
     # @return [String,nil]
     def construct(parts, opts = {})
-      required = %i[house_number street_name state]
+      required = %i[house_number street_name city]
       return nil if required.any? { |f| parts[f].to_s.empty? }
 
       opts = {
         include_label: false,
         include_dir: false,
         include_unit: true,
-        include_city: true,
+        include_state: true,
         include_postcode: true,
         include_country: true,
         overwrite_postcode: false
@@ -42,8 +42,8 @@ module NYAddressor
           include_set << field if opts[:include_dir]
         when :unit
           include_set << field if opts[:include_unit]
-        when :city
-          include_set << field if opts[:include_city]
+        when :state
+          include_set << field if opts[:include_state]
         when :postcode
           include_set << field if opts[:include_postcode]
         when :country
@@ -75,7 +75,7 @@ module NYAddressor
         countryless: { include_country: false },
         sns: {
           include_unit: false,
-          include_city: false,
+          include_state: false,
           include_postcode: false,
           include_country: false
         }
