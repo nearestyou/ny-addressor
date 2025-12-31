@@ -27,7 +27,6 @@ module NYAddressor
         city: NYAddressor.first_present(parts[:city], parts[:city_district], parts[:state], parts[:postcode], parts[:country]) #Country here might break countryless fingerprints and postcode
       }
 
-      # TODO: Asl Cooper thoughts on now that we have first_present, can we switch this to just check if any are nil/empty? change to .all?
       return nil if required.values.all? { |v| v.to_s.empty? }
 
       opts = {
