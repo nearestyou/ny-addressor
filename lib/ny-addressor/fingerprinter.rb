@@ -22,11 +22,12 @@ module NYAddressor
     # @return [String,nil]
     def construct(parts, opts = {})
       required = {
-        house_number: NYAddressor.first_present(parts[:house_number], parts[:house]),
-        street_name: NYAddressor.first_present(parts[:street_name], parts[:suburb]),
-        city: NYAddressor.first_present(parts[:city], parts[:city_district], parts[:state], parts[:country]) #Country here might break countryless fingerprints, but it means we can generate some
+        house_number: NYAddressor.first_present(parts[:house_number], parts[:house], parts[:street_name]),
+        street_name: NYAddressor.first_present(parts[:street_name], parts[:suburb], parts[:house], parts[:house_number]),
+        city: NYAddressor.first_present(parts[:city], parts[:city_district], parts[:suburb], parts[:state], parts[:postcode], parts[:country]) #Country here might break countryless fingerprints and postcode
       }
 
+      # TODO: Asl Cooper thoughts on now that we have first_present, can we switch this to just check if any are nil/empty?
       return nil if required.values.any? { |v| v.to_s.empty? }
 
       opts = {
