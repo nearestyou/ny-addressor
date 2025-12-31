@@ -23,8 +23,8 @@ module NYAddressor
     def construct(parts, opts = {})
       required = {
         house_number: NYAddressor.first_present(parts[:house_number], parts[:house]),
-        street_name: parts[:street_name],
-        city: NYAddressor.first_present(parts[:city], parts[:city_district], parts[:state])
+        street_name: NYAddressor.first_present(parts[:street_name], parts[:suburb]),
+        city: NYAddressor.first_present(parts[:city], parts[:city_district], parts[:state], parts[:country]) #Country here might break countryless fingerprints, but it means we can generate some
       }
 
       return nil if required.values.any? { |v| v.to_s.empty? }
