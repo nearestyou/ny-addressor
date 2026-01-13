@@ -22,12 +22,12 @@ module NYAddressor
     # @return [String,nil]
     def construct(parts, opts = {})
       required = {
-        house_number: NYAddressor.first_present(parts[:house_number], parts[:house], parts[:po_box], parts[:street_name]),
+        house_number: NYAddressor.first_present(parts[:house_number], parts[:house], parts[:po_box]),
         street_name: NYAddressor.first_present(parts[:street_name], parts[:suburb]),
-        city: NYAddressor.first_present(parts[:city], parts[:city_district], parts[:state], parts[:postcode], parts[:country]) #Country here might break countryless fingerprints and postcode
+        city: NYAddressor.first_present(parts[:city], parts[:city_district], parts[:state], parts[:postcode], parts[:country])
       }
 
-      return nil if required.values.all? { |v| v.to_s.empty? }
+      return nil if required.values.any? { |v| v.to_s.empty? }
 
       opts = {
         include_label: false,
