@@ -31,4 +31,8 @@ module NYAddressorNEW
       end
     end
   end
+
+  def self.first_present(*values)
+    values.find { |v| !v.to_s.empty? }
+  end
 end
