@@ -2,7 +2,7 @@
 require 'digest'
 require "countries"
 module NYAddressorNEW
-  class Fingerprinter
+  module Fingerprinter
     DEFAULT_ORDER = %i[
       house_number
       street_name
@@ -15,10 +15,11 @@ module NYAddressorNEW
       country
     ].freeze
 
+    module_function
 
     # @param parts [Hash{Symbol=>String}] parsed address components
     # @return [String,nil]
-    def self.construct(parts, opts = {})
+    def construct(parts, opts = {})
       required = %i[house_number street_name state]
       return nil if required.any? { |f| parts[f].to_s.empty? }
 
@@ -66,7 +67,7 @@ module NYAddressorNEW
 
     # @param parts [Hash{Symbol=>String}] parsed address components
     # @return [Hash{Symbol=>String}]
-    def self.all(parts)
+    def all(parts)
       variants = {
         full: {},
         zipless: { overwrite_postcode: true },

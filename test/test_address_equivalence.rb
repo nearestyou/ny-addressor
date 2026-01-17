@@ -34,6 +34,18 @@ class AddressEquivalenceTest < Minitest::Test
     )
   end
 
+  def test_spaces
+    assert_same_full(
+      '1351 VETERANS PKWY,CLARKSVILLE,IN,47129',
+      '1351 VETERANS PKWY, CLARKSVILLE, IN, 47129'
+    )
+
+    assert_same_full(
+      '1351 VETERANS PKWY,CLARKSVILLE,IN,47129',
+      '1351 VETERANS PKWY CLARKSVILLE IN 47129'
+    )
+  end
+
   def test_prefix_suffix
     assert_same_full(
       '1600 North Penn Ave, Washington, DC, 20500',

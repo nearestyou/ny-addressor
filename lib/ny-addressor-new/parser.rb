@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module NYAddressorNEW
-  class Parser
+  module Parser
     DIRECTIONALS = {
       "n"=>"n","north"=>"n","s"=>"s","south"=>"s","e"=>"e","east"=>"e","w"=>"w","west"=>"w",
       "ne"=>"ne","northeast"=>"ne","nw"=>"nw","northwest"=>"nw","se"=>"se","southeast"=>"se","sw"=>"sw","southwest"=>"sw" }.freeze
@@ -12,12 +12,14 @@ module NYAddressorNEW
       expressway route
     ].freeze
 
+    module_function
+
     # N Main St -> dir=N, name=Main, label=St
     # Main St N -> dir=N, name=Main, label=St
     # North St ->  dir=, name=North, label=St
     # @param road [String]
     # @return [Hash{Symbol=>String}]
-    def self.parse_road(road)
+    def parse_road(road)
       tokens = road.downcase.split(/\s+/)
       return { street_name: road } if tokens.size <= 1
 
@@ -42,7 +44,7 @@ module NYAddressorNEW
 
     # @param raw [String]
     # @return [Hash{Symbol=>String}]
-    def self.parts(raw)
+    def parts(raw)
       result = {}
       Postal::Parser.parse_address(raw.to_s).each do |c|
         if c[:label] == :road

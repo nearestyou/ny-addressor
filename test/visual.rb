@@ -13,3 +13,4 @@ puts nya.normalized
 nya.parts.each do |k, v|
   puts "  #{k.to_s.ljust(16)} -> #{v.inspect}"
 end
+puts nya.expanded_variants

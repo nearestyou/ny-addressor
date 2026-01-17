@@ -22,7 +22,7 @@ module NYAddressorNEW
     # @return [Hash{Symbol=>String}]
     def parts
       @__parts ||= begin
-                     NYAddressorNEW::Canonicalizer.apply(Parser.parts(normalized))
+                     Canonicalizer.apply(Parser.parts(normalized))
                    end
     end
 
