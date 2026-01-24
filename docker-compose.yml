@@ -1,0 +1,8 @@
+services:
+  ny-addressor:
+    build: .
+    container_name: ny-addressor
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/app:z
